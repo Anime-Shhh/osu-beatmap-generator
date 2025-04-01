@@ -1,1 +1,1 @@
-# osu-beatmap-generator
+# osu!-beatmap-generator
