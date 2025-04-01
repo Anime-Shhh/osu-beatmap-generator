@@ -1,6 +1,6 @@
 import os
 
-base_path = "stableOsuData/"
+base_path = "stableOsuData/Songs"
 extensions = [".mp3", ".wav", ".ogg"]
 
 
