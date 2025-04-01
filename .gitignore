@@ -1,0 +1,3 @@
+stableOsuData/*
+!stableOsuData/
+venv
