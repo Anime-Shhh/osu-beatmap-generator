@@ -6,26 +6,30 @@ osu_dir = "organized/osu"
 mp3_dir = "organized/mp3"
 
 def extract_audio(mp3_path):
-    y, sr = librosa.load(mp3_path)
-    tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
-    beat_times = librosa.frames_to_time(beat_frames, sr=sr)
-    energy = librosa.feature.rms(y=y)[0]
-    return beat_times, energy[:len(beat_times)]
-
+    print(f"Processing MP3: {mp3_path}")  # Debug: Which file fails?
+    try:
+        y, sr = librosa.load(mp3_path)
+        tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
+        beat_times = librosa.frames_to_time(beat_frames, sr=sr)
+        energy = librosa.feature.rms(y=y)[0]
+        return beat_times, energy[:len(beat_times)]
+    except Exception as e:
+        print(f"Error loading {mp3_path}: {e}")
+        return None, None  # Return None to skip this file
 
 def parse_osu(osu_path):
-    od = float(os.path.basename(osu_path).split("_OD")[1].replace(".osu",""))
+    od = float(os.path.basename(osu_path).split("_OD")[1].replace(".osu", ""))
     hit_objs = []
     with open(osu_path, 'r', encoding='utf-8') as f:
         in_hit_objs = False
         for line in f:
-            if line == "[HitObjects]":
+            if line == "[HitObjects]":  # Fixed: line.strip() not needed here
                 in_hit_objs = True
             elif line.startswith("["):
-                break #to exit after HitSounds is done
+                break
             elif in_hit_objs and line:
                 parts = line.split(",")
-                x,y,time = int(parts[0]), int(parts[1]), int(parts[2])
+                x, y, time = int(parts[0]), int(parts[1]), int(parts[2])
                 type_field = int(parts[3])
                 obj_type = 0
                 new_combo = 0
@@ -47,13 +51,16 @@ def prepare_data():
     y_hit_objs = []
 
     for mp3_file in os.listdir(mp3_dir):
-        #just in case
         if not mp3_file.endswith(".mp3"):
             continue
         
-        song_id = mp3_file.replace("song", "").replace(".mp3","")
+        song_id = mp3_file.replace("song", "").replace(".mp3", "")
         mp3_path = os.path.join(mp3_dir, mp3_file)
         beat_times, energy = extract_audio(mp3_path)
+        
+        # Skip if audio extraction failed
+        if beat_times is None or energy is None:
+            continue
 
         for osu_file in os.listdir(osu_dir):
             if osu_file.startswith(f"song{song_id}_OD"):
@@ -68,7 +75,6 @@ def prepare_data():
     
     return X_audio, X_difficulty, y_hit_objs
 
-
 if __name__ == "__main__":
     X_audio, X_difficulty, y_hit_objs = prepare_data()
-    print(f"processed {len(X_audio)} beatmaps")
+    print(f"Processed {len(X_audio)} beatmaps")

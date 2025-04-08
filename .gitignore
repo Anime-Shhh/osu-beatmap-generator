@@ -2,3 +2,4 @@ stableOsuData/*
 !stableOsuData/
 venv
 organized/*
+__pycache__/
