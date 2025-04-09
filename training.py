@@ -6,39 +6,35 @@ from preprocess import prepare_data
 # Load preprocessed data
 X_audio, X_difficulty, y_hit_objects = prepare_data()
 
-# Debug: Check shapes
-print("X_audio length:", len(X_audio))
-for i, x in enumerate(X_audio[:5]):  # Print first 5 for inspection
+# Filter out empty arrays and debug
+X_audio = [x for x in X_audio if len(x) > 0]
+X_difficulty = [x for x in X_difficulty if len(x) > 0]
+y_hit_objects = [y for y in y_hit_objects if len(y) > 0]
+
+print("X_audio length after filter:", len(X_audio))
+for i, x in enumerate(X_audio[:5]):
     print(f"X_audio[{i}] shape: {np.array(x).shape}")
 print("X_difficulty length:", len(X_difficulty))
 print("y_hit_objects length:", len(y_hit_objects))
 
-# Pad sequences to the same length
-max_len = max(len(x) for x in X_audio if len(x) > 0)  # Avoid empty arrays
-X_audio_padded = tf.keras.preprocessing.sequence.pad_sequences(
-    [x for x in X_audio if len(x) > 0], maxlen=max_len, padding='post', dtype='float32'
-)
-X_difficulty_padded = tf.keras.preprocessing.sequence.pad_sequences(
-    [x for x in X_difficulty if len(x) > 0], maxlen=max_len, padding='post', dtype='float32'
-)
-y_padded = tf.keras.preprocessing.sequence.pad_sequences(
-    [y for y in y_hit_objects if len(y) > 0], maxlen=max_len, padding='post', dtype='float32'
-)
+if not X_audio:
+    raise ValueError("No valid data to train on after filtering empty arrays")
 
-# Ensure X_audio_padded is 3D (samples, timesteps, features)
-if len(X_audio_padded.shape) == 2:  # If 2D, reshape
-    X_audio_padded = X_audio_padded[..., np.newaxis]  # Add feature dimension
-    X_audio_padded = np.repeat(X_audio_padded, 2, axis=-1)  # Hack: Repeat to match 2 features (temp fix)
+# Pad sequences to the same length
+max_len = max(len(x) for x in X_audio)
+X_audio_padded = tf.keras.preprocessing.sequence.pad_sequences(X_audio, maxlen=max_len, padding='post', dtype='float32')
+X_difficulty_padded = tf.keras.preprocessing.sequence.pad_sequences(X_difficulty, maxlen=max_len, padding='post', dtype='float32')
+y_padded = tf.keras.preprocessing.sequence.pad_sequences(y_hit_objects, maxlen=max_len, padding='post', dtype='float32')
 
 # Combine audio and difficulty into one input
-X = np.concatenate([X_audio_padded, X_difficulty_padded[..., np.newaxis]], axis=-1)  # Shape: (samples, timesteps, 3)
+X = np.concatenate([X_audio_padded, X_difficulty_padded[..., np.newaxis]], axis=-1)
 print("X shape:", X.shape)
 
 # Build the LSTM model
 model = tf.keras.Sequential([
-    layers.LSTM(128, input_shape=(None, 3), return_sequences=True),  # 3 features: beat_time, energy, OD
+    layers.LSTM(128, input_shape=(None, 3), return_sequences=True),
     layers.LSTM(64, return_sequences=True),
-    layers.Dense(6)  # Output: time, x, y, type, new_combo, hitsound
+    layers.Dense(6)
 ])
 model.compile(optimizer='adam', loss='mse')
 model.summary()

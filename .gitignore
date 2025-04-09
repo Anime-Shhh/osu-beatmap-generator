@@ -3,3 +3,4 @@ stableOsuData/*
 venv
 organized/*
 __pycache__/
+osu_generator.h5
