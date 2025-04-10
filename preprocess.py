@@ -13,6 +13,9 @@ def extract_audio(mp3_path):
         beat_times = librosa.frames_to_time(beat_frames, sr=sr)
         energy = librosa.feature.rms(y=y)[0]
         print(f"Beat times length: {len(beat_times)}, Energy length: {len(energy)}")
+        if len(beat_times) == 0:
+            print(f"Skipping {mp3_path}: No beats detected")
+            return None, None
         return beat_times, energy[:len(beat_times)]
     except Exception as e:
         print(f"Error loading {mp3_path}: {e}")
@@ -27,7 +30,7 @@ def parse_osu(osu_path):
             line = line.strip()
             if line == "[HitObjects]":
                 in_hit_objs = True
-            elif line.startswith("[") and in_hit_objs:
+            elif in_hit_objs and line.startswith("["):
                 break
             elif in_hit_objs and line:
                 parts = line.split(",")
@@ -35,23 +38,20 @@ def parse_osu(osu_path):
                 type_field = int(parts[3])
                 obj_type = 0
                 new_combo = 0
-                if type_field & 1:  # Circle
-                    obj_type = 1
-                elif type_field & 2:  # Slider
-                    obj_type = 2
-                elif type_field & 8:  # Spinner
-                    obj_type = 3
-                if type_field & 4:  # New combo
-                    new_combo = 1
+                if type_field & 1: obj_type = 1
+                elif type_field & 2: obj_type = 2
+                elif type_field & 8: obj_type = 3
+                if type_field & 4: new_combo = 1
                 hitsound = int(parts[4]) if len(parts) > 4 else 0
                 hit_objs.append((time, x, y, obj_type, new_combo, hitsound))
-    print(f"Parsed {osu_path}: {len(hit_objs)} hit objects")  # Debug
+    print(f"Parsed {osu_path}: {len(hit_objs)} hit objects")
     return hit_objs, od
 
 def prepare_data():
     X_audio = []
     X_difficulty = []
     y_hit_objs = []
+    max_time = 120000  # Adjust based on your longest map
 
     for mp3_file in os.listdir(mp3_dir):
         if not mp3_file.endswith(".mp3"):
@@ -64,18 +64,25 @@ def prepare_data():
         if beat_times is None or energy is None:
             continue
 
-        X = np.column_stack((beat_times, energy))
-        print(f"X shape for {mp3_file}: {X.shape}")  # Debug: Check X
+        max_beat = max(beat_times)
+        X = np.column_stack((
+            beat_times / max_beat,  # Normalize to [0,1]
+            energy / np.max(energy)  # Ensure [0,1]
+        ))
 
         for osu_file in os.listdir(osu_dir):
             if osu_file.startswith(f"song{song_id}_OD"):
                 osu_path = os.path.join(osu_dir, osu_file)
                 hit_objs, od = parse_osu(osu_path)
                 y = np.array(hit_objs, dtype=np.float32)
+                y[:, 0] /= max_time  # Normalize time
+                y[:, 1] /= 512       # Normalize x
+                y[:, 2] /= 384       # Normalize y
+                y[:, 5] /= 255       # Normalize hitsound
+                
                 min_len = min(len(X), len(y))
-                print(f"Appending for {osu_file}: X shape={X[:min_len].shape}, y shape={y[:min_len].shape}")
                 X_audio.append(X[:min_len])
-                X_difficulty.append(np.full(min_len, od))
+                X_difficulty.append(np.full(min_len, od / 10))  # Normalize OD
                 y_hit_objs.append(y[:min_len])
     
     return X_audio, X_difficulty, y_hit_objs

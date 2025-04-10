@@ -3,5 +3,5 @@ stableOsuData/*
 venv
 organized/*
 __pycache__/
-osu_generator.h5
+*.h5
 test_songs/*

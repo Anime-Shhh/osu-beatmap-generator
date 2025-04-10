@@ -5,7 +5,7 @@ import librosa
 import shutil
 import zipfile
 
-model_path = "osu_generator.h5"
+model_path = "osu_generator_normalized.h5"
 test_song_path = "test_songs/apothecary.mp3"
 temp_dir = "temp_dir"
 output_dir = "output"
@@ -19,12 +19,13 @@ def extract_audio_features(test_song_path):
     return beat_times, energy[:len(beat_times)]
 
 def prepare_input(beat_times, energy, od, max_len=1007):
-    X = np.column_stack((beat_times, energy))
+    max_beat = max(beat_times)
+    X = np.column_stack((beat_times / max_beat, energy / np.max(energy)))
     X_padded = tf.keras.preprocessing.sequence.pad_sequences(
         [X], maxlen=max_len, padding='post', dtype='float32'
     )
     od_padded = tf.keras.preprocessing.sequence.pad_sequences(
-        [np.full(len(X), od)], maxlen=max_len, padding='post', dtype='float32'
+        [np.full(len(X), od / 10)], maxlen=max_len, padding='post', dtype='float32'
     )
     return np.concatenate([X_padded, od_padded[..., np.newaxis]], axis=-1)
 
@@ -40,10 +41,11 @@ def generate_hit_objects(model, mp3_path, od=4.0):
     print(f"Raw predictions (first 5): {predictions[:5]}")
     
     hit_objects = []
+    max_time = 120000  # Match training max_time
     for i, pred in enumerate(predictions):
         time, x, y, obj_type, new_combo, hitsound = pred
-        time = int(max(0, time) * 1000)  # Seconds to ms
-        x = int(np.clip(x * 512, 0, 512))  # Scale to grid
+        time = int(max(0, time) * max_time)  # Denormalize
+        x = int(np.clip(x * 512, 0, 512))
         y = int(np.clip(y * 384, 0, 384))
         obj_type = int(np.round(np.clip(obj_type, 1, 3)))
         new_combo = int(np.round(np.clip(new_combo, 0, 1)))
