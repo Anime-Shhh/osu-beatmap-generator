@@ -1,124 +1,123 @@
-import os
 import librosa
 import numpy as np
+import os
+import torch
+from torch.utils.data import Dataset, DataLoader
+import re
 
-osu_dir = "organized/osu"
-mp3_dir = "organized/mp3"
-
-def extract_audio(mp3_path):
-    print(f"Processing MP3: {mp3_path}")
+def mp3_to_spectrogram(mp3_path, sr=22050, n_mels=128, hop_length=512, max_frames=10000):
     try:
-        y, sr = librosa.load(mp3_path, mono=True)
-        tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
-        beat_times = librosa.frames_to_time(beat_frames, sr=sr)
-        if len(beat_times) < 10:
-            print(f"Skipping {mp3_path}: Too few beats ({len(beat_times)})")
-            return None, None, None
-        energy = librosa.feature.rms(y=y)[0]
-        beat_frames = np.minimum(beat_frames, len(energy) - 1)
-        energy = energy[beat_frames]
-        print(f"Beat times length: {len(beat_times)}, Energy length: {len(energy)}")
-        print(f"Sample beat_times: {beat_times[:5]}, Sample energy: {energy[:5]}")
-        if np.any(np.isnan(energy)) or np.any(np.isinf(energy)):
-            print(f"Invalid energy values in {mp3_path}")
-            return None, None, None
-        return beat_times, energy, tempo
+        y, sr = librosa.load(mp3_path, sr=sr)
+        mel_spec = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=n_mels, hop_length=hop_length)
+        mel_spec_db = librosa.power_to_db(mel_spec, ref=np.max)
+        if mel_spec_db.shape[1] > max_frames:
+            mel_spec_db = mel_spec_db[:, :max_frames]
+        else:
+            mel_spec_db = np.pad(mel_spec_db, ((0, 0), (0, max_frames - mel_spec_db.shape[1])), mode='constant')
+        return mel_spec_db
     except Exception as e:
-        print(f"Error loading {mp3_path}: {e}")
-        return None, None, None
+        print(f"Error processing {mp3_path}: {e}")
+        return None
 
-def parse_osu(osu_path):
-    od = float(os.path.basename(osu_path).split("_OD")[1].replace(".osu", ""))
-    hit_objs = []
-    with open(osu_path, 'r', encoding='utf-8') as f:
-        in_hit_objs = False
-        for line in f:
-            line = line.strip()
-            if line == "[HitObjects]":
-                in_hit_objs = True
-            elif in_hit_objs and line.startswith("["):
-                break
-            elif in_hit_objs and line:
-                parts = line.split(",")
-                x, y, time = int(parts[0]), int(parts[1]), int(parts[2])
-                type_field = int(parts[3])
-                obj_type = 1  # Default to circle
-                new_combo = 0
-                if type_field & 1:
-                    obj_type = 1  # Circle
-                elif type_field & 2:
-                    obj_type = 2  # Slider
-                elif type_field & 8:
-                    obj_type = 3  # Spinner
-                if type_field & 4:
-                    new_combo = 1
-                hitsound = int(parts[4]) if len(parts) > 4 else 0
-                hit_objs.append((time, x, y, obj_type, new_combo, hitsound))
-        print(f"Parsed {osu_path}: {len(hit_objs)} hit objects, Types: {np.unique([o[3] for o in hit_objs])}")
-    return hit_objs, od
+def parse_osu_file(osu_path, grid_size=(16, 12)):
+    hit_objects = []
+    try:
+        with open(osu_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            hit_object_section = False
+            for line in lines:
+                if line.strip() == '[HitObjects]':
+                    hit_object_section = True
+                    continue
+                if hit_object_section and line.strip():
+                    parts = line.strip().split(',')
+                    if len(parts) < 4:
+                        continue
+                    x, y, time = int(parts[0]), int(parts[1]), int(parts[2])
+                    hit_type = int(parts[3])
+                    grid_x = min(int(x / 512 * grid_size[0]), grid_size[0] - 1)
+                    grid_y = min(int(y / 384 * grid_size[1]), grid_size[1] - 1)
+                    type_id = 0 if hit_type & 1 else 1 if hit_type & 2 else 2
+                    hit_objects.append({'time': time, 'type': type_id, 'grid_x': grid_x, 'grid_y': grid_y})
+    except Exception as e:
+        print(f"Error parsing {osu RIFF (WAVE) fmt 
+            return hit_objects
 
-def prepare_data():
-    X_audio = []
-    X_difficulty = []
-    y_hit_objs = []
-    y_obj_types = []
-    max_time = 120000
+def preprocess_audio(input_dir, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    for mp3_file in os.listdir(input_dir):
+        if mp3_file.endswith('.mp3'):
+            mp3_path = os.path.join(input_dir, mp3_file)
+            mel_spec = mp3_to_spectrogram(mp3_path)
+            if mel_spec is not None:
+                output_path = os.path.join(output_dir, mp3_file.replace('.mp3', '.npy'))
+                np.save(output_path, mel_spec)
+                print(f"Processed {mp3_file}")
 
-    for mp3_file in os.listdir(mp3_dir):
-        if not mp3_file.endswith(".mp3"):
-            continue
-        
-        song_id = mp3_file.replace("song", "").replace(".mp3", "")
-        mp3_path = os.path.join(mp3_dir, mp3_file)
-        beat_times, energy, tempo = extract_audio(mp3_path)
-        
-        if beat_times is None:
-            continue
-
-        max_beat = max(beat_times) if max(beat_times) > 0 else 1.0
-        max_energy = np.max(energy) if np.max(energy) > 0 else 1.0
-        X = np.column_stack((
-            beat_times / max_beat,
-            energy / max_energy,
-            np.full(len(beat_times), tempo / 240)
-        ))
-        if np.any(np.isnan(X)) or np.any(np.isinf(X)):
-            print(f"Skipping {mp3_file}: Invalid X values")
-            continue
-
-        print(f"X shape for {mp3_file}: {X.shape}, Sample X: {X[:5]}")
-
-        for osu_file in os.listdir(osu_dir):
-            if osu_file.startswith(f"song{song_id}_OD"):
+def preprocess_beatmaps(mp3_dir, osu_dir, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    mp3_files = {f.replace('.mp3', '') for f in os.listdir(mp3_dir) if f.endswith('.mp3')}
+    for osu_file in os.listdir(osu_dir):
+        if osu_file.endswith('.osu'):
+            # Extract base song name (e.g., 'song1' from 'song1_OD5.0.osu')
+            match = re.match(r'^(.*?)(?:_OD\d+\.\d+)?\.osu$', osu_file)
+            if not match:
+                continue
+            song_name = match.group(1)
+            if song_name in mp3_files:
                 osu_path = os.path.join(osu_dir, osu_file)
-                hit_objs, od = parse_osu(osu_path)
-                y = np.array(hit_objs, dtype=np.float32)
-                y[:, 0] /= max_time
-                y[:, 1] /= 512
-                y[:, 2] /= 384
-                y[:, 5] /= 255
-                obj_types = y[:, 3].astype(int) - 1
-                
-                if np.any(obj_types < 0) or np.any(obj_types > 2):
-                    print(f"Skipping {osu_file}: Invalid obj_types {np.unique(obj_types)}")
-                    continue
-                
-                if np.any(np.isnan(y)) or np.any(np.isinf(y)):
-                    print(f"Skipping {osu_file}: Invalid y values")
-                    continue
+                hit_objects = parse_osu_file(osu_path)
+                if hit_objects:
+                    output_path = os.path.join(output_dir, osu_file.replace('.osu', '.npy'))
+                    np.save(output_path, hit_objects)
+                    print(f"Processed {osu_file}")
 
-                min_len = min(len(X), len(y))
-                if min_len < 10:
-                    print(f"Skipping {osu_file}: Too few aligned objects ({min_len})")
-                    continue
+class OsuDataset(Dataset):
+    def __init__(self, spec_dir, beatmap_dir, max_frames=10000):
+        self.spec_files = [f for f in os.listdir(spec_dir) if f.endswith('.npy')]
+        self.beatmap_files = [f for f in os.listdir(beatmap_dir) if f.endswith('.npy')]
+        self.spec_dir = spec_dir
+        self.beatmap_dir = beatmap_dir
+        self.max_frames = max_frames
 
-                X_audio.append(X[:min_len])
-                X_difficulty.append(np.full(min_len, od / 10))
-                y_hit_objs.append(y[:min_len, [0, 1, 2, 4, 5]])
-                y_obj_types.append(obj_types[:min_len])
-    
-    return X_audio, X_difficulty, y_hit_objs, y_obj_types
+    def __len__(self):
+        return len(self.beatmap_files)
+
+    def __getitem__(self, idx):
+        beatmap_file = self.beatmap_files[idx]
+        # Find corresponding spectrogram (e.g., 'song1_OD5.0.npy' -> 'song1.npy')
+        song_name = re.match(r'^(.*?)(?:_OD\d+\.\d+)?\.npy$', beatmap_file).group(1)
+        spec_file = f"{song_name}.npy"
+        
+        spec_path = os.path.join(self.spec_dir, spec_file)
+        beatmap_path = os.path.join(self.beatmap_dir, beatmap_file)
+        
+        # Load spectrogram
+        spec = np.load(spec_path)
+        
+        # Load and tokenize hit objects
+        hit_objects = np.load(beatmap_path, allow_pickle=True)
+        tokens = []
+        for obj in hit_objects:
+            time_bin = min(int(obj['time'] / 1000 * 22050 / 512), self.max_frames - 1)
+            tokens.append([time_bin, obj['type'], obj['grid_x'], obj['grid_y']])
+        
+        max_tokens = 300
+        if len(tokens) > max_tokens:
+            tokens = tokens[:max_tokens]
+        else:
+            tokens = tokens + [[0, 0, 0, 0]] * (max_tokens - len(tokens))
+        
+        return torch.tensor(spec, dtype=torch.float32), torch.tensor(tokens, dtype=torch.long)
 
 if __name__ == "__main__":
-    X_audio, X_difficulty, y_hit_objs, y_obj_types = prepare_data()
-    print(f"Processed {len(X_audio)} beatmaps")
+    # Preprocess audio
+    preprocess_audio('data/organized/mp3', 'data/spectrograms')
+    # Preprocess beatmaps
+    preprocess_beatmaps('data/organized/mp3', 'data/organized/osu', 'data/parsed_beatmaps')
+    # Test dataset
+    dataset = OsuDataset('data/spectrograms', 'data/parsed_beatmaps')
+    dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+    for specs, tokens in dataloader:
+        print(f"Sample batch: specs shape {specs.shape}, tokens shape {tokens.shape}")
+        break
