@@ -2,12 +2,19 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from preprocess import OsuDataset
+from model import TransformerDecoder
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Initialize model, dataset, and dataloader
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = TransformerDecoder().to(device)
 dataset = OsuDataset('data/spectrograms', 'data/parsed_beatmaps')
-dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+dataloader = DataLoader(dataset, batch_size=4, shuffle=True, collate_fn=lambda x: [item for item in x if item is not None])
 
 # Loss and optimizer
 criterion = nn.CrossEntropyLoss(ignore_index=0)  # Ignore padding
@@ -18,7 +25,11 @@ num_epochs = 10
 for epoch in range(num_epochs):
     model.train()
     total_loss = 0
+    batch_count = 0
     for specs, tokens in dataloader:
+        if specs is None or tokens is None:
+            logger.warning("Skipping invalid batch")
+            continue
         specs, tokens = specs.to(device), tokens.to(device)
         
         optimizer.zero_grad()
@@ -35,5 +46,12 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         total_loss += loss.item()
+        batch_count += 1
     
-    print(f'Epoch {epoch+1}, Loss: {total_loss / len(dataloader)}')
+    if batch_count > 0:
+        print(f'Epoch {epoch+1}, Loss: {total_loss / batch_count}')
+    else:
+        print(f'Epoch {epoch+1}, No valid batches processed')
+
+# Save the model
+torch.save(model.state_dict(), 'output/model.pth')

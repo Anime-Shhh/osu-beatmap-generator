@@ -84,5 +84,6 @@ class PositionalEncoding(nn.Module):
         return x
 
 # Example usage
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = TransformerDecoder().to(device)
+if __name__ == "__main__":
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = TransformerDecoder().to(device)

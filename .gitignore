@@ -1,7 +1,7 @@
 stableOsuData/*
 !stableOsuData/
 venv
-organized/*
+data/*
 __pycache__/
 *.h5
 test_songs/*
