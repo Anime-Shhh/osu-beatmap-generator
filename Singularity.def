@@ -1,0 +1,29 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+
+%post
+    apt-get update && apt-get install -y --no-install-recommends \
+        git ffmpeg libsndfile1 libsox-dev sox
+    pip install --no-cache-dir \
+        torchaudio==2.1.0 \
+        transformers==4.36.0 \
+        datasets==2.16.0 \
+        librosa==0.10.1 \
+        wandb==0.16.0 \
+        tensorboard==2.15.0 \
+        soundfile==0.12.1 \
+        numpy==1.26.4 \
+        webdataset==0.2.86 \
+        tokenizers==0.15.0 \
+        nltk==3.8.1 \
+        shapely==2.0.2 \
+        madmom==0.16.1
+    pip cache purge
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+%environment
+    export LC_ALL=C
+    export PYTHONNOUSERSITE=1
+
+%runscript
+    python "$@"

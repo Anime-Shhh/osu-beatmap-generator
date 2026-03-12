@@ -1,0 +1,14 @@
+sbatch configs/bash_script.sh #submits slurm job
+squeue -u asj102 #shows my submitted job statuses
+scontrol show job jobid #shows details about job
+scancel 121340 #cancels a job
+
+#checking logs
+ #errors
+cat /common/users/asj102/osu_project/logs/slurm_121416.err
+ #logs
+cat /common/users/asj102/osu_project/logs/slurm_121416.out
+
+
+sacct -u asj102 -S 2026-01-01 #gets all jobs done past 2026-1-1
+sacct -u netid #gets all your jobs
