@@ -184,7 +184,7 @@ def generate_beatmap(args) -> str:
 
     while start + WINDOW_SAMPLES <= num_samples:
         chunk = waveform[:, start : start + WINDOW_SAMPLES].to(device)
-        mel = mel_transform(chunk)  # [1, N_MELS, T]
+        mel = torch.log(mel_transform(chunk) + 1e-7)  # [1, N_MELS, T]
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
@@ -209,7 +209,7 @@ def generate_beatmap(args) -> str:
         remaining = waveform[:, start:].to(device)
         pad_len = WINDOW_SAMPLES - remaining.shape[-1]
         remaining = torch.nn.functional.pad(remaining, (0, pad_len))
-        mel = mel_transform(remaining)
+        mel = torch.log(mel_transform(remaining) + 1e-7)
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms

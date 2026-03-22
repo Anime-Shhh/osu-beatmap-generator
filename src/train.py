@@ -209,7 +209,7 @@ def train_one_epoch(
     tf_ratio = get_teacher_forcing_ratio(epoch, args)
 
     ce_loss_fn = nn.CrossEntropyLoss(ignore_index=PAD)
-    mse_loss_fn = nn.MSELoss()
+    smooth_l1_loss_fn = nn.SmoothL1Loss()
 
     end = time.time()
     first_batch_time = None
@@ -231,7 +231,7 @@ def train_one_epoch(
         padding_mask = tgt_input == PAD
 
         compute_start = time.time()
-        with autocast(dtype=torch.float16):
+        with autocast(dtype=torch.bfloat16):
             outputs = model(mel, tgt_input, padding_mask)
 
             logits = outputs["logits"]
@@ -242,20 +242,20 @@ def train_one_epoch(
 
             # Residual losses (only on non-pad positions)
             mask = (tgt_output != PAD).unsqueeze(-1).float()
-            time_res_loss = mse_loss_fn(
+            time_res_loss = smooth_l1_loss_fn(
                 outputs["time_residuals"][:, :tgt_output.shape[1]] * mask,
                 time_res_gt[:, 1:tgt_output.shape[1] + 1].unsqueeze(-1) * mask,
             )
-            x_res_loss = mse_loss_fn(
+            x_res_loss = smooth_l1_loss_fn(
                 outputs["x_residuals"][:, :tgt_output.shape[1]] * mask,
                 x_res_gt[:, 1:tgt_output.shape[1] + 1].unsqueeze(-1) * mask,
             )
-            y_res_loss = mse_loss_fn(
+            y_res_loss = smooth_l1_loss_fn(
                 outputs["y_residuals"][:, :tgt_output.shape[1]] * mask,
                 y_res_gt[:, 1:tgt_output.shape[1] + 1].unsqueeze(-1) * mask,
             )
             residual_loss = (time_res_loss + x_res_loss + y_res_loss) / 3.0
-            rhythm_loss = mse_loss_fn(
+            rhythm_loss = smooth_l1_loss_fn(
                 outputs["rhythm_pred"],
                 torch.zeros_like(outputs["rhythm_pred"]),
             )
@@ -399,7 +399,6 @@ def validate(
     num_metrics = 0
 
     ce_loss_fn = nn.CrossEntropyLoss(ignore_index=PAD)
-    mse_loss_fn = nn.MSELoss()
 
     for step, batch in enumerate(dataloader):
         if step >= max_batches:
@@ -415,7 +414,7 @@ def validate(
         tgt_output = tokens[:, 1:]
         padding_mask = tgt_input == PAD
 
-        with autocast(dtype=torch.float16):
+        with autocast(dtype=torch.bfloat16):
             outputs = model(mel, tgt_input, padding_mask)
             logits = outputs["logits"]
             discrete_loss = ce_loss_fn(

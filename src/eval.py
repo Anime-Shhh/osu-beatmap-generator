@@ -79,7 +79,7 @@ def run_eval(model, dataloader, device: torch.device, max_batches: int = 0):
         tgt_output = tokens[:, 1:]
         padding_mask = tgt_input == PAD
 
-        with autocast(dtype=torch.float16):
+        with autocast(dtype=torch.bfloat16):
             outputs = model(mel, tgt_input, padding_mask)
             logits = outputs["logits"]
             loss = ce_loss_fn(

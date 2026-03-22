@@ -177,11 +177,11 @@ def collate_fn(batch: list[dict]) -> dict:
         all_y_res.append([r.y_offset_px for r in residuals] + [0.0] * pad_len)
 
     return {
-        "mel": torch.stack(mels, dim=0),
+        "mel": torch.log(torch.stack(mels, dim=0) + 1e-7),
         "tokens": torch.tensor(all_tokens, dtype=torch.long),
-        "time_residuals": torch.tensor(all_time_res, dtype=torch.float32),
-        "x_residuals": torch.tensor(all_x_res, dtype=torch.float32),
-        "y_residuals": torch.tensor(all_y_res, dtype=torch.float32),
+        "time_residuals": torch.tensor(all_time_res, dtype=torch.float32).clamp(-5.0, 5.0),
+        "x_residuals": torch.tensor(all_x_res, dtype=torch.float32).clamp(-8.0, 8.0),
+        "y_residuals": torch.tensor(all_y_res, dtype=torch.float32).clamp(-6.0, 6.0),
     }
 
 
