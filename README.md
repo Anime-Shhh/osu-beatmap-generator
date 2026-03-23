@@ -21,14 +21,16 @@ The model uses an **encoder–decoder Transformer architecture** with a pretrain
 
 An osu! beatmap defines *when* and *where* a player must click, drag, or spin during a song. Human mappers spend hours manually placing hit objects to match the song's rhythm, melody, and intensity. This project frames beatmap generation as a **sequence-to-sequence problem**:
 
-- **Input:** Mel spectrogram of a ~6-second audio window
+- **Input:** Mel spectrogram of a ~6-second audio window **plus** user-provided conditioning: difficulty (star-rating bin) and BPM
 - **Output:** A variable-length sequence of tokens encoding hit objects with precise timing and spatial placement
+
+Difficulty and BPM are **explicit conditioning inputs**, not prediction targets — they globally control map density, spacing, and structure, and are provided by the user at inference time.
 
 The key challenges are:
 
 1. **Temporal alignment** — hit objects must land on musically meaningful beats
 2. **Spatial coherence** — object placement should form readable patterns
-3. **Difficulty conditioning** — the same song can have Easy, Normal, Hard, Insane, Expert, or Expert+ maps
+3. **Conditioning** — difficulty (5 bins: Easy–Expert) and BPM are given as inputs; the model learns to generate maps that match the requested difficulty
 4. **Multi-object types** — circles, sliders (with parametric Bezier curves), and spinners each have different encodings
 
 ## Dataset
@@ -41,11 +43,15 @@ Raw data is streamed from HuggingFace and preprocessed into WebDataset `.tar` sh
 
 1. **Audio loading:** MP3 bytes are decoded via torchaudio, resampled to 22,050 Hz, and converted to mono
 2. **Mel spectrogram extraction:** 128-bin mel spectrograms with 2048-point FFT and ~20 ms hop length
-3. **Sliding window chunking:** Each song is split into overlapping 6-second windows with a 3-second stride, predicting the middle 3 seconds of each window
-4. **Tokenization:** Each window's hit objects are converted to a discrete token sequence with continuous residuals (see [Tokenization](#tokenization-scheme))
-5. **Shard writing:** Processed (mel, tokens) pairs are written as WebDataset `.tar` files
+3. **BPM extraction:** BPM is parsed from the `.osu` file's `[TimingPoints]` section (60000 / ms_per_beat for the first uninherited timing point)
+4. **Difficulty binning:** Star rating is mapped to a 5-bin scheme (Easy, Normal, Hard, Insane, Expert) for conditioning
+5. **Sliding window chunking:** Each song is split into overlapping 6-second windows with a 3-second stride, predicting the middle 3 seconds of each window
+6. **Tokenization:** Each window's hit objects are converted to a discrete token sequence with continuous residuals (see [Tokenization](#tokenization-scheme))
+7. **Shard writing:** Processed (mel, tokens, difficulty_id, bpm) tuples are written as WebDataset `.tar` files
 
 **Scale:** 500 shards × 200 examples/shard = **100,000 training examples** (~15 GB total)
+
+**Note:** The shard format includes `difficulty_id` and `bpm` per window. Re-preprocessing is required if upgrading from older versions.
 
 ### Data Splits
 
@@ -55,7 +61,7 @@ Shards are deterministically split 80/10/10 into train/val/test sets (400/50/50 
 
 The tokenizer (`src/tokenizer.py`) converts continuous beatmap data into a discrete vocabulary that a Transformer can model, while preserving sub-bin precision through continuous residual outputs.
 
-### Vocabulary (1,244 tokens)
+### Vocabulary (1,238 tokens)
 
 | Range | Count | Purpose |
 |-------|-------|---------|
@@ -64,7 +70,8 @@ The tokenizer (`src/tokenizer.py`) converts continuous beatmap data into a discr
 | 10–13 | 4 | Curve types: `BEZIER`, `LINEAR`, `PERFECT`, `CATMULL` |
 | 14–1037 | 1,024 | Position bins (32×32 grid over the 512×384 playfield) |
 | 1038–1237 | 200 | Time delta bins (0–1990 ms in 10 ms steps) |
-| 1238–1243 | 6 | Difficulty tags: Easy through Expert+ |
+
+Difficulty is **not** a token — it is a separate conditioning input (integer 0–4 for Easy through Expert).
 
 ### Two-Stage Precision
 
@@ -77,38 +84,57 @@ At inference, the final coordinate is: `bin_center + predicted_residual`.
 
 ### Token Sequence Format
 
-Each hit object is encoded as a subsequence within the full sequence:
+Each hit object is encoded as a subsequence within the full sequence. Difficulty and BPM are provided as conditioning inputs, not tokens:
 
 ```
-[BOS] [DIFFICULTY_TAG] [time₁] [CIRCLE] [pos₁] [time₂] [SLIDER_START] [pos₂] [CURVE_TYPE] [SLIDER_CONTROL] [cp_pos] ... [SLIDER_END] [end_pos] ... [EOS]
+[BOS] [time₁] [CIRCLE] [pos₁] [time₂] [SLIDER_START] [pos₂] [CURVE_TYPE] [SLIDER_CONTROL] [cp_pos] ... [SLIDER_END] [end_pos] ... [EOS]
 ```
 
 - **Circles:** `<time_bin> <CIRCLE> <pos_bin>` (3 tokens)
 - **Sliders:** `<time_bin> <SLIDER_START> <pos_bin> <curve_type> [<SLIDER_CONTROL> <cp_pos>]* <SLIDER_END> <end_pos>` (variable length)
 - **Spinners:** `<time_bin> <SPINNER_START> <pos_bin> <duration_bin> <SPINNER_END>` (5 tokens)
 
+### Difficulty Binning (5 bins)
+
+| Bin | Star Rating | Label |
+|-----|-------------|-------|
+| 0 | &lt; 2.0 | Easy |
+| 1 | &lt; 3.0 | Normal |
+| 2 | &lt; 4.0 | Hard |
+| 3 | &lt; 5.3 | Insane |
+| 4 | ≥ 5.3 | Expert |
+
 ## Model Architecture
 
-The model (`src/model.py`) is an encoder–decoder Transformer with **140.8M parameters** (68.8M trainable).
+The model (`src/model.py`) is an encoder–decoder Transformer with conditioning.
+
+### Conditioning Encoder
+
+Difficulty and BPM are encoded into a single conditioning token prepended to the audio memory:
+
+1. **Difficulty embedding:** Learned embedding for 5 difficulty bins (Easy–Expert)
+2. **BPM projection:** Log-scaled BPM (log(bpm)/log(300)) passed through an MLP for perceptual tempo modeling
+3. **Combined token:** `[B, 1, D]` conditioning token is concatenated with encoder output so the decoder cross-attends to `[cond | audio]`
 
 ### Audio Encoder
 
-The encoder converts a mel spectrogram into a sequence of audio embeddings that the decoder cross-attends to.
+The encoder converts a mel spectrogram into a sequence of audio embeddings:
 
 1. **Backbone:** [Audio Spectrogram Transformer (AST)](https://huggingface.co/MIT/ast-finetuned-audioset-10-10-0.4593) — a Vision Transformer pretrained on AudioSet for audio classification. Most layers are frozen; only the last 2 Transformer layers are fine-tuned.
 2. **Position embedding resizing:** AST was pretrained on 10-second clips (1024 frames). Since our input is ~6 seconds (301 frames), the positional embeddings are bilinearly interpolated to match the actual mel length at runtime.
-3. **Temporal upsampling:** A 1D convolutional stack with 2× upsampling increases the temporal resolution of AST's output to provide finer-grained audio features for the decoder.
-4. **Rhythm head:** A small MLP predicts BPM and key from mean-pooled encoder embeddings as an auxiliary regularization signal.
+3. **Temporal upsampling:** A 1D convolutional stack with 2× upsampling increases the temporal resolution of AST's output.
+
+BPM is provided as a conditioning input, not predicted.
 
 ### Beatmap Decoder
 
-The decoder autoregressively generates the token sequence conditioned on the encoder output.
+The decoder autoregressively generates the token sequence conditioned on `[cond | encoder_out]`:
 
-1. **Token + positional embeddings:** Learned embeddings for the 1,244-token vocabulary and up to 2,048 sequence positions
+1. **Token + positional embeddings:** Learned embeddings for the 1,238-token vocabulary and up to 2,048 sequence positions
 2. **Transformer decoder:** 6 layers, 8 attention heads, 2048-dim feedforward, pre-norm architecture with causal masking
-3. **Cross-attention:** Each decoder layer attends to the full encoder output, allowing the model to ground its predictions in the audio
+3. **Cross-attention:** Each decoder layer attends to the conditioning token and full audio encoder output
 4. **Output heads (hybrid):**
-   - `discrete_head`: Linear projection to 1,244 logits for next-token prediction (trained with CrossEntropyLoss)
+   - `discrete_head`: Linear projection to 1,238 logits for next-token prediction (trained with CrossEntropyLoss)
    - `time_res_head`: Linear → scalar for time residual offset
    - `x_res_head`: Linear → scalar for x-position residual offset
    - `y_res_head`: Linear → scalar for y-position residual offset
@@ -127,7 +153,7 @@ Training (`src/train.py`) is designed for SLURM-based GPU clusters with several 
 |-----------|-------|
 | Optimizer | AdamW (lr=1e-4, weight_decay=1e-2) |
 | Scheduler | CosineAnnealingWarmRestarts (T₀=20, T_mult=2) |
-| Precision | Mixed precision (FP16 via GradScaler) |
+| Precision | Mixed precision (bfloat16 via GradScaler) |
 | Batch size | Auto-detected from GPU VRAM (16 for A4000/A5000, 32 for A100) |
 | Gradient accumulation | 1–4 steps depending on config |
 | Gradient clipping | Max norm 1.0 |
@@ -137,15 +163,14 @@ Training (`src/train.py`) is designed for SLURM-based GPU clusters with several 
 
 ### Loss Function
 
-The total loss is a weighted combination of three components:
+The total loss is a weighted combination of two components:
 
 ```
-L_total = 0.7 × L_discrete + 0.2 × L_residual + 0.1 × L_rhythm
+L_total = 0.8 × L_discrete + 0.2 × L_residual
 ```
 
-- **L_discrete** (weight 0.7): CrossEntropyLoss over 1,244 classes for next-token prediction. PAD tokens are masked via `ignore_index`.
-- **L_residual** (weight 0.2): MSELoss on the three residual heads (time, x, y), only computed on non-PAD positions.
-- **L_rhythm** (weight 0.1): MSELoss regularizer on the rhythm prediction head.
+- **L_discrete** (weight 0.8): CrossEntropyLoss over 1,238 classes for next-token prediction. PAD tokens are masked via `ignore_index`.
+- **L_residual** (weight 0.2): SmoothL1Loss on the three residual heads (time, x, y), only computed on non-PAD positions. Residual targets are clamped to documented ranges (±5 ms time, ±8 px x, ±6 px y).
 
 ### Curriculum Learning
 
@@ -192,7 +217,7 @@ Four metrics (`src/metrics.py`) measure generation quality:
 
 ## Inference
 
-The inference script (`src/inference.py`) generates a complete `.osu` file from an MP3:
+The inference script (`src/inference.py`) generates a complete `.osu` file from an MP3. **Difficulty and BPM are required conditioning inputs** that directly control the model's output:
 
 ```bash
 python -m src.inference \
@@ -200,18 +225,23 @@ python -m src.inference \
     --output generated.osu \
     --checkpoint models/best.pt \
     --difficulty 4.5 \
+    --bpm 174 \
     --temperature 0.9
 ```
+
+- **`--difficulty`**: Star rating (mapped to 5-bin scheme: Easy/Normal/Hard/Insane/Expert). Controls map density and structure.
+- **`--bpm`**: Song tempo in BPM. Use `0` to auto-estimate via librosa beat tracking (fallback: 120).
 
 ### Generation Process
 
 1. Load and resample audio to 22,050 Hz mono
-2. Estimate BPM using librosa beat tracking
-3. Slide a 6-second window across the song with 3-second stride
-4. For each window: encode mel → autoregressively sample tokens with temperature
-5. Detokenize tokens + residuals back to hit objects with absolute timestamps
-6. Deduplicate overlapping windows (remove objects within 5 ms of each other)
-7. Write the complete `.osu` file with metadata, timing points, and hit objects
+2. Get BPM: use `--bpm` if provided, else estimate via librosa
+3. Convert difficulty star rating to conditioning bin (0–4)
+4. Slide a 6-second window across the song with 3-second stride
+5. For each window: encode mel + conditioning (diff_id, bpm) → autoregressively sample tokens with temperature
+6. Detokenize tokens + residuals back to hit objects with absolute timestamps
+7. Deduplicate overlapping windows (remove objects within 5 ms of each other)
+8. Write the complete `.osu` file with metadata, timing points, and hit objects
 
 ## Project Structure
 
@@ -298,17 +328,23 @@ python -m src.eval \
 ```bash
 python -m src.inference \
     --input song.mp3 \
+    --output generated.osu \
     --checkpoint ./models/best.pt \
-    --difficulty 4.5
+    --difficulty 4.5 \
+    --bpm 174
 ```
 
 ## Current Status
 
-The model trains successfully through 12 epochs with decreasing loss (~5.8 → ~2.0), demonstrating that the architecture can learn the audio-to-beatmap mapping. Training encounters NaN loss around epoch 13, likely due to numerical instability in the mixed-precision training pipeline. This is an active area of debugging — the input data (mel spectrograms and tokens) remains finite at the point of failure, suggesting the issue originates within the model's forward pass or gradient computation under FP16.
+The model has been refactored to use **explicit conditioning** for difficulty and BPM. These are now user-provided inputs rather than prediction targets, improving controllability and training stability.
+
+**Breaking change:** Old checkpoints and preprocessed shards are incompatible. Re-run preprocessing (`sbatch configs/preprocess.sh`) before training.
 
 ### Key Technical Decisions
 
-- **AST over training from scratch:** Transfer learning from AudioSet provides strong audio feature extraction with minimal fine-tuning, reducing training time and data requirements significantly.
-- **Grid tokenization over direct regression:** Framing placement as classification over 1,024 bins (with residual refinement) gives the model a structured output space that is easier to learn than unconstrained coordinate regression.
-- **WebDataset over standard Dataset:** Streaming `.tar` shards enables efficient I/O when training data exceeds RAM, and pairs naturally with the SLURM cluster's architecture of copying shards to `/dev/shm`.
-- **Sliding window over full-song generation:** Processing 6-second windows keeps sequence lengths manageable (~100–500 tokens) and memory bounded, while the 3-second stride with deduplication produces seamless full-song maps.
+- **Explicit conditioning over prediction:** Difficulty and BPM are conditioning inputs, not tokens the decoder predicts. This gives the user direct control over map style and reduces model instability.
+- **AST over training from scratch:** Transfer learning from AudioSet provides strong audio feature extraction with minimal fine-tuning.
+- **Grid tokenization over direct regression:** Framing placement as classification over 1,024 bins (with residual refinement) gives the model a structured output space. Residual targets are clamped and SmoothL1Loss is used for numerical stability.
+- **bfloat16 over FP16:** Mixed precision uses bfloat16 to avoid overflow in cross-entropy loss. Log-mel spectrograms and clamped residuals further improve training stability.
+- **WebDataset over standard Dataset:** Streaming `.tar` shards enables efficient I/O when training data exceeds RAM.
+- **Sliding window over full-song generation:** Processing 6-second windows keeps sequence lengths manageable (~100–500 tokens) and memory bounded.

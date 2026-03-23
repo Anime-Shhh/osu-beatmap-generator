@@ -101,9 +101,8 @@ def parse_args():
     p.add_argument("--dropout", type=float, default=0.1)
 
     # Loss weights
-    p.add_argument("--w_discrete", type=float, default=0.7)
+    p.add_argument("--w_discrete", type=float, default=0.8)
     p.add_argument("--w_residual", type=float, default=0.2)
-    p.add_argument("--w_rhythm", type=float, default=0.1)
     return p.parse_args()
 
 
@@ -224,15 +223,16 @@ def train_one_epoch(
         time_res_gt = batch["time_residuals"].to(device)
         x_res_gt = batch["x_residuals"].to(device)
         y_res_gt = batch["y_residuals"].to(device)
+        difficulty_id = batch["difficulty_id"].to(device)
+        bpm = batch["bpm"].to(device)
 
-        # Shifted input/target for autoregressive
         tgt_input = tokens[:, :-1]
         tgt_output = tokens[:, 1:]
         padding_mask = tgt_input == PAD
 
         compute_start = time.time()
         with autocast(dtype=torch.bfloat16):
-            outputs = model(mel, tgt_input, padding_mask)
+            outputs = model(mel, tgt_input, difficulty_id, bpm, padding_mask)
 
             logits = outputs["logits"]
             discrete_loss = ce_loss_fn(
@@ -240,7 +240,6 @@ def train_one_epoch(
                 tgt_output.reshape(-1),
             )
 
-            # Residual losses (only on non-pad positions)
             mask = (tgt_output != PAD).unsqueeze(-1).float()
             time_res_loss = smooth_l1_loss_fn(
                 outputs["time_residuals"][:, :tgt_output.shape[1]] * mask,
@@ -255,15 +254,10 @@ def train_one_epoch(
                 y_res_gt[:, 1:tgt_output.shape[1] + 1].unsqueeze(-1) * mask,
             )
             residual_loss = (time_res_loss + x_res_loss + y_res_loss) / 3.0
-            rhythm_loss = smooth_l1_loss_fn(
-                outputs["rhythm_pred"],
-                torch.zeros_like(outputs["rhythm_pred"]),
-            )
 
             loss = (
                 args.w_discrete * discrete_loss
                 + args.w_residual * residual_loss
-                + args.w_rhythm * rhythm_loss
             )
             loss = loss / args.accum_steps
 
@@ -286,7 +280,7 @@ def train_one_epoch(
 
         finite_losses = all(
             _isfinite(t)
-            for t in (loss, discrete_loss, residual_loss, rhythm_loss)
+            for t in (loss, discrete_loss, residual_loss)
         )
         finite_targets = all(
             _isfinite(t)
@@ -299,7 +293,6 @@ def train_one_epoch(
                 outputs["time_residuals"],
                 outputs["x_residuals"],
                 outputs["y_residuals"],
-                outputs["rhythm_pred"],
             )
         )
 
@@ -316,10 +309,8 @@ def train_one_epoch(
             _tensor_stats("time_residuals", outputs["time_residuals"])
             _tensor_stats("x_residuals", outputs["x_residuals"])
             _tensor_stats("y_residuals", outputs["y_residuals"])
-            _tensor_stats("rhythm_pred", outputs["rhythm_pred"])
             print(f"discrete_loss finite: {torch.isfinite(discrete_loss).item()}", flush=True)
             print(f"residual_loss finite: {torch.isfinite(residual_loss).item()}", flush=True)
-            print(f"rhythm_loss finite: {torch.isfinite(rhythm_loss).item()}", flush=True)
             print(f"total_loss finite: {torch.isfinite(loss).item()}", flush=True)
             keys = batch.get("key")
             if keys is not None:
@@ -409,13 +400,15 @@ def validate(
         time_res_gt = batch["time_residuals"].to(device)
         x_res_gt = batch["x_residuals"].to(device)
         y_res_gt = batch["y_residuals"].to(device)
+        difficulty_id = batch["difficulty_id"].to(device)
+        bpm = batch["bpm"].to(device)
 
         tgt_input = tokens[:, :-1]
         tgt_output = tokens[:, 1:]
         padding_mask = tgt_input == PAD
 
         with autocast(dtype=torch.bfloat16):
-            outputs = model(mel, tgt_input, padding_mask)
+            outputs = model(mel, tgt_input, difficulty_id, bpm, padding_mask)
             logits = outputs["logits"]
             discrete_loss = ce_loss_fn(
                 logits.reshape(-1, TOTAL_VOCAB),

@@ -74,13 +74,15 @@ def run_eval(model, dataloader, device: torch.device, max_batches: int = 0):
         time_res_gt = batch["time_residuals"].to(device)
         x_res_gt = batch["x_residuals"].to(device)
         y_res_gt = batch["y_residuals"].to(device)
+        difficulty_id = batch["difficulty_id"].to(device)
+        bpm = batch["bpm"].to(device)
 
         tgt_input = tokens[:, :-1]
         tgt_output = tokens[:, 1:]
         padding_mask = tgt_input == PAD
 
         with autocast(dtype=torch.bfloat16):
-            outputs = model(mel, tgt_input, padding_mask)
+            outputs = model(mel, tgt_input, difficulty_id, bpm, padding_mask)
             logits = outputs["logits"]
             loss = ce_loss_fn(
                 logits.reshape(-1, TOTAL_VOCAB),

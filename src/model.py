@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import ASTModel, ASTConfig
 
-from .tokenizer import TOTAL_VOCAB, PAD, BOS, NUM_DIFF_TAGS, VOCAB_SIZE
+from .tokenizer import TOTAL_VOCAB, PAD, BOS, NUM_DIFF_BINS
 from .dataset import N_MELS
 
 
@@ -77,11 +77,6 @@ class AudioEncoder(nn.Module):
 
         self.upsample = TemporalUpsampleHead(d_model)
         self.mel_proj = nn.Linear(N_MELS, d_model)
-        self.rhythm_head = nn.Sequential(
-            nn.Linear(d_model, 256),
-            nn.GELU(),
-            nn.Linear(256, 2),  # BPM, key
-        )
         self.ast_success = 0
         self.ast_fallback = 0
         self._fallback_warned = False
@@ -118,18 +113,16 @@ class AudioEncoder(nn.Module):
         self.ast.embeddings.position_embeddings = nn.Parameter(new_pos)
         self.ast.config.max_length = mel_len
 
-    def forward(self, mel: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, mel: torch.Tensor) -> torch.Tensor:
         """
         Args:
             mel: [B, 1, N_MELS, T] mel spectrogram
 
         Returns:
             encoder_out: [B, T', D] temporal embeddings
-            rhythm_pred: [B, 2] (BPM, key predictions)
         """
         B = mel.shape[0]
 
-        # AST expects [B, T, freq] — reshape mel
         if mel.dim() == 4:
             mel = mel.squeeze(1)  # [B, N_MELS, T]
         mel = mel.transpose(1, 2)  # [B, T, N_MELS]
@@ -144,10 +137,8 @@ class AudioEncoder(nn.Module):
             )
             self._ast_pos_len = mel_len
 
-        # Project mel bins to model dim for non-AST path
         projected = self.mel_proj(mel)  # [B, T, D]
 
-        # Try AST forward pass; fall back to projection if shape mismatch
         try:
             ast_out = self.ast(input_values=mel).last_hidden_state
             encoder_out = self.upsample(ast_out)
@@ -162,11 +153,7 @@ class AudioEncoder(nn.Module):
                 )
                 self._fallback_warned = True
 
-        # Rhythm prediction from mean-pooled embeddings
-        pooled = encoder_out.mean(dim=1)
-        rhythm_pred = self.rhythm_head(pooled)
-
-        return encoder_out, rhythm_pred
+        return encoder_out
 
     def get_ast_stats(self) -> dict[str, int]:
         return {"ast_success": self.ast_success, "ast_fallback": self.ast_fallback}
@@ -261,11 +248,40 @@ class BeatmapDecoder(nn.Module):
 
 
 # ---------------------------------------------------------------------------
+# Conditioning Encoder  (difficulty + BPM -> single conditioning token)
+# ---------------------------------------------------------------------------
+class ConditioningEncoder(nn.Module):
+    """Embeds difficulty bin and log-normalized BPM into a single [B,1,D] token."""
+
+    def __init__(self, d_model: int = 768, num_difficulties: int = NUM_DIFF_BINS):
+        super().__init__()
+        self.diff_embed = nn.Embedding(num_difficulties, d_model)
+        self.bpm_proj = nn.Sequential(
+            nn.Linear(1, d_model),
+            nn.GELU(),
+            nn.Linear(d_model, d_model),
+        )
+        self.norm = nn.LayerNorm(d_model)
+
+    def forward(self, difficulty_id: torch.Tensor, bpm: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            difficulty_id: [B] int tensor  (0..4)
+            bpm:           [B, 1] float tensor (raw BPM)
+        Returns:
+            cond: [B, 1, D]
+        """
+        bpm_log = torch.log(bpm.clamp(min=1.0)) / math.log(300.0)
+        cond = self.diff_embed(difficulty_id) + 0.5 * self.bpm_proj(bpm_log)
+        return self.norm(cond).unsqueeze(1)
+
+
+# ---------------------------------------------------------------------------
 # Full Model
 # ---------------------------------------------------------------------------
 class OsuMapper(nn.Module):
     """
-    End-to-end model: mel spectrogram -> beatmap tokens + residuals.
+    End-to-end model: mel + difficulty + BPM -> beatmap tokens + residuals.
     """
 
     def __init__(
@@ -285,6 +301,7 @@ class OsuMapper(nn.Module):
             d_model=d_model,
             unfreeze_last_n=encoder_unfreeze_last_n,
         )
+        self.conditioning = ConditioningEncoder(d_model)
         self.decoder = BeatmapDecoder(
             d_model=d_model,
             nhead=decoder_heads,
@@ -298,24 +315,29 @@ class OsuMapper(nn.Module):
         self,
         mel: torch.Tensor,
         tgt_tokens: torch.Tensor,
+        difficulty_id: torch.Tensor,
+        bpm: torch.Tensor,
         tgt_padding_mask: Optional[torch.Tensor] = None,
     ) -> dict[str, torch.Tensor]:
-        encoder_out, rhythm_pred = self.encoder(mel)
+        encoder_out = self.encoder(mel)
+        cond = self.conditioning(difficulty_id, bpm)  # [B, 1, D]
+        memory = torch.cat([cond, encoder_out], dim=1)  # [B, 1+T, D]
         logits, time_res, x_res, y_res = self.decoder(
-            encoder_out, tgt_tokens, tgt_padding_mask
+            memory, tgt_tokens, tgt_padding_mask
         )
         return {
             "logits": logits,
             "time_residuals": time_res,
             "x_residuals": x_res,
             "y_residuals": y_res,
-            "rhythm_pred": rhythm_pred,
         }
 
     @torch.no_grad()
     def generate(
         self,
         mel: torch.Tensor,
+        difficulty_id: torch.Tensor,
+        bpm: torch.Tensor,
         max_len: int = 512,
         temperature: float = 1.0,
         beam_size: int = 1,
@@ -323,6 +345,10 @@ class OsuMapper(nn.Module):
         """
         Greedy / temperature-sampled autoregressive generation.
 
+        Args:
+            mel:           [B, 1, N_MELS, T] or [1, N_MELS, T]
+            difficulty_id: [B] int tensor
+            bpm:           [B, 1] float tensor
         Returns:
             tokens: list of generated token ids
             residuals: list of (time_res, x_res, y_res) tuples
@@ -333,7 +359,9 @@ class OsuMapper(nn.Module):
         if mel.dim() == 3:
             mel = mel.unsqueeze(0)
 
-        encoder_out, _ = self.encoder(mel)
+        encoder_out = self.encoder(mel)
+        cond = self.conditioning(difficulty_id, bpm)
+        memory = torch.cat([cond, encoder_out], dim=1)
 
         tokens = [BOS]
         residuals_out = [(0.0, 0.0, 0.0)]
@@ -341,7 +369,7 @@ class OsuMapper(nn.Module):
 
         for _ in range(max_len):
             tgt = torch.tensor([tokens], dtype=torch.long, device=device)
-            logits, t_res, x_res, y_res = self.decoder(encoder_out, tgt)
+            logits, t_res, x_res, y_res = self.decoder(memory, tgt)
 
             next_logits = logits[0, -1, :] / temperature
             probs = F.softmax(next_logits, dim=-1)

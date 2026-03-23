@@ -25,7 +25,7 @@ from .dataset import (
     load_audio_from_bytes, build_mel_transform, extract_windows,
     TARGET_SR, WINDOW_SAMPLES,
 )
-from .tokenizer import Residuals
+from .tokenizer import Residuals, difficulty_to_bin, parse_osu_bpm
 
 
 def parse_args():
@@ -49,9 +49,19 @@ def serialize_tensor(t: torch.Tensor) -> bytes:
     return buf.getvalue()
 
 
-def serialize_tokens(tokens: list[int], residuals: list[Residuals]) -> bytes:
+def serialize_tokens(
+    tokens: list[int],
+    residuals: list[Residuals],
+    difficulty_id: int,
+    bpm: float,
+) -> bytes:
     buf = io.BytesIO()
-    torch.save({"tokens": tokens, "residuals": residuals}, buf)
+    torch.save({
+        "tokens": tokens,
+        "residuals": residuals,
+        "difficulty_id": difficulty_id,
+        "bpm": bpm,
+    }, buf)
     return buf.getvalue()
 
 
@@ -130,9 +140,12 @@ def main():
                         continue
 
                     star_rating = float(bm.get("difficultyrating", 4.0))
+                    diff_id = difficulty_to_bin(star_rating)
+                    bpm = parse_osu_bpm(osu_content)
 
                     windows = extract_windows(
-                        waveform, osu_content, star_rating, mel_transform,
+                        waveform, osu_content, mel_transform,
+                        diff_id, bpm,
                     )
 
                     for w in windows:
@@ -143,7 +156,9 @@ def main():
                         sink.write({
                             "__key__": key,
                             "mel.pt": serialize_tensor(w["mel"]),
-                            "tokens.pt": serialize_tokens(w["tokens"], w["residuals"]),
+                            "tokens.pt": serialize_tokens(
+                                w["tokens"], w["residuals"], diff_id, bpm,
+                            ),
                         })
                         sample_in_shard += 1
                         global_count += 1

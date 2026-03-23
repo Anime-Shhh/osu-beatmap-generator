@@ -22,7 +22,7 @@ from torch.utils.data import IterableDataset, DataLoader, get_worker_info
 
 from .tokenizer import (
     tokenize_beatmap, Residuals, PAD, TOTAL_VOCAB,
-    difficulty_to_token, TIME_QUANT_MS,
+    difficulty_to_bin, parse_osu_bpm, TIME_QUANT_MS,
 )
 
 
@@ -103,8 +103,9 @@ class AudioAugmenter:
 def extract_windows(
     waveform: torch.Tensor,
     osu_content: str,
-    star_rating: float,
     mel_transform: torchaudio.transforms.MelSpectrogram,
+    difficulty_id: int,
+    bpm: float,
     augmenter: Optional[AudioAugmenter] = None,
 ) -> list[dict]:
     """
@@ -114,9 +115,10 @@ def extract_windows(
         mel: [1, N_MELS, time_frames]
         tokens: list[int]
         residuals: list[Residuals]
+        difficulty_id: int  (0..4)
+        bpm: float
     """
     num_samples = waveform.shape[-1]
-    duration_ms = (num_samples / TARGET_SR) * 1000.0
     windows = []
 
     start = 0
@@ -125,12 +127,11 @@ def extract_windows(
         mel = mel_transform(chunk)  # [1, N_MELS, T]
 
         window_start_ms = (start / TARGET_SR) * 1000.0
-        window_end_ms = window_start_ms + WINDOW_SEC * 1000.0
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
         predict_end_ms = predict_start_ms + PREDICT_SEC * 1000.0
 
         tok_obj = tokenize_beatmap(
-            osu_content, star_rating,
+            osu_content,
             window_start_ms=predict_start_ms,
             window_end_ms=predict_end_ms,
         )
@@ -139,6 +140,8 @@ def extract_windows(
             "mel": mel,
             "tokens": tok_obj.tokens,
             "residuals": tok_obj.residuals,
+            "difficulty_id": difficulty_id,
+            "bpm": bpm,
         })
 
         start += STRIDE_SAMPLES
@@ -182,6 +185,8 @@ def collate_fn(batch: list[dict]) -> dict:
         "time_residuals": torch.tensor(all_time_res, dtype=torch.float32).clamp(-5.0, 5.0),
         "x_residuals": torch.tensor(all_x_res, dtype=torch.float32).clamp(-8.0, 8.0),
         "y_residuals": torch.tensor(all_y_res, dtype=torch.float32).clamp(-6.0, 6.0),
+        "difficulty_id": torch.tensor([b["difficulty_id"] for b in batch], dtype=torch.long),
+        "bpm": torch.tensor([[b["bpm"]] for b in batch], dtype=torch.float32),
     }
 
 
@@ -265,13 +270,15 @@ class OsuStreamingDataset(IterableDataset):
                         continue
 
                     star_rating = float(bm.get("difficultyrating", 4.0))
+                    diff_id = difficulty_to_bin(star_rating)
+                    bpm = parse_osu_bpm(osu_content)
 
                     if not self._passes_filter(osu_content):
                         continue
 
                     windows = extract_windows(
-                        waveform, osu_content, star_rating,
-                        mel_tfm, self.augmenter,
+                        waveform, osu_content,
+                        mel_tfm, diff_id, bpm, self.augmenter,
                     )
 
                     for w in windows:
@@ -333,10 +340,14 @@ class OsuCachedDataset(IterableDataset):
                 tokens_data = torch.load(io.BytesIO(sample["tokens.pt"]), weights_only=False)
                 tokens = tokens_data["tokens"]
                 residuals = tokens_data["residuals"]
+                difficulty_id = tokens_data.get("difficulty_id", 2)
+                bpm = tokens_data.get("bpm", 120.0)
                 yield {
                     "mel": mel,
                     "tokens": tokens,
                     "residuals": residuals,
+                    "difficulty_id": int(difficulty_id),
+                    "bpm": float(bpm),
                     "key": sample.get("__key__"),
                     "url": sample.get("__url__"),
                 }

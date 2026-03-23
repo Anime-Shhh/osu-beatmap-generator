@@ -57,15 +57,10 @@ POS_OFFSET = _NUM_SPECIAL
 TIME_OFFSET = POS_OFFSET + NUM_POS_BINS
 VOCAB_SIZE = TIME_OFFSET + NUM_TIME_BINS  # 1238
 
-# Difficulty tag tokens for style conditioning (appended after vocab)
-DIFF_EASY = VOCAB_SIZE
-DIFF_NORMAL = VOCAB_SIZE + 1
-DIFF_HARD = VOCAB_SIZE + 2
-DIFF_INSANE = VOCAB_SIZE + 3
-DIFF_EXPERT = VOCAB_SIZE + 4
-DIFF_EXPERT_PLUS = VOCAB_SIZE + 5
-NUM_DIFF_TAGS = 6
-TOTAL_VOCAB = VOCAB_SIZE + NUM_DIFF_TAGS  # 1244
+# Difficulty is now a conditioning input, not a token in the sequence.
+# 5 bins: EASY=0, NORMAL=1, HARD=2, INSANE=3, EXPERT=4
+NUM_DIFF_BINS = 5
+TOTAL_VOCAB = VOCAB_SIZE  # 1238
 
 MAX_SLIDER_CONTROL_POINTS = 8
 
@@ -136,20 +131,18 @@ def bin_to_time(token: int, residual_ms: float = 0.0) -> float:
     return idx * TIME_QUANT_MS + residual_ms
 
 
-def difficulty_to_token(star_rating: float) -> int:
-    """Map star rating to a difficulty tag token."""
+def difficulty_to_bin(star_rating: float) -> int:
+    """Map star rating to a difficulty conditioning bin (0-4)."""
     if star_rating < 2.0:
-        return DIFF_EASY
+        return 0   # EASY
     elif star_rating < 3.0:
-        return DIFF_NORMAL
-    elif star_rating < 4.5:
-        return DIFF_HARD
-    elif star_rating < 6.0:
-        return DIFF_INSANE
-    elif star_rating < 7.5:
-        return DIFF_EXPERT
+        return 1   # NORMAL
+    elif star_rating < 4.0:
+        return 2   # HARD
+    elif star_rating < 5.3:
+        return 3   # INSANE
     else:
-        return DIFF_EXPERT_PLUS
+        return 4   # EXPERT
 
 
 # ---------------------------------------------------------------------------
@@ -260,17 +253,46 @@ def parse_osu_metadata(osu_content: str) -> dict:
     return meta
 
 
+def parse_osu_bpm(osu_content: str) -> float:
+    """Extract primary BPM from the first uninherited [TimingPoints] entry."""
+    in_timing = False
+    for line in osu_content.splitlines():
+        line = line.strip()
+        if line == "[TimingPoints]":
+            in_timing = True
+            continue
+        if not in_timing:
+            continue
+        if line.startswith("["):
+            break
+        if not line:
+            continue
+        parts = line.split(",")
+        if len(parts) < 2:
+            continue
+        try:
+            beat_length = float(parts[1])
+        except ValueError:
+            continue
+        uninherited = len(parts) < 7 or parts[6].strip() == "1"
+        if uninherited and beat_length > 0:
+            return 60000.0 / beat_length
+    return 120.0
+
+
 # ---------------------------------------------------------------------------
 # Tokenize / Detokenize
 # ---------------------------------------------------------------------------
 def tokenize_beatmap(
     osu_content: str,
-    star_rating: float = 4.0,
     window_start_ms: float = 0.0,
     window_end_ms: float = float("inf"),
 ) -> TokenizedObject:
     """
     Convert an .osu file (or window of it) into a token sequence with residuals.
+
+    Sequence: [BOS] <objects...> [EOS]
+    Difficulty and BPM are handled as separate conditioning inputs, not tokens.
 
     Token sequence format per hit object:
         <TIME_BIN> <TYPE> <POS_BIN> [slider params...]
@@ -289,10 +311,7 @@ def tokenize_beatmap(
     objects.sort(key=lambda o: o["time"])
 
     result = TokenizedObject()
-    diff_tok = difficulty_to_token(star_rating)
     result.tokens.append(BOS)
-    result.residuals.append(Residuals())
-    result.tokens.append(diff_tok)
     result.residuals.append(Residuals())
 
     prev_time = window_start_ms

@@ -26,7 +26,7 @@ from .dataset import (
 )
 from .tokenizer import (
     detokenize_to_hitobjects, hitobjects_to_osu_lines,
-    Residuals, BOS, EOS, difficulty_to_token,
+    Residuals, BOS, EOS, difficulty_to_bin,
 )
 
 
@@ -37,7 +37,9 @@ def parse_args():
     p.add_argument("--checkpoint", type=str,
                     default="/common/users/asj102/osu_project/models/best.pt")
     p.add_argument("--difficulty", type=float, default=4.0,
-                    help="Target star rating for style conditioning")
+                    help="Target star rating for conditioning (mapped to 5-bin scheme)")
+    p.add_argument("--bpm", type=float, default=0.0,
+                    help="Song BPM for conditioning (0 = auto-estimate)")
     p.add_argument("--temperature", type=float, default=0.9)
     p.add_argument("--max_tokens_per_window", type=int, default=512)
     p.add_argument("--device", type=str, default="auto")
@@ -170,12 +172,20 @@ def generate_beatmap(args) -> str:
     duration_sec = num_samples / TARGET_SR
     print(f"Audio duration: {duration_sec:.1f}s ({num_samples} samples at {TARGET_SR}Hz)")
 
-    bpm = estimate_bpm(waveform, TARGET_SR)
-    print(f"Estimated BPM: {bpm:.1f}")
+    if args.bpm > 0:
+        bpm = args.bpm
+        print(f"Using provided BPM: {bpm:.1f}")
+    else:
+        bpm = estimate_bpm(waveform, TARGET_SR)
+        print(f"Auto-estimated BPM: {bpm:.1f}")
+
+    diff_id = difficulty_to_bin(args.difficulty)
+    diff_tensor = torch.tensor([diff_id], device=device)
+    bpm_tensor = torch.tensor([[bpm]], device=device, dtype=torch.float32)
+    print(f"Conditioning: difficulty_bin={diff_id}, bpm={bpm:.1f}")
 
     mel_transform = build_mel_transform(str(device))
 
-    # Generate per-window
     all_objects = []
     window_count = 0
     start = 0
@@ -190,7 +200,8 @@ def generate_beatmap(args) -> str:
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
 
         tokens, residuals_raw = model.generate(
-            mel, max_len=args.max_tokens_per_window, temperature=args.temperature
+            mel, diff_tensor, bpm_tensor,
+            max_len=args.max_tokens_per_window, temperature=args.temperature,
         )
 
         residuals = [
@@ -204,7 +215,6 @@ def generate_beatmap(args) -> str:
 
         start += STRIDE_SAMPLES
 
-    # Handle remaining audio shorter than full window
     if start < num_samples and num_samples - start > WINDOW_SAMPLES // 4:
         remaining = waveform[:, start:].to(device)
         pad_len = WINDOW_SAMPLES - remaining.shape[-1]
@@ -215,7 +225,8 @@ def generate_beatmap(args) -> str:
         predict_start_ms = window_start_ms
 
         tokens, residuals_raw = model.generate(
-            mel, max_len=args.max_tokens_per_window, temperature=args.temperature
+            mel, diff_tensor, bpm_tensor,
+            max_len=args.max_tokens_per_window, temperature=args.temperature,
         )
         residuals = [
             Residuals(time_offset_ms=r[0], x_offset_px=r[1], y_offset_px=r[2])
