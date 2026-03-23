@@ -1,4 +1,4 @@
-# OsuMapper — AI Beatmap Generation from Audio
+# OsuM — AI Beatmap Generation from Audio
 
 OsuMapper is an end-to-end deep learning system that automatically generates [osu!](https://osu.ppy.sh/) beatmaps from raw audio. Given an MP3 file of any song, the model produces a fully playable `.osu` beatmap file containing timed hit circles, sliders, and spinners — the core gameplay elements of osu!standard mode.
 
