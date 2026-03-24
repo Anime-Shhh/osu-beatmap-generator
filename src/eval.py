@@ -117,7 +117,8 @@ def run_eval(model, dataloader, device: torch.device, max_batches: int = 0):
                     )
                 )
 
-            metrics = compute_all_metrics(pred_t, true_t, pred_res, true_res)
+            sample_ms_per_beat = 60000.0 / bpm[b].item()
+            metrics = compute_all_metrics(pred_t, true_t, pred_res, true_res, ms_per_beat=sample_ms_per_beat)
             edit_values.append(float(metrics["edit_distance"]))
             if metrics["timing_mae_ms"] != float("inf"):
                 timing_values.append(float(metrics["timing_mae_ms"]))

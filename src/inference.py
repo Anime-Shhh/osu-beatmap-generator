@@ -21,8 +21,9 @@ import torchaudio
 
 from .model import OsuMapper
 from .dataset import (
-    build_mel_transform, TARGET_SR, WINDOW_SAMPLES, STRIDE_SAMPLES,
-    WINDOW_SEC, STRIDE_SEC, PREDICT_START_SEC, PREDICT_SEC, N_MELS,
+    build_mel_transform, compute_onset_strength, TARGET_SR,
+    WINDOW_SAMPLES, STRIDE_SAMPLES, WINDOW_SEC, STRIDE_SEC,
+    PREDICT_START_SEC, PREDICT_SEC, N_MELS,
 )
 from .tokenizer import (
     detokenize_to_hitobjects, hitobjects_to_osu_lines,
@@ -192,9 +193,14 @@ def generate_beatmap(args) -> str:
 
     print(f"Generating beatmap (difficulty={args.difficulty}, temp={args.temperature})...")
 
+    ms_per_beat = 60000.0 / bpm
+
     while start + WINDOW_SAMPLES <= num_samples:
         chunk = waveform[:, start : start + WINDOW_SAMPLES].to(device)
-        mel = torch.log(mel_transform(chunk) + 1e-7)  # [1, N_MELS, T]
+        mel = mel_transform(chunk)  # [1, N_MELS, T]
+        onset = compute_onset_strength(chunk.cpu(), mel.shape[-1])  # [1, T]
+        mel = torch.cat([mel, onset.unsqueeze(0).to(device)], dim=1)  # [1, N_FEATURES, T]
+        mel = torch.log(mel + 1e-7)
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
@@ -209,7 +215,9 @@ def generate_beatmap(args) -> str:
             for r in residuals_raw
         ]
 
-        objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms)
+        objects = detokenize_to_hitobjects(
+            tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat,
+        )
         all_objects.extend(objects)
         window_count += 1
 
@@ -219,7 +227,10 @@ def generate_beatmap(args) -> str:
         remaining = waveform[:, start:].to(device)
         pad_len = WINDOW_SAMPLES - remaining.shape[-1]
         remaining = torch.nn.functional.pad(remaining, (0, pad_len))
-        mel = torch.log(mel_transform(remaining) + 1e-7)
+        mel = mel_transform(remaining)
+        onset = compute_onset_strength(remaining.cpu(), mel.shape[-1])
+        mel = torch.cat([mel, onset.unsqueeze(0).to(device)], dim=1)
+        mel = torch.log(mel + 1e-7)
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms
@@ -232,7 +243,9 @@ def generate_beatmap(args) -> str:
             Residuals(time_offset_ms=r[0], x_offset_px=r[1], y_offset_px=r[2])
             for r in residuals_raw
         ]
-        objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms)
+        objects = detokenize_to_hitobjects(
+            tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat,
+        )
         end_ms = (num_samples / TARGET_SR) * 1000.0
         objects = [o for o in objects if o["time"] <= end_ms]
         all_objects.extend(objects)

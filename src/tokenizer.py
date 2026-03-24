@@ -45,22 +45,25 @@ BIN_W = PLAYFIELD_W / GRID_W   # 16.0 px
 BIN_H = PLAYFIELD_H / GRID_H   # 12.0 px
 
 NUM_POS_BINS = GRID_W * GRID_H  # 1024
-NUM_TIME_BINS = 200             # 0..1990ms in 10ms steps
-TIME_QUANT_MS = 10.0
-MAX_TIME_DELTA_MS = (NUM_TIME_BINS - 1) * TIME_QUANT_MS  # 1990ms
+
+# Beat-relative timing: bins represent fractions of a beat, not milliseconds.
+# 128 bins at 1/16-beat resolution covers 0 to ~8 beats.
+NUM_BEAT_BINS = 128
+BEAT_QUANT = 1.0 / 16.0        # each bin = 1/16 of a beat
+MAX_BEAT_DELTA = (NUM_BEAT_BINS - 1) * BEAT_QUANT  # 7.9375 beats
 
 # Vocabulary layout:
 #   [0..13]     special + type + curve tokens
 #   [14..1037]  position bins  (32*32 = 1024)
-#   [1038..1237] time delta bins (200)
+#   [1038..1165] beat delta bins (128)
 POS_OFFSET = _NUM_SPECIAL
 TIME_OFFSET = POS_OFFSET + NUM_POS_BINS
-VOCAB_SIZE = TIME_OFFSET + NUM_TIME_BINS  # 1238
+VOCAB_SIZE = TIME_OFFSET + NUM_BEAT_BINS  # 1166
 
 # Difficulty is now a conditioning input, not a token in the sequence.
 # 5 bins: EASY=0, NORMAL=1, HARD=2, INSANE=3, EXPERT=4
 NUM_DIFF_BINS = 5
-TOTAL_VOCAB = VOCAB_SIZE  # 1238
+TOTAL_VOCAB = VOCAB_SIZE  # 1166
 
 MAX_SLIDER_CONTROL_POINTS = 8
 
@@ -71,7 +74,7 @@ MAX_SLIDER_CONTROL_POINTS = 8
 @dataclass
 class Residuals:
     """Continuous residuals for sub-bin precision."""
-    time_offset_ms: float = 0.0   # [-5, +5] ms
+    time_offset_ms: float = 0.0   # beat residual in [-BEAT_QUANT/2, +BEAT_QUANT/2]
     x_offset_px: float = 0.0      # [-BIN_W/2, +BIN_W/2] px
     y_offset_px: float = 0.0      # [-BIN_H/2, +BIN_H/2] px
 
@@ -115,20 +118,20 @@ def bin_to_xy(token: int, res: Optional[Residuals] = None) -> tuple[float, float
     return x, y
 
 
-def time_to_bin(delta_ms: float) -> tuple[int, float]:
-    """Quantize time delta (ms) to bin index and residual."""
-    clamped = max(0, min(MAX_TIME_DELTA_MS, delta_ms))
-    bin_idx = int(round(clamped / TIME_QUANT_MS))
-    bin_idx = max(0, min(NUM_TIME_BINS - 1, bin_idx))
-    residual_ms = delta_ms - bin_idx * TIME_QUANT_MS
-    residual_ms = max(-TIME_QUANT_MS / 2, min(TIME_QUANT_MS / 2, residual_ms))
-    return TIME_OFFSET + bin_idx, residual_ms
+def beat_to_bin(delta_beats: float) -> tuple[int, float]:
+    """Quantize beat delta to bin index and residual (in beats)."""
+    clamped = max(0.0, min(MAX_BEAT_DELTA, delta_beats))
+    bin_idx = int(round(clamped / BEAT_QUANT))
+    bin_idx = max(0, min(NUM_BEAT_BINS - 1, bin_idx))
+    residual = delta_beats - bin_idx * BEAT_QUANT
+    residual = max(-BEAT_QUANT / 2, min(BEAT_QUANT / 2, residual))
+    return TIME_OFFSET + bin_idx, residual
 
 
-def bin_to_time(token: int, residual_ms: float = 0.0) -> float:
-    """Convert time bin token back to milliseconds."""
+def bin_to_beat(token: int, residual: float = 0.0) -> float:
+    """Convert beat bin token back to beat delta."""
     idx = token - TIME_OFFSET
-    return idx * TIME_QUANT_MS + residual_ms
+    return idx * BEAT_QUANT + residual
 
 
 def difficulty_to_bin(star_rating: float) -> int:
@@ -285,26 +288,30 @@ def parse_osu_bpm(osu_content: str) -> float:
 # ---------------------------------------------------------------------------
 def tokenize_beatmap(
     osu_content: str,
+    ms_per_beat: float = 500.0,
     window_start_ms: float = 0.0,
     window_end_ms: float = float("inf"),
 ) -> TokenizedObject:
     """
     Convert an .osu file (or window of it) into a token sequence with residuals.
 
+    Time deltas are expressed in **beats** (delta_ms / ms_per_beat) so the model
+    learns rhythm independently of BPM.
+
     Sequence: [BOS] <objects...> [EOS]
     Difficulty and BPM are handled as separate conditioning inputs, not tokens.
 
     Token sequence format per hit object:
-        <TIME_BIN> <TYPE> <POS_BIN> [slider params...]
+        <BEAT_BIN> <TYPE> <POS_BIN> [slider params...]
 
     For sliders:
-        <TIME_BIN> <SLIDER_START> <POS_BIN> <CURVE_TYPE>
+        <BEAT_BIN> <SLIDER_START> <POS_BIN> <CURVE_TYPE>
         [<SLIDER_CONTROL> <POS_BIN>] * N
         <SLIDER_END> <POS_BIN(last)>
 
     For spinners:
-        <TIME_BIN> <SPINNER_START> <POS_BIN>
-        <TIME_BIN(duration)> <SPINNER_END>
+        <BEAT_BIN> <SPINNER_START> <POS_BIN>
+        <BEAT_BIN(duration)> <SPINNER_END>
     """
     objects = parse_osu_hitobjects(osu_content)
     objects = [o for o in objects if window_start_ms <= o["time"] < window_end_ms]
@@ -318,7 +325,8 @@ def tokenize_beatmap(
 
     for obj in objects:
         delta_ms = obj["time"] - prev_time
-        time_tok, time_res = time_to_bin(delta_ms)
+        delta_beats = delta_ms / ms_per_beat
+        time_tok, time_res = beat_to_bin(delta_beats)
         pos_tok, pos_res = xy_to_bin(obj["x"], obj["y"])
         pos_res.time_offset_ms = time_res
 
@@ -351,8 +359,9 @@ def tokenize_beatmap(
         elif obj["type"] == "spinner":
             result.tokens.extend([time_tok, TYPE_SPINNER_START, pos_tok])
             result.residuals.extend([Residuals(time_offset_ms=time_res), Residuals(), pos_res])
-            duration = obj.get("end_time", obj["time"] + 1000) - obj["time"]
-            dur_tok, dur_res = time_to_bin(duration)
+            duration_ms = obj.get("end_time", obj["time"] + 1000) - obj["time"]
+            duration_beats = duration_ms / ms_per_beat
+            dur_tok, dur_res = beat_to_bin(duration_beats)
             result.tokens.extend([dur_tok, TYPE_SPINNER_END])
             result.residuals.extend([Residuals(time_offset_ms=dur_res), Residuals()])
 
@@ -367,10 +376,14 @@ def detokenize_to_hitobjects(
     tokens: list[int],
     residuals: Optional[list[Residuals]] = None,
     base_time_ms: float = 0.0,
+    ms_per_beat: float = 500.0,
 ) -> list[dict]:
     """
     Convert token sequence back to a list of hit object dicts
     suitable for writing to .osu format.
+
+    Beat-relative deltas are multiplied by ms_per_beat to recover absolute
+    millisecond timestamps.
     """
     if residuals is None:
         residuals = [Residuals()] * len(tokens)
@@ -387,10 +400,10 @@ def detokenize_to_hitobjects(
             i += 1
             continue
 
-        # Time delta token
-        if TIME_OFFSET <= tok < TIME_OFFSET + NUM_TIME_BINS:
-            delta = bin_to_time(tok, residuals[i].time_offset_ms)
-            current_time += delta
+        # Beat delta token
+        if TIME_OFFSET <= tok < TIME_OFFSET + NUM_BEAT_BINS:
+            delta_beats = bin_to_beat(tok, residuals[i].time_offset_ms)
+            current_time += delta_beats * ms_per_beat
             i += 1
             if i >= n:
                 break
@@ -446,9 +459,9 @@ def detokenize_to_hitobjects(
                 i += 1
 
                 end_time = current_time + 1000
-                if i < n and TIME_OFFSET <= tokens[i] < TIME_OFFSET + NUM_TIME_BINS:
-                    duration = bin_to_time(tokens[i], residuals[i].time_offset_ms)
-                    end_time = current_time + duration
+                if i < n and TIME_OFFSET <= tokens[i] < TIME_OFFSET + NUM_BEAT_BINS:
+                    dur_beats = bin_to_beat(tokens[i], residuals[i].time_offset_ms)
+                    end_time = current_time + dur_beats * ms_per_beat
                     i += 1
                     if i < n and tokens[i] == TYPE_SPINNER_END:
                         i += 1

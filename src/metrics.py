@@ -12,8 +12,8 @@ from typing import Optional
 
 from .tokenizer import (
     detokenize_to_hitobjects, Residuals,
-    TIME_OFFSET, NUM_TIME_BINS, POS_OFFSET, NUM_POS_BINS,
-    bin_to_time, bin_to_xy,
+    TIME_OFFSET, NUM_BEAT_BINS, POS_OFFSET, NUM_POS_BINS,
+    bin_to_beat, bin_to_xy,
 )
 
 
@@ -45,13 +45,14 @@ def timing_mae(
     true_tokens: list[int],
     pred_residuals: Optional[list[Residuals]] = None,
     true_residuals: Optional[list[Residuals]] = None,
+    ms_per_beat: float = 500.0,
 ) -> float:
     """
     Mean absolute error of hit object timing (ms).
     Reconstructs absolute times from token sequences and compares.
     """
-    pred_objs = detokenize_to_hitobjects(pred_tokens, pred_residuals)
-    true_objs = detokenize_to_hitobjects(true_tokens, true_residuals)
+    pred_objs = detokenize_to_hitobjects(pred_tokens, pred_residuals, ms_per_beat=ms_per_beat)
+    true_objs = detokenize_to_hitobjects(true_tokens, true_residuals, ms_per_beat=ms_per_beat)
 
     if not pred_objs or not true_objs:
         return float("inf")
@@ -86,6 +87,7 @@ def hit_f1(
     true_residuals: Optional[list[Residuals]] = None,
     time_tolerance_ms: float = 20.0,
     pos_tolerance_px: float = 50.0,
+    ms_per_beat: float = 500.0,
 ) -> dict[str, float]:
     """
     F1 score: a predicted hit is a true positive if it matches a ground truth
@@ -93,8 +95,8 @@ def hit_f1(
 
     Returns dict with precision, recall, f1.
     """
-    pred_objs = detokenize_to_hitobjects(pred_tokens, pred_residuals)
-    true_objs = detokenize_to_hitobjects(true_tokens, true_residuals)
+    pred_objs = detokenize_to_hitobjects(pred_tokens, pred_residuals, ms_per_beat=ms_per_beat)
+    true_objs = detokenize_to_hitobjects(true_tokens, true_residuals, ms_per_beat=ms_per_beat)
 
     if not pred_objs and not true_objs:
         return {"precision": 1.0, "recall": 1.0, "f1": 1.0}
@@ -139,6 +141,7 @@ def slider_iou(
     pred_residuals: Optional[list[Residuals]] = None,
     true_residuals: Optional[list[Residuals]] = None,
     buffer_px: float = 10.0,
+    ms_per_beat: float = 500.0,
 ) -> float:
     """
     Compute IoU of slider curves using buffered line geometry.
@@ -149,8 +152,8 @@ def slider_iou(
     except ImportError:
         return 0.0
 
-    pred_objs = detokenize_to_hitobjects(pred_tokens, pred_residuals)
-    true_objs = detokenize_to_hitobjects(true_tokens, true_residuals)
+    pred_objs = detokenize_to_hitobjects(pred_tokens, pred_residuals, ms_per_beat=ms_per_beat)
+    true_objs = detokenize_to_hitobjects(true_tokens, true_residuals, ms_per_beat=ms_per_beat)
 
     pred_sliders = [o for o in pred_objs if o["type"] == "slider"]
     true_sliders = [o for o in true_objs if o["type"] == "slider"]
@@ -204,12 +207,19 @@ def compute_all_metrics(
     true_tokens: list[int],
     pred_residuals: Optional[list[Residuals]] = None,
     true_residuals: Optional[list[Residuals]] = None,
+    ms_per_beat: float = 500.0,
 ) -> dict[str, float]:
     """Compute all metrics and return as a flat dict."""
     results = {}
     results["edit_distance"] = token_edit_distance(pred_tokens, true_tokens)
-    results["timing_mae_ms"] = timing_mae(pred_tokens, true_tokens, pred_residuals, true_residuals)
-    f1_results = hit_f1(pred_tokens, true_tokens, pred_residuals, true_residuals)
+    results["timing_mae_ms"] = timing_mae(
+        pred_tokens, true_tokens, pred_residuals, true_residuals, ms_per_beat=ms_per_beat,
+    )
+    f1_results = hit_f1(
+        pred_tokens, true_tokens, pred_residuals, true_residuals, ms_per_beat=ms_per_beat,
+    )
     results.update({f"hit_{k}": v for k, v in f1_results.items()})
-    results["slider_iou"] = slider_iou(pred_tokens, true_tokens, pred_residuals, true_residuals)
+    results["slider_iou"] = slider_iou(
+        pred_tokens, true_tokens, pred_residuals, true_residuals, ms_per_beat=ms_per_beat,
+    )
     return results

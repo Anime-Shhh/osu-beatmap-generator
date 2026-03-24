@@ -22,7 +22,7 @@ from torch.utils.data import IterableDataset, DataLoader, get_worker_info
 
 from .tokenizer import (
     tokenize_beatmap, Residuals, PAD, TOTAL_VOCAB,
-    difficulty_to_bin, parse_osu_bpm, TIME_QUANT_MS,
+    difficulty_to_bin, parse_osu_bpm, BEAT_QUANT,
 )
 
 
@@ -33,6 +33,7 @@ TARGET_SR = 22050
 N_FFT = 2048
 HOP_LENGTH = 441     # ~20ms at 22050 Hz
 N_MELS = 128
+N_FEATURES = N_MELS + 1  # mel + onset strength channel
 
 WINDOW_SEC = 6.0
 STRIDE_SEC = 3.0
@@ -63,6 +64,20 @@ def load_audio_from_bytes(audio_bytes: bytes) -> tuple[torch.Tensor, int]:
         resampler = torchaudio.transforms.Resample(sr, TARGET_SR)
         waveform = resampler(waveform)
     return waveform, TARGET_SR
+
+
+def compute_onset_strength(waveform: torch.Tensor, n_frames: int) -> torch.Tensor:
+    """Compute onset strength aligned to mel frames, normalized to [0, 1]."""
+    import librosa
+    y = waveform.squeeze().numpy()
+    onset = librosa.onset.onset_strength(y=y, sr=TARGET_SR, hop_length=HOP_LENGTH)
+    onset = torch.from_numpy(onset).float()
+    if onset.shape[0] < n_frames:
+        onset = torch.nn.functional.pad(onset, (0, n_frames - onset.shape[0]))
+    else:
+        onset = onset[:n_frames]
+    onset = onset / (onset.max() + 1e-7)
+    return onset.unsqueeze(0)  # [1, T]
 
 
 # ---------------------------------------------------------------------------
@@ -112,7 +127,7 @@ def extract_windows(
     Extract overlapping windows from a full song.
 
     Returns list of dicts:
-        mel: [1, N_MELS, time_frames]
+        mel: [1, N_FEATURES, time_frames]  (mel + onset strength)
         tokens: list[int]
         residuals: list[Residuals]
         difficulty_id: int  (0..4)
@@ -120,11 +135,15 @@ def extract_windows(
     """
     num_samples = waveform.shape[-1]
     windows = []
+    ms_per_beat = 60000.0 / bpm
 
     start = 0
     while start + WINDOW_SAMPLES <= num_samples:
         chunk = waveform[:, start : start + WINDOW_SAMPLES]
         mel = mel_transform(chunk)  # [1, N_MELS, T]
+
+        onset = compute_onset_strength(chunk, mel.shape[-1])  # [1, T]
+        mel = torch.cat([mel, onset.unsqueeze(0)], dim=1)     # [1, N_FEATURES, T]
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
@@ -132,6 +151,7 @@ def extract_windows(
 
         tok_obj = tokenize_beatmap(
             osu_content,
+            ms_per_beat=ms_per_beat,
             window_start_ms=predict_start_ms,
             window_end_ms=predict_end_ms,
         )
@@ -182,7 +202,7 @@ def collate_fn(batch: list[dict]) -> dict:
     return {
         "mel": torch.log(torch.stack(mels, dim=0) + 1e-7),
         "tokens": torch.tensor(all_tokens, dtype=torch.long),
-        "time_residuals": torch.tensor(all_time_res, dtype=torch.float32).clamp(-5.0, 5.0),
+        "time_residuals": torch.tensor(all_time_res, dtype=torch.float32).clamp(-BEAT_QUANT / 2, BEAT_QUANT / 2),
         "x_residuals": torch.tensor(all_x_res, dtype=torch.float32).clamp(-8.0, 8.0),
         "y_residuals": torch.tensor(all_y_res, dtype=torch.float32).clamp(-6.0, 6.0),
         "difficulty_id": torch.tensor([b["difficulty_id"] for b in batch], dtype=torch.long),

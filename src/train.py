@@ -426,7 +426,8 @@ def validate(
             true_t = [t for t in true_t if t != PAD]
             pred_t = pred_t[:len(true_t)]
 
-            metrics = compute_all_metrics(pred_t, true_t)
+            sample_ms_per_beat = 60000.0 / bpm[b].item()
+            metrics = compute_all_metrics(pred_t, true_t, ms_per_beat=sample_ms_per_beat)
             total_edit_dist += metrics["edit_distance"]
             mae = metrics["timing_mae_ms"]
             if mae != float("inf"):

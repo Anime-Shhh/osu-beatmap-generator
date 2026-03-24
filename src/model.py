@@ -13,7 +13,7 @@ import torch.nn.functional as F
 from transformers import ASTModel, ASTConfig
 
 from .tokenizer import TOTAL_VOCAB, PAD, BOS, NUM_DIFF_BINS
-from .dataset import N_MELS
+from .dataset import N_MELS, N_FEATURES
 
 
 # ---------------------------------------------------------------------------
@@ -76,7 +76,7 @@ class AudioEncoder(nn.Module):
                 param.requires_grad = True
 
         self.upsample = TemporalUpsampleHead(d_model)
-        self.mel_proj = nn.Linear(N_MELS, d_model)
+        self.mel_proj = nn.Linear(N_FEATURES, d_model)
         self.ast_success = 0
         self.ast_fallback = 0
         self._fallback_warned = False
@@ -116,7 +116,7 @@ class AudioEncoder(nn.Module):
     def forward(self, mel: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            mel: [B, 1, N_MELS, T] mel spectrogram
+            mel: [B, 1, N_FEATURES, T] mel spectrogram + onset strength
 
         Returns:
             encoder_out: [B, T', D] temporal embeddings
@@ -124,8 +124,8 @@ class AudioEncoder(nn.Module):
         B = mel.shape[0]
 
         if mel.dim() == 4:
-            mel = mel.squeeze(1)  # [B, N_MELS, T]
-        mel = mel.transpose(1, 2)  # [B, T, N_MELS]
+            mel = mel.squeeze(1)  # [B, N_FEATURES, T]
+        mel = mel.transpose(1, 2)  # [B, T, N_FEATURES]
 
         mel_len = mel.shape[1]
         if self._ast_pos_len is not None and mel_len != self._ast_pos_len:
@@ -137,10 +137,12 @@ class AudioEncoder(nn.Module):
             )
             self._ast_pos_len = mel_len
 
-        projected = self.mel_proj(mel)  # [B, T, D]
+        projected = self.mel_proj(mel)  # [B, T, D] -- uses all N_FEATURES channels
+
+        mel_for_ast = mel[:, :, :N_MELS]  # strip onset channel for AST
 
         try:
-            ast_out = self.ast(input_values=mel).last_hidden_state
+            ast_out = self.ast(input_values=mel_for_ast).last_hidden_state
             encoder_out = self.upsample(ast_out)
             self.ast_success += 1
         except Exception as exc:
