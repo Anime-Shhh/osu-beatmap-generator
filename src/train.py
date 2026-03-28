@@ -415,6 +415,22 @@ def validate(
                 tgt_output.reshape(-1),
             )
 
+        if step == 0:
+            mel_no_onset = mel.clone()
+            mel_no_onset[:, :, -1, :] = 0.0
+            with autocast(dtype=torch.bfloat16):
+                outputs_no_onset = model(
+                    mel_no_onset, tgt_input, difficulty_id, bpm, padding_mask
+                )
+            diff = (
+                outputs["logits"].float() - outputs_no_onset["logits"].float()
+            ).abs().mean()
+            print(
+                f"[val diag] Onset zero-out logit diff: {diff:.4f} "
+                f"(if <0.01 → model may be ignoring onset)",
+                flush=True,
+            )
+
         total_loss += discrete_loss.item()
         num_batches += 1
 
@@ -432,8 +448,57 @@ def validate(
             mae = metrics["timing_mae_ms"]
             if mae != float("inf"):
                 total_timing_mae += mae
-        total_hit_f1 += metrics["hit_f1"]
-        num_metrics += 1
+            total_hit_f1 += metrics["hit_f1"]
+            num_metrics += 1
+
+            # #region agent log
+            if step == 0 and b == 0:
+                import json as _json
+                from .tokenizer import (
+                    TIME_OFFSET as _TO, NUM_BEAT_BINS as _NB,
+                    POS_OFFSET as _PO, NUM_POS_BINS as _NP,
+                    _NUM_SPECIAL as _NS,
+                    detokenize_to_hitobjects as _detok,
+                )
+                _LOG = "/common/home/asj102/personalCS/osu_beatmap_generator/.cursor/debug-559ead.log"
+                _pred_time = [t for t in pred_t if _TO <= t < _TO + _NB]
+                _true_time = [t for t in true_t if _TO <= t < _TO + _NB]
+                _pred_pos = [t for t in pred_t if _PO <= t < _PO + _NP]
+                _true_pos = [t for t in true_t if _PO <= t < _PO + _NP]
+                _pred_type = [t for t in pred_t if 4 <= t <= 13]
+                _true_type = [t for t in true_t if 4 <= t <= 13]
+                _pred_objs = _detok(pred_t, ms_per_beat=sample_ms_per_beat)
+                _true_objs = _detok(true_t, ms_per_beat=sample_ms_per_beat)
+                _pred_times_ms = sorted([o["time"] for o in _pred_objs])
+                _true_times_ms = sorted([o["time"] for o in _true_objs])
+                _pred_time_bins_raw = [t - _TO for t in _pred_time]
+                _true_time_bins_raw = [t - _TO for t in _true_time]
+                _time_tok_acc = sum(1 for p, t in zip(pred_t, true_t) if p == t and _TO <= t < _TO + _NB) / max(len(_true_time), 1)
+                _all_acc = sum(1 for p, t in zip(pred_t, true_t) if p == t) / max(len(true_t), 1)
+                def _cat(t):
+                    if _TO <= t < _TO + _NB: return "time"
+                    if _PO <= t < _PO + _NP: return "pos"
+                    if 4 <= t <= 13: return "type"
+                    return "other"
+                _cat_match = {"time_at_time": 0, "pos_at_time": 0, "type_at_time": 0, "other_at_time": 0,
+                              "time_at_pos": 0, "pos_at_pos": 0, "type_at_pos": 0, "other_at_pos": 0,
+                              "time_at_type": 0, "pos_at_type": 0, "type_at_type": 0, "other_at_type": 0}
+                for _p, _t in zip(pred_t, true_t):
+                    _pc, _tc = _cat(_p), _cat(_t)
+                    if _tc == "time": _cat_match[f"{_pc}_at_time"] += 1
+                    elif _tc == "pos": _cat_match[f"{_pc}_at_pos"] += 1
+                    elif _tc == "type": _cat_match[f"{_pc}_at_type"] += 1
+                _time_bin_err = [abs(p - t) for p, t in zip(_pred_time_bins_raw, _true_time_bins_raw)] if _pred_time_bins_raw and _true_time_bins_raw else []
+                _mean_bin_err = sum(_time_bin_err) / len(_time_bin_err) if _time_bin_err else -1
+                with open(_LOG, "a") as _f:
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H1", "message": "token_breakdown", "data": {"seq_len": len(true_t), "pred_time_count": len(_pred_time), "true_time_count": len(_true_time), "pred_pos_count": len(_pred_pos), "true_pos_count": len(_true_pos), "pred_type_count": len(_pred_type), "true_type_count": len(_true_type), "pred_obj_count": len(_pred_objs), "true_obj_count": len(_true_objs)}, "timestamp": int(time.time()*1000)}) + "\n")
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H2", "message": "time_bin_dist", "data": {"pred_bins": _pred_time_bins_raw[:30], "true_bins": _true_time_bins_raw[:30], "pred_bin_set": sorted(set(_pred_time_bins_raw)), "true_bin_set": sorted(set(_true_time_bins_raw)), "mean_bin_error": round(_mean_bin_err, 2)}, "timestamp": int(time.time()*1000)}) + "\n")
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H3", "message": "bpm_and_timing", "data": {"bpm": float(bpm[b].item()), "ms_per_beat": round(sample_ms_per_beat, 2), "pred_times_ms": [round(t, 1) for t in _pred_times_ms[:15]], "true_times_ms": [round(t, 1) for t in _true_times_ms[:15]], "timing_mae": round(mae, 2) if mae != float("inf") else -1}, "timestamp": int(time.time()*1000)}) + "\n")
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H4", "message": "accuracy", "data": {"time_tok_accuracy": round(_time_tok_acc, 4), "overall_tok_accuracy": round(_all_acc, 4)}, "timestamp": int(time.time()*1000)}) + "\n")
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H5", "message": "first_30_tokens", "data": {"pred_first30": pred_t[:30], "true_first30": true_t[:30]}, "timestamp": int(time.time()*1000)}) + "\n")
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H1H2", "message": "category_confusion", "data": _cat_match, "timestamp": int(time.time()*1000)}) + "\n")
+                    _f.write(_json.dumps({"sessionId": "559ead", "hypothesisId": "H2", "message": "bin_level_errors", "data": {"per_pos_bin_err": _time_bin_err[:20], "mean_bin_error": round(_mean_bin_err, 2)}, "timestamp": int(time.time()*1000)}) + "\n")
+            # #endregion
 
     if num_batches == 0:
         print(
@@ -684,17 +749,7 @@ def main():
               f"hit_f1={val_metrics['val/hit_f1']:.4f}")
         print(f"  lr={lr:.6f} | time={elapsed:.1f}s")
 
-        encoder_stats = model.encoder.get_ast_stats()
-        print(
-            "  encoder_ast: success={ok} fallback={fb}".format(
-                ok=encoder_stats["ast_success"],
-                fb=encoder_stats["ast_fallback"],
-            )
-        )
-
         logger_payload = {"train/epoch_loss": train_loss, "epoch": epoch, **val_metrics}
-        logger_payload["model/ast_success"] = encoder_stats["ast_success"]
-        logger_payload["model/ast_fallback"] = encoder_stats["ast_fallback"]
         if split_shards:
             logger_payload["data/train_shards"] = len(split_shards["train"])
             logger_payload["data/val_shards"] = len(split_shards["val"])

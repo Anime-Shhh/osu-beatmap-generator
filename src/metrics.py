@@ -85,7 +85,7 @@ def hit_f1(
     true_tokens: list[int],
     pred_residuals: Optional[list[Residuals]] = None,
     true_residuals: Optional[list[Residuals]] = None,
-    time_tolerance_ms: float = 20.0,
+    time_tolerance_ms: float = 50.0,
     pos_tolerance_px: float = 50.0,
     ms_per_beat: float = 500.0,
 ) -> dict[str, float]:

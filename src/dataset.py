@@ -43,6 +43,9 @@ WINDOW_SAMPLES = int(WINDOW_SEC * TARGET_SR)      # 132300
 STRIDE_SAMPLES = int(STRIDE_SEC * TARGET_SR)       # 66150
 PREDICT_START_SEC = (WINDOW_SEC - PREDICT_SEC) / 2  # 1.5s
 
+# Print mel vs onset (log) stats once per process (first collate batch) to avoid log spam.
+_COLLATE_DIAG_PRINTED = False
+
 
 def build_mel_transform(device: str = "cpu") -> torchaudio.transforms.MelSpectrogram:
     return torchaudio.transforms.MelSpectrogram(
@@ -199,8 +202,31 @@ def collate_fn(batch: list[dict]) -> dict:
         all_x_res.append([r.x_offset_px for r in residuals] + [0.0] * pad_len)
         all_y_res.append([r.y_offset_px for r in residuals] + [0.0] * pad_len)
 
+    mel_log = torch.log(torch.stack(mels, dim=0) + 1e-7)
+
+    mel_ch = mel_log[:, :, :N_MELS, :]
+    onset_ch = mel_log[:, :, N_MELS:, :]
+    mel_ch = (mel_ch - mel_ch.mean()) / (mel_ch.std() + 1e-6)
+    onset_ch = (onset_ch - onset_ch.mean()) / (onset_ch.std() + 1e-6)
+    mel_normed = torch.cat([mel_ch, onset_ch], dim=2)
+
+    global _COLLATE_DIAG_PRINTED
+    if not _COLLATE_DIAG_PRINTED:
+        _COLLATE_DIAG_PRINTED = True
+        print(
+            f"[collate diag] post-norm shape={mel_normed.shape} | "
+            f"mel (128 ch) mean={mel_ch.mean():.3f} std={mel_ch.std():.3f} "
+            f"min={mel_ch.min():.3f} max={mel_ch.max():.3f}",
+            flush=True,
+        )
+        print(
+            f"[collate diag] onset (1 ch) mean={onset_ch.mean():.3f} std={onset_ch.std():.3f} "
+            f"min={onset_ch.min():.3f} max={onset_ch.max():.3f}",
+            flush=True,
+        )
+
     return {
-        "mel": torch.log(torch.stack(mels, dim=0) + 1e-7),
+        "mel": mel_normed,
         "tokens": torch.tensor(all_tokens, dtype=torch.long),
         "time_residuals": torch.tensor(all_time_res, dtype=torch.float32).clamp(-BEAT_QUANT / 2, BEAT_QUANT / 2),
         "x_residuals": torch.tensor(all_x_res, dtype=torch.float32).clamp(-8.0, 8.0),

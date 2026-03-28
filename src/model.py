@@ -77,8 +77,10 @@ class AudioEncoder(nn.Module):
 
         self.upsample = TemporalUpsampleHead(d_model)
         self.mel_proj = nn.Linear(N_FEATURES, d_model)
-        self.ast_success = 0
-        self.ast_fallback = 0
+        self.mel_gate = nn.Sequential(
+            nn.Linear(d_model, d_model),
+            nn.Sigmoid(),
+        )
         self._fallback_warned = False
         self._ast_pos_len = getattr(self.ast.config, "max_length", None)
 
@@ -137,17 +139,15 @@ class AudioEncoder(nn.Module):
             )
             self._ast_pos_len = mel_len
 
-        projected = self.mel_proj(mel)  # [B, T, D] -- uses all N_FEATURES channels
+        projected = self.mel_proj(mel)  # [B, T, D] -- includes onset channel
 
-        mel_for_ast = mel[:, :, :N_MELS]  # strip onset channel for AST
+        mel_for_ast = mel[:, :, :N_MELS]  # strip onset for AST (expects 128 bins)
 
         try:
             ast_out = self.ast(input_values=mel_for_ast).last_hidden_state
             encoder_out = self.upsample(ast_out)
-            self.ast_success += 1
         except Exception as exc:
             encoder_out = self.upsample(projected)
-            self.ast_fallback += 1
             if not self._fallback_warned:
                 print(
                     "WARNING: AST forward failed; using projected mel fallback path. "
@@ -155,10 +155,16 @@ class AudioEncoder(nn.Module):
                 )
                 self._fallback_warned = True
 
-        return encoder_out
+        proj_aligned = F.interpolate(
+            projected.transpose(1, 2),
+            size=encoder_out.shape[1],
+            mode="linear",
+            align_corners=False,
+        ).transpose(1, 2)
+        gate = self.mel_gate(proj_aligned)
+        encoder_out = encoder_out + gate * proj_aligned
 
-    def get_ast_stats(self) -> dict[str, int]:
-        return {"ast_success": self.ast_success, "ast_fallback": self.ast_fallback}
+        return encoder_out
 
 
 # ---------------------------------------------------------------------------

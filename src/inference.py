@@ -201,6 +201,11 @@ def generate_beatmap(args) -> str:
         onset = compute_onset_strength(chunk.cpu(), mel.shape[-1])  # [1, T]
         mel = torch.cat([mel, onset.unsqueeze(0).to(device)], dim=1)  # [1, N_FEATURES, T]
         mel = torch.log(mel + 1e-7)
+        mel_ch = mel[:, :N_MELS, :]
+        onset_ch = mel[:, N_MELS:, :]
+        mel_ch = (mel_ch - mel_ch.mean()) / (mel_ch.std() + 1e-6)
+        onset_ch = (onset_ch - onset_ch.mean()) / (onset_ch.std() + 1e-6)
+        mel = torch.cat([mel_ch, onset_ch], dim=1)
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
@@ -231,6 +236,11 @@ def generate_beatmap(args) -> str:
         onset = compute_onset_strength(remaining.cpu(), mel.shape[-1])
         mel = torch.cat([mel, onset.unsqueeze(0).to(device)], dim=1)
         mel = torch.log(mel + 1e-7)
+        mel_ch = mel[:, :N_MELS, :]
+        onset_ch = mel[:, N_MELS:, :]
+        mel_ch = (mel_ch - mel_ch.mean()) / (mel_ch.std() + 1e-6)
+        onset_ch = (onset_ch - onset_ch.mean()) / (onset_ch.std() + 1e-6)
+        mel = torch.cat([mel_ch, onset_ch], dim=1)
 
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms
