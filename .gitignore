@@ -18,3 +18,4 @@ data
 *.sif
 .DS_Store
 .cursor/
+venv/

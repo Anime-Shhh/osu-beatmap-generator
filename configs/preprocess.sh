@@ -32,7 +32,7 @@ echo "Examples per shard: $EXAMPLES_PER_SHARD"
 echo "Expected size note: $EXPECTED_SIZE_NOTE"
 echo "========================="
 
-python -m src.preprocess \
+python -u -m src.preprocess \
     --output_dir "$OUTPUT_DIR" \
     --max_shards "$TARGET_TOTAL_SHARDS" \
     --examples_per_shard "$EXAMPLES_PER_SHARD" \

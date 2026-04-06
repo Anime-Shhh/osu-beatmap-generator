@@ -1,55 +1,58 @@
 """
-Inference script: Load a trained OsuMapper checkpoint and generate
-a .osu beatmap file from an input .mp3 file.
-
-Usage:
-    python -m src.inference \
-        --input song.mp3 \
-        --output generated.osu \
-        --checkpoint /common/users/asj102/osu_project/models/best.pt \
-        --difficulty 4.5
+Inference entrypoint for legacy autoregressive generation and flow generation.
 """
+
+from __future__ import annotations
 
 import argparse
 import os
-import sys
-import time
-from datetime import datetime
 
 import torch
 import torchaudio
 
-from .model import OsuMapper
+from .checkpoints import load_model_state_dict
 from .dataset import (
-    build_mel_transform, compute_onset_strength, TARGET_SR,
-    WINDOW_SAMPLES, STRIDE_SAMPLES, WINDOW_SEC, STRIDE_SEC,
-    PREDICT_START_SEC, PREDICT_SEC, N_MELS,
+    N_MELS,
+    PREDICT_START_SEC,
+    STRIDE_SAMPLES,
+    TARGET_SR,
+    WINDOW_SAMPLES,
+    build_feature_tensor,
+    build_mel_transform,
+    normalize_mel_batch,
 )
-from .tokenizer import (
-    detokenize_to_hitobjects, hitobjects_to_osu_lines,
-    Residuals, BOS, EOS, difficulty_to_bin,
-)
+from .flow_model import LatentFlowMatcher, integrate_flow
+from .latent_ae import SignalAutoencoder
+from .model import OsuMapper
+from .representation import DEFAULT_FRAME_RATE, NUM_SIGNAL_CHANNELS, decode_signal_to_osu, ms_to_frame
+from .tokenizer import Residuals, detokenize_to_hitobjects, difficulty_to_bin, hitobjects_to_osu_lines
 
 
 def parse_args():
     p = argparse.ArgumentParser(description="Generate .osu beatmap from audio")
-    p.add_argument("--input", type=str, required=True, help="Path to .mp3 file")
-    p.add_argument("--output", type=str, default="", help="Output .osu path (default: input_name.osu)")
-    p.add_argument("--checkpoint", type=str,
-                    default="/common/users/asj102/osu_project/models/best.pt")
-    p.add_argument("--difficulty", type=float, default=4.0,
-                    help="Target star rating for conditioning (mapped to 5-bin scheme)")
-    p.add_argument("--bpm", type=float, default=0.0,
-                    help="Song BPM for conditioning (0 = auto-estimate)")
+    p.add_argument("--input", type=str, required=True, help="Path to input audio")
+    p.add_argument("--output", type=str, default="", help="Output .osu path")
+    p.add_argument("--checkpoint", type=str, default="/common/users/asj102/osu_project/models/best.pt")
+    p.add_argument("--ae_checkpoint", type=str, default="")
+    p.add_argument("--generation_mode", type=str, choices=["auto", "legacy", "flow"], default="auto")
+    p.add_argument("--difficulty", type=float, default=4.0, help="Target star rating for conditioning")
+    p.add_argument("--bpm", type=float, default=0.0, help="Song BPM for conditioning (0 = auto-estimate)")
     p.add_argument("--temperature", type=float, default=0.9)
     p.add_argument("--max_tokens_per_window", type=int, default=512)
+    p.add_argument("--ode_steps", type=int, default=32)
+    p.add_argument("--guidance_scale", type=float, default=1.0)
+    p.add_argument("--full_song_context", action="store_true")
     p.add_argument("--device", type=str, default="auto")
 
-    # Model architecture (must match training)
     p.add_argument("--d_model", type=int, default=768)
     p.add_argument("--decoder_layers", type=int, default=6)
     p.add_argument("--decoder_heads", type=int, default=8)
     p.add_argument("--decoder_ff", type=int, default=2048)
+    p.add_argument("--dropout", type=float, default=0.1)
+    p.add_argument("--latent_dim", type=int, default=96)
+    p.add_argument("--ae_hidden_dim", type=int, default=256)
+    p.add_argument("--flow_hidden_dim", type=int, default=256)
+    p.add_argument("--cond_dim", type=int, default=256)
     return p.parse_args()
 
 
@@ -103,75 +106,199 @@ SliderTickRate:1
 def star_to_difficulty_name(star: float) -> str:
     if star < 2.0:
         return "Easy"
-    elif star < 3.0:
+    if star < 3.0:
         return "Normal"
-    elif star < 4.5:
+    if star < 4.5:
         return "Hard"
-    elif star < 6.0:
+    if star < 6.0:
         return "Insane"
-    elif star < 7.5:
+    if star < 7.5:
         return "Expert"
     return "Expert+"
 
 
 def star_to_od_ar(star: float) -> tuple[float, float]:
-    """Heuristic mapping from star rating to OD/AR."""
     od = min(10, max(2, star * 1.3))
     ar = min(10, max(3, star * 1.4))
     return round(od, 1), round(ar, 1)
 
 
 def estimate_bpm(waveform: torch.Tensor, sr: int) -> float:
-    """Simple onset-based BPM estimation."""
     try:
         import librosa
-        y = waveform.squeeze().numpy()
+
+        y = waveform.squeeze().cpu().numpy()
         tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
-        if hasattr(tempo, '__len__'):
+        if hasattr(tempo, "__len__"):
             return float(tempo[0])
         return float(tempo)
     except Exception:
         return 120.0
 
 
-def generate_beatmap(args) -> str:
-    """Main generation pipeline."""
+def _device_from_args(args) -> torch.device:
     if args.device == "auto":
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    else:
-        device = torch.device(args.device)
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return torch.device(args.device)
 
-    print(f"Device: {device}")
-    print(f"Loading model from: {args.checkpoint}")
 
+def _load_audio(path: str) -> torch.Tensor:
+    waveform, sr = torchaudio.load(path)
+    if waveform.shape[0] > 1:
+        waveform = waveform.mean(dim=0, keepdim=True)
+    if sr != TARGET_SR:
+        waveform = torchaudio.transforms.Resample(sr, TARGET_SR)(waveform)
+    return waveform
+
+
+def _resolve_generation_mode(args, checkpoint: dict) -> str:
+    if args.generation_mode != "auto":
+        return args.generation_mode
+    stage = checkpoint.get("stage", "legacy")
+    return "flow" if stage == "flow" else "legacy"
+
+
+def _build_normalized_mel(waveform: torch.Tensor, mel_transform, device: torch.device) -> torch.Tensor:
+    feature = build_feature_tensor(waveform.cpu(), mel_transform).unsqueeze(0)  # [1,1,C,T]
+    feature = normalize_mel_batch(feature)
+    return feature.to(device)
+
+
+def _load_legacy_model(args, checkpoint: dict, device: torch.device) -> OsuMapper:
     model = OsuMapper(
         d_model=args.d_model,
         decoder_layers=args.decoder_layers,
         decoder_heads=args.decoder_heads,
         decoder_ff=args.decoder_ff,
+        dropout=args.dropout,
+    ).to(device)
+    load_model_state_dict(model, checkpoint["model_state_dict"])
+    model.eval()
+    return model
+
+
+def _load_ae_and_flow(args, checkpoint: dict, device: torch.device):
+    ae = SignalAutoencoder(hidden_dim=args.ae_hidden_dim, latent_dim=args.latent_dim).to(device)
+    flow = LatentFlowMatcher(
+        latent_dim=args.latent_dim,
+        hidden_dim=args.flow_hidden_dim,
+        cond_dim=args.cond_dim,
+    ).to(device)
+    ae_state = checkpoint.get("ae_state_dict")
+    if ae_state is None:
+        if not args.ae_checkpoint:
+            raise ValueError("Flow inference requires --ae_checkpoint when the flow checkpoint does not contain AE weights.")
+        ae_checkpoint = torch.load(args.ae_checkpoint, map_location=device, weights_only=False)
+        ae_state = ae_checkpoint.get("model_state_dict", ae_checkpoint)
+    load_model_state_dict(ae, ae_state, strict=True)
+    load_model_state_dict(flow, checkpoint["model_state_dict"], strict=True)
+    ae.eval()
+    flow.eval()
+    return ae, flow
+
+
+@torch.no_grad()
+def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm: float, device: torch.device) -> list[dict]:
+    model = _load_legacy_model(args, checkpoint, device)
+    mel_transform = build_mel_transform("cpu")
+    diff_id = difficulty_to_bin(args.difficulty)
+    diff_tensor = torch.tensor([diff_id], device=device)
+    bpm_tensor = torch.tensor([[bpm]], device=device, dtype=torch.float32)
+
+    all_objects = []
+    start = 0
+    ms_per_beat = 60000.0 / max(bpm, 1e-6)
+
+    while start + WINDOW_SAMPLES <= waveform.shape[-1]:
+        chunk = waveform[:, start:start + WINDOW_SAMPLES]
+        mel = _build_normalized_mel(chunk, mel_transform, device)
+        window_start_ms = (start / TARGET_SR) * 1000.0
+        predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
+        tokens, residuals_raw = model.generate(
+            mel.squeeze(0),
+            diff_tensor,
+            bpm_tensor,
+            max_len=args.max_tokens_per_window,
+            temperature=args.temperature,
+        )
+        residuals = [Residuals(time_offset_ms=t, x_offset_px=x, y_offset_px=y) for t, x, y in residuals_raw]
+        objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat)
+        all_objects.extend(objects)
+        start += STRIDE_SAMPLES
+
+    if start < waveform.shape[-1] and waveform.shape[-1] - start > WINDOW_SAMPLES // 4:
+        remaining = waveform[:, start:]
+        if remaining.shape[-1] < WINDOW_SAMPLES:
+            remaining = torch.nn.functional.pad(remaining, (0, WINDOW_SAMPLES - remaining.shape[-1]))
+        mel = _build_normalized_mel(remaining, mel_transform, device)
+        window_start_ms = (start / TARGET_SR) * 1000.0
+        tokens, residuals_raw = model.generate(
+            mel.squeeze(0),
+            diff_tensor,
+            bpm_tensor,
+            max_len=args.max_tokens_per_window,
+            temperature=args.temperature,
+        )
+        residuals = [Residuals(time_offset_ms=t, x_offset_px=x, y_offset_px=y) for t, x, y in residuals_raw]
+        objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=window_start_ms, ms_per_beat=ms_per_beat)
+        end_ms = (waveform.shape[-1] / TARGET_SR) * 1000.0
+        all_objects.extend([obj for obj in objects if obj["time"] <= end_ms])
+
+    all_objects.sort(key=lambda obj: obj["time"])
+    deduped = []
+    for obj in all_objects:
+        if deduped and abs(obj["time"] - deduped[-1]["time"]) < 5:
+            continue
+        deduped.append(obj)
+    return deduped
+
+
+@torch.no_grad()
+def generate_flow_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm: float, device: torch.device) -> list[dict]:
+    ae, flow = _load_ae_and_flow(args, checkpoint, device)
+    mel_transform = build_mel_transform("cpu")
+    mel = _build_normalized_mel(waveform, mel_transform, device)
+    difficulty_id = torch.tensor([difficulty_to_bin(args.difficulty)], device=device, dtype=torch.long)
+    difficulty_value = torch.tensor([[args.difficulty]], device=device, dtype=torch.float32)
+    bpm_tensor = torch.tensor([[bpm]], device=device, dtype=torch.float32)
+
+    duration_ms = waveform.shape[-1] * 1000.0 / TARGET_SR
+    signal_frames = max(1, ms_to_frame(duration_ms, DEFAULT_FRAME_RATE) + 1)
+    dummy_signal = torch.zeros(1, NUM_SIGNAL_CHANNELS, signal_frames, device=device)
+    latent_shape = tuple(ae.encode(dummy_signal).shape)
+    generated_latent = integrate_flow(
+        flow_model=flow,
+        latent_shape=latent_shape,
+        mel=mel,
+        difficulty_id=difficulty_id,
+        difficulty_value=difficulty_value,
+        bpm=bpm_tensor,
+        steps=max(args.ode_steps, 1),
+        guidance_scale=args.guidance_scale,
+        device=device,
+    )
+    generated_signal = ae.decode(generated_latent, output_len=signal_frames)[0]
+    return decode_signal_to_osu(
+        generated_signal,
+        bpm=bpm,
+        offset_ms=0.0,
+        star_rating=args.difficulty,
+        frame_rate=DEFAULT_FRAME_RATE,
     )
 
-    if os.path.exists(args.checkpoint):
-        ckpt = torch.load(args.checkpoint, map_location=device, weights_only=False)
-        model.load_state_dict(ckpt["model_state_dict"])
-        print(f"Loaded checkpoint from epoch {ckpt.get('epoch', '?')}")
-    else:
-        print(f"WARNING: Checkpoint not found at {args.checkpoint}, using random weights")
 
-    model = model.to(device)
-    model.eval()
+def generate_beatmap(args) -> str:
+    device = _device_from_args(args)
+    print(f"Device: {device}")
+    print(f"Loading checkpoint: {args.checkpoint}")
 
-    # Load audio
-    print(f"Loading audio: {args.input}")
-    waveform, sr = torchaudio.load(args.input)
-    if waveform.shape[0] > 1:
-        waveform = waveform.mean(dim=0, keepdim=True)
-    if sr != TARGET_SR:
-        waveform = torchaudio.transforms.Resample(sr, TARGET_SR)(waveform)
+    checkpoint = torch.load(args.checkpoint, map_location=device, weights_only=False)
+    generation_mode = _resolve_generation_mode(args, checkpoint)
+    print(f"Resolved generation_mode={generation_mode}")
 
-    num_samples = waveform.shape[-1]
-    duration_sec = num_samples / TARGET_SR
-    print(f"Audio duration: {duration_sec:.1f}s ({num_samples} samples at {TARGET_SR}Hz)")
+    waveform = _load_audio(args.input)
+    duration_sec = waveform.shape[-1] / TARGET_SR
+    print(f"Audio duration: {duration_sec:.1f}s")
 
     if args.bpm > 0:
         bpm = args.bpm
@@ -180,102 +307,16 @@ def generate_beatmap(args) -> str:
         bpm = estimate_bpm(waveform, TARGET_SR)
         print(f"Auto-estimated BPM: {bpm:.1f}")
 
-    diff_id = difficulty_to_bin(args.difficulty)
-    diff_tensor = torch.tensor([diff_id], device=device)
-    bpm_tensor = torch.tensor([[bpm]], device=device, dtype=torch.float32)
-    print(f"Conditioning: difficulty_bin={diff_id}, bpm={bpm:.1f}")
+    if generation_mode == "legacy":
+        objects = generate_legacy_objects(args, checkpoint, waveform, bpm, device)
+    else:
+        objects = generate_flow_objects(args, checkpoint, waveform, bpm, device)
 
-    mel_transform = build_mel_transform(str(device))
-
-    all_objects = []
-    window_count = 0
-    start = 0
-
-    print(f"Generating beatmap (difficulty={args.difficulty}, temp={args.temperature})...")
-
-    ms_per_beat = 60000.0 / bpm
-
-    while start + WINDOW_SAMPLES <= num_samples:
-        chunk = waveform[:, start : start + WINDOW_SAMPLES].to(device)
-        mel = mel_transform(chunk)  # [1, N_MELS, T]
-        onset = compute_onset_strength(chunk.cpu(), mel.shape[-1])  # [1, T]
-        mel = torch.cat([mel, onset.unsqueeze(0).to(device)], dim=1)  # [1, N_FEATURES, T]
-        mel = torch.log(mel + 1e-7)
-        mel_ch = mel[:, :N_MELS, :]
-        onset_ch = mel[:, N_MELS:, :]
-        mel_ch = (mel_ch - mel_ch.mean()) / (mel_ch.std() + 1e-6)
-        onset_ch = (onset_ch - onset_ch.mean()) / (onset_ch.std() + 1e-6)
-        mel = torch.cat([mel_ch, onset_ch], dim=1)
-
-        window_start_ms = (start / TARGET_SR) * 1000.0
-        predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
-
-        tokens, residuals_raw = model.generate(
-            mel, diff_tensor, bpm_tensor,
-            max_len=args.max_tokens_per_window, temperature=args.temperature,
-        )
-
-        residuals = [
-            Residuals(time_offset_ms=r[0], x_offset_px=r[1], y_offset_px=r[2])
-            for r in residuals_raw
-        ]
-
-        objects = detokenize_to_hitobjects(
-            tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat,
-        )
-        all_objects.extend(objects)
-        window_count += 1
-
-        start += STRIDE_SAMPLES
-
-    if start < num_samples and num_samples - start > WINDOW_SAMPLES // 4:
-        remaining = waveform[:, start:].to(device)
-        pad_len = WINDOW_SAMPLES - remaining.shape[-1]
-        remaining = torch.nn.functional.pad(remaining, (0, pad_len))
-        mel = mel_transform(remaining)
-        onset = compute_onset_strength(remaining.cpu(), mel.shape[-1])
-        mel = torch.cat([mel, onset.unsqueeze(0).to(device)], dim=1)
-        mel = torch.log(mel + 1e-7)
-        mel_ch = mel[:, :N_MELS, :]
-        onset_ch = mel[:, N_MELS:, :]
-        mel_ch = (mel_ch - mel_ch.mean()) / (mel_ch.std() + 1e-6)
-        onset_ch = (onset_ch - onset_ch.mean()) / (onset_ch.std() + 1e-6)
-        mel = torch.cat([mel_ch, onset_ch], dim=1)
-
-        window_start_ms = (start / TARGET_SR) * 1000.0
-        predict_start_ms = window_start_ms
-
-        tokens, residuals_raw = model.generate(
-            mel, diff_tensor, bpm_tensor,
-            max_len=args.max_tokens_per_window, temperature=args.temperature,
-        )
-        residuals = [
-            Residuals(time_offset_ms=r[0], x_offset_px=r[1], y_offset_px=r[2])
-            for r in residuals_raw
-        ]
-        objects = detokenize_to_hitobjects(
-            tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat,
-        )
-        end_ms = (num_samples / TARGET_SR) * 1000.0
-        objects = [o for o in objects if o["time"] <= end_ms]
-        all_objects.extend(objects)
-
-    # Deduplicate overlapping windows (remove objects too close in time)
-    all_objects.sort(key=lambda o: o["time"])
-    deduped = []
-    for obj in all_objects:
-        if deduped and abs(obj["time"] - deduped[-1]["time"]) < 5:
-            continue
-        deduped.append(obj)
-
-    print(f"Generated {len(deduped)} hit objects from {window_count} windows")
-
-    # Build .osu file
-    hitobject_lines = hitobjects_to_osu_lines(deduped)
+    hitobject_lines = hitobjects_to_osu_lines(objects)
     title = os.path.splitext(os.path.basename(args.input))[0]
     diff_name = star_to_difficulty_name(args.difficulty)
     od, ar = star_to_od_ar(args.difficulty)
-    beat_length = 60000.0 / bpm
+    beat_length = 60000.0 / max(bpm, 1e-6)
 
     osu_content = OSU_TEMPLATE.format(
         audio_filename=os.path.basename(args.input),
@@ -287,13 +328,12 @@ def generate_beatmap(args) -> str:
         hitobjects="\n".join(hitobject_lines),
     )
 
-    # Output
     if not args.output:
         args.output = os.path.splitext(args.input)[0] + ".osu"
+    with open(args.output, "w", encoding="utf-8") as handle:
+        handle.write(osu_content)
 
-    with open(args.output, "w", encoding="utf-8") as f:
-        f.write(osu_content)
-
+    print(f"Generated {len(objects)} hit objects")
     print(f"Saved beatmap to: {args.output}")
     return args.output
 

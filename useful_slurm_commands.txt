@@ -9,6 +9,80 @@ cat /common/users/asj102/osu_project/logs/slurm_121416.err
  #logs
 cat /common/users/asj102/osu_project/logs/slurm_121416.out
 
-
-sacct -u asj102 -S 2026-01-01 #gets all jobs done past 2026-1-1
+#gets all jobs done past 2026-1-1
+sacct -u asj102 -S 2026-01-01 
 sacct -u netid #gets all your jobs
+
+
+# runs the inference script to test the model
+sbatch configs/inference_any_gpu.sh
+
+# to check its logs
+stdout log: /common/users/asj102/osu_project/logs/infer_<jobid>.out
+stderr log: /common/users/asj102/osu_project/logs/infer_<jobid>.err
+
+#generated files are stored here, example:
+ls -la /common/users/asj102/osu_project/data/inference_output/kaguya.osu
+
+SLURM logs from configs/preprocess.sh.
+
+They go to:
+
+cat /common/users/asj102/osu_project/logs/preproc_<jobid>.out
+cat /common/users/asj102/osu_project/logs/preproc_<jobid>.err
+
+
+
+Rerun the quick checks once, since I made a couple small safety patches after the earlier test run:
+python3 -m py_compile src/*.py tests/*.py
+python3 -m unittest tests/test_representation.py tests/test_dataset_collate.py
+Do a small preprocess smoke test first, not the full dataset yet:
+sbatch configs/preprocess.sh --max_shards 4 --examples_per_shard 64 --include_full_song --quality_filter ranked_only
+Important:
+
+--include_full_song is required for AE/flow.
+Do not pass --no_legacy_windows; you want both legacy windows and full-song samples in the cache.
+preprocess.sh clears the shard directory first, so this is a smoke cache, not your final training cache.
+If that preprocess job succeeds, do an AE smoke run:
+sbatch configs/train_any_gpu.sh \
+  --stage ae \
+  --quality_filter ranked_only \
+  --batch_size 2 \
+  --epochs 1 \
+  --dry_run \
+  --model_dir /common/users/asj102/osu_project/models_ae \
+  --log_dir /common/users/asj102/osu_project/logs_ae
+If AE smoke succeeds, do a flow smoke run:
+sbatch configs/train_any_gpu.sh \
+  --stage flow \
+  --use_flow_matching \
+  --quality_filter ranked_only \
+  --batch_size 1 \
+  --epochs 1 \
+  --dry_run \
+  --ae_checkpoint /common/users/asj102/osu_project/models_ae/best.pt \
+  --model_dir /common/users/asj102/osu_project/models_flow \
+  --log_dir /common/users/asj102/osu_project/logs_flow
+Only after those smoke jobs pass, rebuild the real cache:
+sbatch configs/preprocess.sh --max_shards 500 --examples_per_shard 200 --include_full_song --quality_filter ranked_only
+Then do real AE training, then real flow training, with separate model dirs:
+sbatch configs/train_any_gpu.sh \
+  --stage ae \
+  --quality_filter ranked_only \
+  --batch_size 2 \
+  --model_dir /common/users/asj102/osu_project/models_ae \
+  --log_dir /common/users/asj102/osu_project/logs_ae
+sbatch configs/train_any_gpu.sh \
+  --stage flow \
+  --use_flow_matching \
+  --quality_filter ranked_only \
+  --batch_size 1 \
+  --ae_checkpoint /common/users/asj102/osu_project/models_ae/best.pt \
+  --model_dir /common/users/asj102/osu_project/models_flow \
+  --log_dir /common/users/asj102/osu_project/logs_flow
+Why this order
+
+Old shards are not enough for AE/flow.
+Full-song samples are only produced if you preprocess with --include_full_song.
+Small smoke jobs catch schema, loader, and memory issues before you burn cluster time.
+Separate model_dirs prevent best.pt from being overwritten between AE and flow stages.

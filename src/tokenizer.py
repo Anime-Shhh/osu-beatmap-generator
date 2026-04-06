@@ -197,11 +197,19 @@ def parse_osu_hitobjects(osu_content: str) -> list[dict]:
                 y = float(parts[1])
                 time_ms = float(parts[2])
                 type_int = int(parts[3])
+                hit_sound = int(parts[4]) if len(parts) > 4 else 0
             except (ValueError, IndexError):
                 continue
 
             hit_type = _parse_hit_type(type_int)
-            obj = {"time": time_ms, "type": hit_type, "x": x, "y": y}
+            obj = {
+                "time": time_ms,
+                "type": hit_type,
+                "x": x,
+                "y": y,
+                "hit_sound": hit_sound,
+                "new_combo": bool(type_int & 4),
+            }
 
             if hit_type == "slider" and len(parts) >= 8:
                 curve_data = parts[5]
