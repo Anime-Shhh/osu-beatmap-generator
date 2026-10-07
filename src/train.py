@@ -233,7 +233,10 @@ def build_dataset(args, epoch: int, split_name: str, split_shards: dict[str, lis
     if split_name == "train" and args.stage == "legacy":
         if epoch < args.curriculum_circles_until:
             curriculum = "circles_only"
-        augmenter = AudioAugmenter(enabled=(epoch > 5))
+        # Do not time-stretch until labels, timing map, and BPM are transformed
+        # together.  The old path changed the waveform while re-tokenizing the
+        # original .osu timestamps, which corrupts supervision.
+        augmenter = None
 
     mel_transform = build_mel_transform("cpu")
     return OsuStreamingDataset(

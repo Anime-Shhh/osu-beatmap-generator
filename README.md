@@ -1,6 +1,66 @@
-# OsuM — AI Beatmap Generation from Audio
+# OsuM — audio-to-osu!standard research
 
-OsuMapper is an end-to-end deep learning system that automatically generates [osu!](https://osu.ppy.sh/) beatmaps from raw audio. Given an MP3 file of any song, the model produces a fully playable `.osu` beatmap file containing timed hit circles, sliders, and spinners — the core gameplay elements of osu!standard mode.
+> **Use architecture v2 for all new work.** The original AST/token and
+> experimental AE/latent-flow paths below are retained only as historical
+> baselines. They are not the current implementation, do not have an
+> audio-only timing solution, and should not be used for a new run.
+
+The current system is **Tempo-Posterior Hierarchical Event Diffusion**:
+
+```text
+audio-derived features → tempo/meter/downbeat hypotheses → timestamp-aligned
+whole-song bar context → grammar-constrained sparse event plans → active-event
+geometry/path diffusion → constraint projection → strict audit/compiler →
+one editor-ready, ranked-like draft for human mapper review
+```
+
+It produces a playable **draft**, not an automatically rankable map. osu!'s
+Ranking Criteria prohibit generative creation of hit objects, timing, and
+hitsounds for Ranked maps; human review and editing remain required. See the
+full design in [plans/tempo-posterior-hierarchical-event-diffusion.md](plans/tempo-posterior-hierarchical-event-diffusion.md).
+
+## V2 status and safety
+
+The v2 implementation now includes canonical audio/cache manifests, audio/fingerprint-safe source splits, meter-aware timing hypotheses, a strict `MapSpec` compiler/validator, sparse grammar targets, timestamp-aligned planner and geometry models, explicit prior-bar boundary conditioning, safe record/checkpoint schemas, candidate auditing, and static iLab job templates.
+
+No training, GPU allocation, Slurm submission, audio-model download, or iLab interaction is performed by importing these modules. The only v2 optimizer entry point is deliberately guarded:
+
+```bash
+python -m src.v2.train ... --confirm-training
+```
+
+The template [configs/v2_train_a6000.sbatch](configs/v2_train_a6000.sbatch) is inert until a user manually submits it and sets `CONFIRM_TRAINING=1`; it is configured for one 48 GB RTX A6000, BF16, durable checkpoints, and a three-day allocation. It must be adapted and submitted only when you have permission to use the target cluster.
+
+### V2 runtime contract
+
+Audio is the only conceptual product input. In implementation, generation takes a feature bundle produced from that audio plus clock hypotheses from a pinned beat/downbeat resolver. This is intentional: neither MERT nor Beat This! weights are silently downloaded at inference, and source `.osu` timing/settings are never allowed into the audio-only inference path.
+
+The first v2 feature stack is 24 kHz mono audio, 96-bin 100 Hz log-mel plus rhythmic auxiliaries/beat confidence, and a frozen, train-only-PCA-compressed 128-D semantic stream with explicit timestamps. Checkpoints bind to the **feature pipeline signature**, while every song record retains a separate content cache hash—do not confuse the two.
+
+The default bare-audio profile is 4.5★, AR9, CS4, OD8, HP6, slider multiplier 1.4, and slider tick rate 1. It samples four candidates and packages only a strict-validator-clean winner with an audit manifest. If none pass, it returns a failure report instead of an invalid `.osu` file. `style_cluster` is intentionally reserved rather than silently ignored until train-only structural clustering and novelty checks are implemented.
+
+### V2 source layout
+
+| Path | Purpose |
+|---|---|
+| `src/v2/audio.py`, `clock.py` | Canonical-audio/cache identity and audio-only timing-hypothesis contracts |
+| `src/v2/mapspec.py` | Native timing/settings/event IR, deterministic `.osu` compiler, interval-aware validator |
+| `src/v2/grammar.py`, `sparse_model.py` | Meter-aware rational-snap sparse planner; no fixed two-lane grid |
+| `src/v2/geometry.py` | Active-event circle/slider-anchor diffusion and bounded path projection |
+| `src/v2/preprocess.py`, `dataset.py` | Song-level records plus tensor-free verified JSON indexes, jittered clocks, no-leakage split bindings, padded bar batches |
+| `src/v2/training.py`, `train.py` | Explicit stage-separated trainer, prior-bar condition dropout, provenance-checked checkpoints, guarded CLI |
+| `src/v2/inference.py`, `generate.py` | Feature-bundle generation, candidate audit/rerank, safe packaging |
+| `configs/v2_*.sbatch` | Static templates only; they never submit jobs themselves |
+
+## Legacy documentation (archived baseline)
+
+The remainder of this README describes the original baseline for comparison and
+reproducibility. Its reported teacher-forced metrics do **not** establish
+playable, validator-clean full-song generation. See
+[ARCHITECTURE_REVIEW.md](ARCHITECTURE_REVIEW.md) for the faults that motivated
+v2.
+
+OsuMapper is an experimental end-to-end system for generating [osu!](https://osu.ppy.sh/) beatmap candidates from raw audio. Given an MP3 file, it can serialize `.osu` files containing timed hit circles, sliders, and spinners; current legacy checkpoints have **not** demonstrated reliably playable, validator-clean full-song maps.
 
 The model uses an **encoder–decoder Transformer architecture** with a pretrained audio encoder (Audio Spectrogram Transformer) and an autoregressive decoder that generates a structured token sequence representing beatmap objects. A novel **hybrid discrete + continuous output** scheme enables both coarse grid-based placement and sub-pixel precision via learned residual offsets.
 

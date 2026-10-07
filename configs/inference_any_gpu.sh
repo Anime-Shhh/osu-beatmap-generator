@@ -136,6 +136,7 @@ python -m src.inference \
   --checkpoint "$CHECKPOINT" \
   --difficulty "$DIFFICULTY" \
   --bpm "$BPM" \
+  --audio_filename "$(basename "$INPUT_AUDIO")" \
   "$@"
 
 export _AG_H=H2 _AG_MSG=inference_finished_ok

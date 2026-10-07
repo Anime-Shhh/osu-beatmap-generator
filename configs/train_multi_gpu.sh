@@ -13,6 +13,11 @@
 
 set -e
 
+echo "ERROR: src.train does not implement DistributedDataParallel."
+echo "Refusing to launch four independent processes that would race checkpoints and duplicate data."
+echo "Use a single-GPU launcher until DDP is implemented end-to-end."
+exit 2
+
 PROJECT_DIR=/common/home/asj102/personalCS/osu_beatmap_generator
 DATA_SRC=/freespace/local/asj102/osu_cache/shards
 SHM_DIR=/dev/shm/asj102/osu_train

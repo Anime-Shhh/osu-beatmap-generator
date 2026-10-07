@@ -14,6 +14,7 @@ from .checkpoints import load_model_state_dict
 from .dataset import (
     N_MELS,
     PREDICT_START_SEC,
+    PREDICT_SEC,
     STRIDE_SAMPLES,
     TARGET_SR,
     WINDOW_SAMPLES,
@@ -32,6 +33,12 @@ def parse_args():
     p = argparse.ArgumentParser(description="Generate .osu beatmap from audio")
     p.add_argument("--input", type=str, required=True, help="Path to input audio")
     p.add_argument("--output", type=str, default="", help="Output .osu path")
+    p.add_argument(
+        "--audio_filename",
+        type=str,
+        default="",
+        help="Audio filename written into the .osu file (defaults to --input basename)",
+    )
     p.add_argument("--checkpoint", type=str, default="/common/users/asj102/osu_project/models/best.pt")
     p.add_argument("--ae_checkpoint", type=str, default="")
     p.add_argument("--generation_mode", type=str, choices=["auto", "legacy", "flow"], default="auto")
@@ -214,6 +221,7 @@ def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm:
         mel = _build_normalized_mel(chunk, mel_transform, device)
         window_start_ms = (start / TARGET_SR) * 1000.0
         predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
+        predict_end_ms = predict_start_ms + PREDICT_SEC * 1000.0
         tokens, residuals_raw = model.generate(
             mel.squeeze(0),
             diff_tensor,
@@ -223,7 +231,12 @@ def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm:
         )
         residuals = [Residuals(time_offset_ms=t, x_offset_px=x, y_offset_px=y) for t, x, y in residuals_raw]
         objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat)
-        all_objects.extend(objects)
+        # Training only supervises the center prediction interval.  Retaining
+        # arbitrary out-of-window autoregressive tokens creates duplicate and
+        # badly stitched objects at window boundaries.
+        all_objects.extend(
+            obj for obj in objects if predict_start_ms <= obj["time"] < predict_end_ms
+        )
         start += STRIDE_SAMPLES
 
     if start < waveform.shape[-1] and waveform.shape[-1] - start > WINDOW_SAMPLES // 4:
@@ -232,6 +245,7 @@ def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm:
             remaining = torch.nn.functional.pad(remaining, (0, WINDOW_SAMPLES - remaining.shape[-1]))
         mel = _build_normalized_mel(remaining, mel_transform, device)
         window_start_ms = (start / TARGET_SR) * 1000.0
+        predict_start_ms = window_start_ms + PREDICT_START_SEC * 1000.0
         tokens, residuals_raw = model.generate(
             mel.squeeze(0),
             diff_tensor,
@@ -240,17 +254,14 @@ def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm:
             temperature=args.temperature,
         )
         residuals = [Residuals(time_offset_ms=t, x_offset_px=x, y_offset_px=y) for t, x, y in residuals_raw]
-        objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=window_start_ms, ms_per_beat=ms_per_beat)
+        objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat)
         end_ms = (waveform.shape[-1] / TARGET_SR) * 1000.0
-        all_objects.extend([obj for obj in objects if obj["time"] <= end_ms])
+        all_objects.extend(
+            obj for obj in objects if predict_start_ms <= obj["time"] <= end_ms
+        )
 
     all_objects.sort(key=lambda obj: obj["time"])
-    deduped = []
-    for obj in all_objects:
-        if deduped and abs(obj["time"] - deduped[-1]["time"]) < 5:
-            continue
-        deduped.append(obj)
-    return deduped
+    return all_objects
 
 
 @torch.no_grad()
@@ -313,13 +324,14 @@ def generate_beatmap(args) -> str:
         objects = generate_flow_objects(args, checkpoint, waveform, bpm, device)
 
     hitobject_lines = hitobjects_to_osu_lines(objects)
-    title = os.path.splitext(os.path.basename(args.input))[0]
+    audio_filename = args.audio_filename or os.path.basename(args.input)
+    title = os.path.splitext(os.path.basename(audio_filename))[0]
     diff_name = star_to_difficulty_name(args.difficulty)
     od, ar = star_to_od_ar(args.difficulty)
     beat_length = 60000.0 / max(bpm, 1e-6)
 
     osu_content = OSU_TEMPLATE.format(
-        audio_filename=os.path.basename(args.input),
+        audio_filename=audio_filename,
         title=title,
         difficulty_name=diff_name,
         od=od,

@@ -61,4 +61,5 @@ python -m src.inference \
     --checkpoint "$CHECKPOINT" \
     --difficulty "$DIFFICULTY" \
     --bpm "$BPM" \
+    --audio_filename "$(basename "$INPUT_AUDIO")" \
     "$@"

@@ -45,6 +45,11 @@ def parse_args():
     p.add_argument("--min_tokens", type=int, default=4, help="Skip samples with fewer tokens than this")
     p.add_argument("--mode_filter", type=int, default=0, help="osu! mode to keep (0=standard)")
     p.add_argument("--resume_from", type=int, default=0, help="Resume from this shard number")
+    p.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Explicitly delete existing shard-*.tar files in output_dir before preprocessing",
+    )
     p.add_argument("--include_full_song", action="store_true", help="Also cache full-song signal samples")
     p.add_argument("--no_legacy_windows", action="store_true", help="Skip the legacy 6-second window samples")
     p.add_argument("--quality_filter", type=str, choices=["all", "ranked_only"], default="all")
@@ -116,12 +121,30 @@ def main():
 
     existing_shards = glob.glob(os.path.join(args.output_dir, "shard-*.tar"))
     if existing_shards:
-        print(f"Clearing {len(existing_shards)} existing shards in {args.output_dir}")
-        for shard_path in existing_shards:
-            try:
-                os.remove(shard_path)
-            except OSError as exc:
-                print(f"Failed to remove {shard_path}: {exc}", file=sys.stderr)
+        if args.overwrite:
+            print(f"Clearing {len(existing_shards)} existing shards in {args.output_dir}")
+            for shard_path in existing_shards:
+                try:
+                    os.remove(shard_path)
+                except OSError as exc:
+                    print(f"Failed to remove {shard_path}: {exc}", file=sys.stderr)
+        elif args.resume_from > 0:
+            resume_target = os.path.join(args.output_dir, f"shard-{args.resume_from:06d}.tar")
+            if os.path.exists(resume_target):
+                raise FileExistsError(
+                    f"Refusing to overwrite resume target {resume_target}. Choose the next unused "
+                    "shard index or pass --overwrite intentionally."
+                )
+            print(
+                f"Keeping {len(existing_shards)} existing shards and resuming at {args.resume_from:06d}",
+                flush=True,
+            )
+        else:
+            raise FileExistsError(
+                f"Found {len(existing_shards)} existing shards in {args.output_dir}. "
+                "Refusing to delete cached data; pass --overwrite to replace it or "
+                "--resume_from NEXT_UNUSED_INDEX to append."
+            )
 
     from datasets import Audio, load_dataset
 
