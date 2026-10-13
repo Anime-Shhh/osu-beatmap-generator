@@ -451,8 +451,6 @@ def validate_events(
             for point_index, (point_x, point_y) in enumerate(event.control_points):
                 if not (math.isfinite(point_x) and math.isfinite(point_y)):
                     errors.append(f"event {index}: slider point {point_index} is non-finite")
-                elif not (0.0 <= point_x <= PLAYFIELD_WIDTH and 0.0 <= point_y <= PLAYFIELD_HEIGHT):
-                    errors.append(f"event {index}: slider point {point_index} is off playfield")
         elif event.kind == EventKind.SPINNER:
             if event.end_beat is None or not math.isfinite(event.end_beat):
                 errors.append(f"event {index}: spinner is missing an end beat")

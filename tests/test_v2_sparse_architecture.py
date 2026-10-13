@@ -78,6 +78,7 @@ class SparseArchitectureTests(unittest.TestCase):
     def test_geometry_absolute_positions_do_not_alias_at_the_old_table_limit(self):
         from src.v2.events import EventKind
         from src.v2.geometry import ActiveEventGeometryDiffuser, GeometryDiffusionConfig
+        from src.v2.grammar import MAX_ANCHORS
 
         diffuser = ActiveEventGeometryDiffuser(
             GeometryDiffusionConfig(
@@ -93,11 +94,11 @@ class SparseArchitectureTests(unittest.TestCase):
             context=torch.randn(1, 3, 32),
             event_kinds=torch.tensor([[int(EventKind.CIRCLE)] * 3]),
             anchor_counts=torch.zeros((1, 3), dtype=torch.long),
-            noisy_geometry_logits=torch.randn(1, 3, 9, 2),
+            noisy_geometry_logits=torch.randn(1, 3, MAX_ANCHORS + 1, 2),
             noise_level=torch.tensor([0.5]),
             event_positions=torch.tensor([[0, 2_048, 100_000]]),
         )
-        self.assertEqual(tuple(output.shape), (1, 3, 9, 2))
+        self.assertEqual(tuple(output.shape), (1, 3, MAX_ANCHORS + 1, 2))
         self.assertTrue(torch.isfinite(output).all())
 
     def test_local_audio_memory_impulse_relocation_produces_differing_representations(self):

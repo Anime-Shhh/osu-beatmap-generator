@@ -36,6 +36,7 @@ from .inference import (
     load_v2_models,
 )
 from .mapspec import MapMetadata
+from .evaluation import RosuDifficultyCalculator, StrictAuditPolicy
 
 
 def _hypotheses(path: str | Path) -> tuple[TimingHypothesis, ...]:
@@ -103,6 +104,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--candidate-count", type=int, default=4)
     parser.add_argument("--temperature", type=float, default=0.9)
     parser.add_argument("--geometry-steps", type=int, default=32)
+    parser.add_argument("--star-tolerance", type=float, default=0.5,
+                        help="reject candidates farther than this from measured target stars")
+    parser.add_argument("--minimum-start-gap-ms", type=float, default=10.0,
+                        help="reject near-simultaneous generated starts; not a difficulty formula")
     parser.add_argument("--device", default="auto")
     parser.add_argument("--style-cluster", default=None)
 
@@ -143,6 +148,9 @@ def main(argv: list[str] | None = None) -> int:
         device_name = "cuda" if torch.cuda.is_available() else "cpu"
 
     models = load_v2_models(args.checkpoint, device=device_name)
+    calculator = RosuDifficultyCalculator()
+    policy = StrictAuditPolicy(max_star_error=args.star_tolerance,
+                               minimum_start_gap_ms=args.minimum_start_gap_ms)
 
     clock_resolver: ClockResolver
     if args.audio:
@@ -197,6 +205,8 @@ def main(argv: list[str] | None = None) -> int:
         temperature=args.temperature,
         geometry_steps=args.geometry_steps,
         metadata=metadata,
+        calculator=calculator,
+        audit_policy=policy,
     )
 
     if draft.selected_candidate is None:

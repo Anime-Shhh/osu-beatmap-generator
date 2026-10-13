@@ -51,6 +51,10 @@ class TrainingConfig:
     symbolic_context_dropout: float = 0.10
     mixed_precision: str = "bf16"  # bf16 | fp16 | none
     seed: int = 1337
+    spacing_loss_weight: float = 0.1
+    turn_loss_weight: float = 0.05
+    slider_shape_loss_weight: float = 0.1
+    geometry_flip_augmentation: bool = True
 
     def __post_init__(self) -> None:
         if self.learning_rate <= 0.0 or self.weight_decay < 0.0:
@@ -59,6 +63,9 @@ class TrainingConfig:
             raise ValueError("gradient accumulation and max gradient norm must be positive")
         if self.seed < 0:
             raise ValueError("seed must be non-negative")
+        for name in ("spacing_loss_weight", "turn_loss_weight", "slider_shape_loss_weight"):
+            if not 0 <= getattr(self, name) < float("inf"):
+                raise ValueError(f"{name} must be finite and non-negative")
         for name in ("profile_dropout", "boundary_context_dropout", "symbolic_context_dropout"):
             value = getattr(self, name)
             if not 0.0 <= value < 1.0:
@@ -272,17 +279,27 @@ def loss_for_batch(
         # Empty bars are valid planner samples but carry no geometry loss.
         zero = next(geometry.parameters()).sum() * 0.0
         return {"loss": zero, "token_loss": token_loss.detach(), "geometry_loss": zero}
-    geometry_loss = geometry_diffusion_loss(
+    clean_geometry = batch["geometry"]
+    if geometry.training and config.geometry_flip_augmentation:
+        # Reflect whole patterns, never individual objects; preserve spacing,
+        # slider topology, handedness diversity, and the rectangular playfield.
+        flips = torch.rand((clean_geometry.shape[0], 1, 1, 2), device=clean_geometry.device) < 0.5
+        clean_geometry = torch.where(flips, 1.0 - clean_geometry, clean_geometry)
+    components = geometry_diffusion_loss(
         geometry,
         context,
         batch["event_kinds"],
         batch["anchor_counts"],
-        batch["geometry"],
+        clean_geometry,
         batch["event_mask"],
         event_features=batch["event_features"],
         event_positions=batch["event_positions"],
+        spacing_weight=config.spacing_loss_weight,
+        turn_weight=config.turn_loss_weight,
+        slider_shape_weight=config.slider_shape_loss_weight,
+        return_components=True,
     )
-    return {"loss": geometry_loss, "token_loss": token_loss.detach(), "geometry_loss": geometry_loss}
+    return {"loss": components["geometry_loss"], "token_loss": token_loss.detach(), **components}
 
 
 def run_epoch(
@@ -305,6 +322,11 @@ def run_epoch(
 
     target_device = torch.device(device)
     training = optimizer is not None
+    if not training:
+        # Condition dropout must not corrupt validation or early stopping.
+        from dataclasses import replace
+        config = replace(config, profile_dropout=0.0, boundary_context_dropout=0.0,
+                         symbolic_context_dropout=0.0)
     if config.stage is TrainingStage.GEOMETRY:
         # Geometry consumes symbolic contexts from an evaluation-mode planner.
         # ``loss_for_batch`` uses no_grad for that pass, avoiding both planner
@@ -333,6 +355,8 @@ def run_epoch(
         grad_context = torch.enable_grad() if training else torch.no_grad()
         with grad_context, context:
             losses = loss_for_batch(planner, geometry, batch, config)
+            if not torch.isfinite(losses["loss"]):
+                raise FloatingPointError("Non-finite training/validation loss; refusing to update weights or save a misleading checkpoint")
             scaled_loss = losses["loss"] / config.gradient_accumulation
         if training:
             if scaler is not None and scaler.is_enabled():
@@ -358,6 +382,12 @@ def run_epoch(
     if training and steps and steps % config.gradient_accumulation:
         if scaler is not None and scaler.is_enabled():
             scaler.unscale_(optimizer)
+        # The last group can be shorter; undo division by the full group size.
+        correction = config.gradient_accumulation / (steps % config.gradient_accumulation)
+        for group in optimizer.param_groups:
+            for parameter in group["params"]:
+                if parameter.grad is not None:
+                    parameter.grad.mul_(correction)
         torch.nn.utils.clip_grad_norm_(
             geometry.parameters() if config.stage is TrainingStage.GEOMETRY and geometry is not None else planner.parameters(),
             config.max_gradient_norm,
@@ -476,6 +506,10 @@ def load_checkpoint(
         if raw_stage is not None:
             saved_stage = str(raw_stage)
     optimizer_compatible = optimizer_stage is None or saved_stage == optimizer_stage.value
+    if geometry is not None and saved_stage == TrainingStage.GEOMETRY.value:
+        saved_space = payload.get("geometry_config", {}).get("coordinate_space", "legacy-logit")
+        if geometry.config.coordinate_space != saved_space:
+            raise ValueError("checkpoint geometry coordinate space differs; do not resume trained geometry with a new representation")
     planner.load_state_dict(_mapping(payload.get("planner"), "planner"), strict=strict)
     if geometry is not None and payload.get("geometry") is not None:
         geometry.load_state_dict(_mapping(payload["geometry"], "geometry"), strict=strict)

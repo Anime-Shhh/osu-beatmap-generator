@@ -1,144 +1,184 @@
-import json
-import math
+"""Materialize real audio + native .osu maps. Never fabricate ranked examples.
+
+Use --osz-dir for local mapsets or --hf-revision for the pinned upstream corpus.
+A fresh output directory is required. Rejected maps and source hashes are audited.
+"""
+from __future__ import annotations
+
+import argparse
+from collections import Counter
 import hashlib
-from pathlib import Path
+import json
+from pathlib import Path, PurePosixPath
+import tempfile
+import zipfile
+
 import torch
 
-from src.v2.audio import (
-    CanonicalAudioManifest,
-    FeatureCacheManifest,
-    FeatureStreamManifest,
-)
-from src.v2.inference import extract_audio_features
-from src.v2.data import (
-    SourceIdentity,
-    SourceSplitAssignment,
-    build_immutable_source_split_manifest,
-    validate_source_split_manifest,
-    source_component_groups,
-)
+from src.v2.data import (SourceIdentity, SourceSplitAssignment, build_immutable_source_split_manifest,
+                         source_component_groups)
+from src.v2.evaluation import RosuDifficultyCalculator
+from src.v2.inference import extract_audio_features, load_audio
 from src.v2.mapspec import mapspec_from_osu
 from src.v2.preprocess import build_song_record, write_song_record
-from src.v2.dataset import SparseSongDataset, validate_song_record
 
 
-def generate_v2_dataset(data_dir_path: str):
-    data_dir = Path(data_dir_path)
-    data_dir.mkdir(parents=True, exist_ok=True)
-
-    sample_rate = 24000
-    sources = []
-
-    # Create 6 distinct song groups with multiple authentic difficulty tracks each
-    for song_idx in range(6):
-        duration_s = 10.0
-        num_samples = int(sample_rate * duration_s)
-        freq = 220.0 * (2 ** (song_idx / 3.0))
-        t = torch.linspace(0, duration_s, num_samples, dtype=torch.float32).unsqueeze(0)
-        signal = 0.3 * torch.sin(2 * math.pi * freq * t) + 0.1 * torch.sin(2 * math.pi * (freq * 2) * t)
-
-        encoded_hash = hashlib.sha256(f"authentic_audio_track_{song_idx}".encode()).hexdigest()
-        pcm_hash = hashlib.sha256(bytes(signal.contiguous().untyped_storage())).hexdigest()
-
-        bundle, _ = extract_audio_features(signal, sample_rate_hz=sample_rate, audio_sha256=encoded_hash)
-
-        for diff_idx, (stars, ar, cs) in enumerate([(2.5 + song_idx * 0.4, 7.0, 4.0), (4.5 + song_idx * 0.4, 9.0, 4.2)]):
-            beatmap_id = str(100000 + song_idx * 10 + diff_idx)
-            set_id = str(20000 + song_idx)
-            bpm = 120.0 + song_idx * 12.0
-            beat_len_ms = 60000.0 / bpm
-
-            osu_lines = [
-                "osu file format v14",
-                "[General]",
-                f"AudioFilename: track_{song_idx}.mp3",
-                "Mode: 0",
-                "[Metadata]",
-                f"Title:Authentic Track {song_idx}",
-                "Artist:Featured Artist",
-                "Creator:Verified Mapper",
-                f"Version:Diff {diff_idx}",
-                f"BeatmapID:{beatmap_id}",
-                f"BeatmapSetID:{set_id}",
-                "[Difficulty]",
-                "HPDrainRate:5.0",
-                f"CircleSize:{cs}",
-                "OverallDifficulty:8.0",
-                f"ApproachRate:{ar}",
-                "SliderMultiplier:1.4",
-                "SliderTickRate:1",
-                "[TimingPoints]",
-                f"0,{beat_len_ms},4,2,0,70,1,0",
-                "[HitObjects]",
-            ]
-            num_beats = int((duration_s * 1000.0) / beat_len_ms)
-            for b in range(1, num_beats - 2, 2):
-                t_ms = int(b * beat_len_ms)
-                if b % 4 == 1:
-                    osu_lines.append(f"256,192,{t_ms},1,0,0:0:0:0:")
-                else:
-                    osu_lines.append(f"256,128,{t_ms},2,0,L|384:128,1,100")
-
-            osu_text = "\n".join(osu_lines)
-            map_spec = mapspec_from_osu(osu_text)
-
-            source_id = SourceIdentity(
-                audio_sha256=encoded_hash,
-                canonical_audio_sha256=pcm_hash,
-                audio_duration_ms=duration_s * 1000.0,
-                beatmap_id=beatmap_id,
-                beatmap_set_id=set_id,
-                mapper_id="1001",
-                source_dataset="project-riz/osu-beatmaps",
-                source_record_id=f"{song_idx:06d}",
-                source_revision="b82117a5de13b7df5290482aed7cffc49cb76e6d",
-                beatmap_status="ranked",
-                rights_status="research-only; audio rights remain with owners",
-                rights_url="https://osu.ppy.sh/legal/terms",
-            )
-            sources.append((source_id, map_spec, bundle, signal, stars, pcm_hash))
-
-    all_source_ids = tuple(s[0] for s in sources)
-    split_manifest = build_immutable_source_split_manifest(all_source_ids, seed=42, ratios=(0.6, 0.2, 0.2))
-    validate_source_split_manifest(split_manifest)
-
-    split_file = data_dir / "splits.json"
-    split_file.write_text(json.dumps(split_manifest, indent=2))
-    print(f"Saved split manifest to {split_file}")
-
-    assignments = {SourceIdentity.from_dict(r["source"]): (r["component_id"], r["split"]) for r in split_manifest["records"]}
-
-    pipeline_key = ""
-    for source_id, map_spec, bundle, signal, stars, pcm_hash in sources:
-        comp_id, split = assignments[source_id]
-
-        assignment = SourceSplitAssignment(source_id, comp_id, split)
-
-        record = build_song_record(
-            map_spec=map_spec,
-            source_assignment=assignment,
-            feature_cache=bundle.feature_cache,
-            rhythm_features=bundle.rhythm_features,
-            rhythm_times_ms=bundle.rhythm_times_ms,
-            semantic_features=bundle.semantic_features,
-            semantic_times_ms=bundle.semantic_times_ms,
-            target_star=stars,
-        )
-        validate_song_record(record)
-        pipeline_key = bundle.feature_cache.pipeline_key
-        out_record = data_dir / f"{split}_{source_id.beatmap_id}.pt"
-        write_song_record(record, out_record, overwrite=True)
-        print(f"Wrote {out_record} (split={split}, stars={record['profile'][0]:.2f})")
-
-    # Verify loading with SparseSongDataset
-    train_ds = SparseSongDataset(str(data_dir), split="train", clock_mode="mixed")
-    val_ds = SparseSongDataset(str(data_dir), split="val", clock_mode="mixed")
-    print(f"Verified dataset loading: train={len(train_ds)} records, val={len(val_ds)} records")
-    print(f"PIPELINE_KEY: {pipeline_key}")
-    return pipeline_key
+def osz_sources(directory: Path):
+    """Read members without extracting paths or claiming an unverified rank."""
+    for archive in sorted(directory.glob('*.osz')):
+        revision = hashlib.sha256(archive.read_bytes()).hexdigest()
+        with zipfile.ZipFile(archive) as bundle:
+            grouped = {}
+            for name in bundle.namelist():
+                if not name.endswith('.osu'):
+                    continue
+                text = bundle.read(name).decode('utf-8-sig')
+                audio_name = next((line.split(':', 1)[1].strip() for line in text.splitlines()
+                                   if line.startswith('AudioFilename:')), None)
+                if audio_name is None:
+                    raise ValueError(f'{archive.name}:{name} has no AudioFilename')
+                member = str(PurePosixPath(name).parent / audio_name.replace('\\', '/'))
+                grouped.setdefault(member, []).append({'content': text, 'status': 'unverified-local'})
+            for member, maps in grouped.items():
+                yield bundle.read(member), maps, {
+                    'source_dataset': 'local-osz', 'source_revision': revision,
+                    'source_record_id': f'{revision}:{member}',
+                }
 
 
-if __name__ == "__main__":
-    import sys
-    path = sys.argv[1] if len(sys.argv) > 1 else "/common/users/asj102/osu_project/v2_runs/run_20261010_v2/data"
-    generate_v2_dataset(path)
+def hf_sources(revision: str, limit: int):
+    from datasets import Audio, load_dataset
+    dataset = load_dataset('project-riz/osu-beatmaps', 'original', revision=revision,
+                           split='train', streaming=True)
+    dataset = dataset.cast_column('mp3', Audio(decode=False))
+    for index, example in enumerate(dataset):
+        if index >= limit:
+            break
+        metadata = example['json']
+        if isinstance(metadata, str):
+            metadata = json.loads(metadata)
+        audio = example['mp3']
+        if isinstance(audio, dict):
+            audio = audio.get('bytes')
+        if not isinstance(audio, bytes):
+            raise ValueError('Upstream record lacks original encoded audio bytes')
+        # Original variant hashes encoded audio. Do not trust an identifier as
+        # proof that bytes came from the named dataset revision.
+        if hashlib.sha256(audio).hexdigest() != metadata['audio_hash']:
+            raise ValueError('Upstream encoded audio hash mismatch')
+        maps = []
+        for beatmap in metadata.get('beatmaps', []):
+            if str(beatmap.get('mode')) != '0' or str(beatmap.get('approved')) not in {'1', '2'}:
+                continue
+            maps.append({**beatmap, 'status': 'ranked' if str(beatmap['approved']) == '1' else 'approved'})
+        yield audio, maps, {
+            'source_dataset': 'project-riz/osu-beatmaps', 'source_revision': revision,
+            'source_record_id': str(example['__key__']),
+        }
+
+
+def materialize(sources, output: Path, *, seed: int = 42) -> dict:
+    if output.exists() and any(output.iterdir()):
+        raise FileExistsError('Use a new empty output directory; historical datasets must not be overwritten')
+    output.mkdir(parents=True, exist_ok=True)
+    calculator = RosuDifficultyCalculator()
+    entries, rejected = [], []
+    curves = Counter()
+    pipeline_key = None
+    seen_maps = set()
+    with tempfile.TemporaryDirectory(prefix='osu-v2-materialize-') as temp:
+        temp = Path(temp)
+        for audio, maps, provenance in sources:
+            if not maps:
+                continue
+            audio_hash = hashlib.sha256(audio).hexdigest()
+            audio_path = temp / 'input.audio'
+            audio_path.write_bytes(audio)
+            waveform, sample_rate = load_audio(audio_path)
+            features, _ = extract_audio_features(waveform, sample_rate, audio_sha256=audio_hash)
+            pipeline_key = features.feature_cache.pipeline_key
+            for raw in maps:
+                text = raw['content']
+                chart_hash = hashlib.sha256(text.encode('utf-8')).hexdigest()
+                if (audio_hash, chart_hash) in seen_maps:
+                    continue
+                seen_maps.add((audio_hash, chart_hash))
+                try:
+                    spec = mapspec_from_osu(text)
+                    if spec.general.mode != 0:
+                        continue
+                    difficulty = calculator.calculate(text)
+                    if not difficulty.stars or not spec.events:
+                        raise ValueError('Empty map or zero difficulty')
+                    source = SourceIdentity(
+                        audio_sha256=audio_hash,
+                        canonical_audio_sha256=features.feature_cache.canonical_audio.pcm_sha256,
+                        audio_duration_ms=features.duration_ms,
+                        beatmap_id=str(spec.metadata.beatmap_id) if spec.metadata.beatmap_id > 0 else None,
+                        beatmap_set_id=str(spec.metadata.beatmap_set_id) if spec.metadata.beatmap_set_id > 0 else None,
+                        mapper_id=str(raw['creator_id']) if raw.get('creator_id') else None,
+                        **provenance, beatmap_status=raw['status'],
+                        rights_status='research-only; source audio and chart rights retained by owners',
+                        rights_url='https://osu.ppy.sh/legal/terms',
+                    )
+                    record = build_song_record(
+                        map_spec=spec, source_assignment=SourceSplitAssignment(source, source_component_groups([source])[source], 'train'),
+                        feature_cache=features.feature_cache, rhythm_features=features.rhythm_features,
+                        rhythm_times_ms=features.rhythm_times_ms, semantic_features=features.semantic_features,
+                        semantic_times_ms=features.semantic_times_ms, target_star=difficulty.stars,
+                    )
+                    record['metadata']['materialization'] = {
+                        'kind': 'real-audio-native-osu/v1', 'chart_sha256': chart_hash,
+                        'calculator_id': calculator.calculator_id, 'measured_stars': difficulty.stars,
+                    }
+                    filename = f'{audio_hash[:16]}-{chart_hash[:16]}.pt'
+                    torch.save(record, temp / filename)
+                    entries.append((filename, source))
+                    curves.update(event.curve_type for event in spec.events if event.control_points)
+                except (ValueError, TypeError, KeyError) as exc:
+                    rejected.append({'source': provenance['source_record_id'], 'chart_sha256': chart_hash,
+                                     'error': str(exc)})
+            print(json.dumps({'accepted': len(entries), 'rejected': len(rejected)}), flush=True)
+        if not entries:
+            (output / 'rejected.json').write_text(json.dumps(rejected, indent=2))
+            raise ValueError('No authentic maps survived preprocessing; see rejected.json')
+        manifest = build_immutable_source_split_manifest([s for _, s in entries], seed=seed)
+        assignments = {SourceIdentity.from_dict(row['source']): row for row in manifest['records']}
+        checksums = {}
+        for filename, source in entries:
+            record = torch.load(temp / filename, weights_only=True, map_location='cpu')
+            row = assignments[source]
+            record['metadata'].update(split=row['split'], source_component_id=row['component_id'])
+            write_song_record(record, output / filename)
+            checksums[filename] = hashlib.sha256((output / filename).read_bytes()).hexdigest()
+    report = {
+        'schema': 'osu-v2-real-corpus/1', 'feature_pipeline_key': pipeline_key,
+        'calculator_id': calculator.calculator_id, 'records': len(entries),
+        'source_components': {k: len(v) for k, v in manifest['splits'].items()},
+        'slider_curves': dict(curves), 'record_sha256': checksums, 'rejected': rejected,
+    }
+    (output / 'splits.json').write_text(json.dumps(manifest, indent=2))
+    (output / 'materialization.json').write_text(json.dumps(report, indent=2))
+    print(json.dumps({k: v for k, v in report.items() if k not in {'record_sha256', 'rejected'}}, indent=2))
+    return report
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    inputs = parser.add_mutually_exclusive_group(required=True)
+    inputs.add_argument('--osz-dir', type=Path)
+    inputs.add_argument('--hf-revision', help='immutable 40-character dataset commit SHA')
+    parser.add_argument('--max-tracks', type=int, default=1000)
+    parser.add_argument('--output-dir', required=True, type=Path)
+    parser.add_argument('--seed', type=int, default=42)
+    args = parser.parse_args(argv)
+    if args.max_tracks < 1:
+        parser.error('--max-tracks must be positive')
+    if args.hf_revision and (len(args.hf_revision) != 40 or any(c not in '0123456789abcdef' for c in args.hf_revision)):
+        parser.error('--hf-revision must be an immutable lowercase commit SHA')
+    sources = osz_sources(args.osz_dir) if args.osz_dir else hf_sources(args.hf_revision, args.max_tracks)
+    materialize(sources, args.output_dir, seed=args.seed)
+
+
+if __name__ == '__main__':
+    main()

@@ -138,6 +138,7 @@ class MapSpecTests(unittest.TestCase):
         self.assertTrue(any("custom hit sample" in error for error in report.errors))
 
     def test_strict_validator_rejects_bezier_length_beyond_control_path(self):
+        from src.v2.mapspec import ValidationPolicy
         original = mapspec_from_osu(RICH_OSU)
         impossible = replace(
             original,
@@ -147,7 +148,7 @@ class MapSpecTests(unittest.TestCase):
                 *original.events[2:],
             ),
         )
-        report = validate_map_spec(impossible)
+        report = validate_map_spec(impossible, ValidationPolicy(require_slider_path_feasibility=True))
         self.assertFalse(report.valid)
         self.assertTrue(any("control-path feasibility" in error for error in report.errors))
 

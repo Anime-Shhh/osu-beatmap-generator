@@ -192,7 +192,9 @@ def _create_mock_checkpoint(path: Path) -> Path:
             dropout=0.0,
         )
     )
-    training_cfg = TrainingConfig(stage=TrainingStage.PLANNER)
+    # Serialization fixture only, never a claim that these tiny random weights
+    # are trained. Planner-only rejection is exercised separately.
+    training_cfg = TrainingConfig(stage=TrainingStage.GEOMETRY)
 
     # Compute pipeline key matching extract_audio_features
     from src.v2.audio import CanonicalAudioManifest, CanonicalAudioSpec, FeatureCacheManifest, FeatureStreamManifest
@@ -833,6 +835,8 @@ class EndToEndGenerationAndCLITests(unittest.TestCase):
                     "--output-dir", str(self.dir_path / "out"),
                 ])
 
+    @mock.patch("src.v2.generate.RosuDifficultyCalculator", new=lambda: CallbackDifficultyCalculator(
+        lambda _: DifficultyCalculation(available=True, stars=4.5, calculator_id="test-fixture")))
     def test_cli_main_generates_valid_osu_and_manifest(self):
         out_dir = self.dir_path / "packaged_output"
         ret = cli_main([
@@ -841,6 +845,7 @@ class EndToEndGenerationAndCLITests(unittest.TestCase):
             "--difficulty", "4.5",
             "--bpm", "120",
             "--offset", "0",
+            "--minimum-start-gap-ms", "0",
             "--title", "E2E Test Song",
             "--artist", "Test Artist",
             "--output-dir", str(out_dir),
@@ -868,6 +873,8 @@ class EndToEndGenerationAndCLITests(unittest.TestCase):
         self.assertEqual(manifest["schema_version"], "osu-beatmap-generator/v2-generation-result/1")
         self.assertEqual(manifest["artifacts"]["audio_file"], "song.wav")
 
+    @mock.patch("src.v2.generate.RosuDifficultyCalculator", new=lambda: CallbackDifficultyCalculator(
+        lambda _: DifficultyCalculation(available=True, stars=4.5, calculator_id="test-fixture")))
     def test_cli_main_generates_self_contained_mp3_package_without_timing_override(self):
         mp3_path = self.dir_path / "source.mp3"
         subprocess.run(
@@ -889,6 +896,7 @@ class EndToEndGenerationAndCLITests(unittest.TestCase):
         ret = cli_main([
             "--checkpoint", str(self.ckpt_path),
             "--input", str(mp3_path),
+            "--minimum-start-gap-ms", "0",
             "--target-star", "4.5",
             "--audio-filename", "packaged-song.mp3",
             "--output-osu", str(out_dir / "audio-only.osu"),

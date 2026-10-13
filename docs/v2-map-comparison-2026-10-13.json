@@ -1,0 +1,164 @@
+{
+  "reference.osz:Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Confession].osu": {
+    "title": "DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size)",
+    "version": "Confession?",
+    "difficulty": {
+      "available": true,
+      "stars": 4.48741353211963,
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "attributes": {
+        "aim": 2.513965337378981,
+        "speed": 1.673698776861868
+      },
+      "error": null
+    },
+    "object_count": 324,
+    "slider_count": 239,
+    "curve_types": {
+      "P": 119,
+      "B": 105,
+      "L": 15
+    },
+    "corner_heads": 0,
+    "minimum_start_gap_ms": 108.0,
+    "mean_head_distance_px": 162.76595192262573,
+    "mean_head_speed_px_per_second": 646.929384631766,
+    "max_head_speed_px_per_second": 1560.144357157783,
+    "max_slider_length_px": 272.999991668701
+  },
+  "reference.osz:Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Easy].osu": {
+    "title": "DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size)",
+    "version": "Easy?",
+    "difficulty": {
+      "available": true,
+      "stars": 1.7398745995771305,
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "attributes": {
+        "aim": 0.9546961855148083,
+        "speed": 0.692823693759862
+      },
+      "error": null
+    },
+    "object_count": 106,
+    "slider_count": 50,
+    "curve_types": {
+      "B": 23,
+      "P": 24,
+      "L": 3
+    },
+    "corner_heads": 0,
+    "minimum_start_gap_ms": 434.0,
+    "mean_head_distance_px": 149.32922757049224,
+    "mean_head_speed_px_per_second": 199.4657136574897,
+    "max_head_speed_px_per_second": 275.7566848515596,
+    "max_slider_length_px": 200.0
+  },
+  "reference.osz:Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Fixxis' Hard].osu": {
+    "title": "DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size)",
+    "version": "Fixxis' Hard?",
+    "difficulty": {
+      "available": true,
+      "stars": 3.162390266016046,
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "attributes": {
+        "aim": 1.6943273506500713,
+        "speed": 1.342231840566146
+      },
+      "error": null
+    },
+    "object_count": 225,
+    "slider_count": 100,
+    "curve_types": {
+      "B": 14,
+      "P": 50,
+      "L": 36
+    },
+    "corner_heads": 0,
+    "minimum_start_gap_ms": 108.0,
+    "mean_head_distance_px": 127.91148472966486,
+    "mean_head_speed_px_per_second": 335.61588432776153,
+    "max_head_speed_px_per_second": 499.3588173165275,
+    "max_slider_length_px": 179.999994506836
+  },
+  "reference.osz:Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Insane].osu": {
+    "title": "DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size)",
+    "version": "Insane?",
+    "difficulty": {
+      "available": true,
+      "stars": 4.0000075820629934,
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "attributes": {
+        "aim": 2.229544401677742,
+        "speed": 1.5199731397302532
+      },
+      "error": null
+    },
+    "object_count": 264,
+    "slider_count": 121,
+    "curve_types": {
+      "P": 76,
+      "B": 37,
+      "L": 8
+    },
+    "corner_heads": 0,
+    "minimum_start_gap_ms": 108.0,
+    "mean_head_distance_px": 153.20505189060282,
+    "mean_head_speed_px_per_second": 492.4367059320307,
+    "max_head_speed_px_per_second": 1195.972817649796,
+    "max_slider_length_px": 264.000008056641
+  },
+  "reference.osz:Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Yahuri-sama's Normal].osu": {
+    "title": "DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size)",
+    "version": "Yahuri-sama's Normal?",
+    "difficulty": {
+      "available": true,
+      "stars": 2.1053293913906583,
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "attributes": {
+        "aim": 1.1288112180392733,
+        "speed": 0.8912952554364837
+      },
+      "error": null
+    },
+    "object_count": 174,
+    "slider_count": 95,
+    "curve_types": {
+      "P": 36,
+      "B": 15,
+      "L": 44
+    },
+    "corner_heads": 0,
+    "minimum_start_gap_ms": 216.0,
+    "mean_head_distance_px": 104.5300534340196,
+    "mean_head_speed_px_per_second": 204.26105186700502,
+    "max_head_speed_px_per_second": 264.8266454045089,
+    "max_slider_length_px": 385.0
+  },
+  "generated.osu": {
+    "title": "Love Dramatic",
+    "version": "Insane (4.5*)",
+    "difficulty": {
+      "available": true,
+      "stars": 10.377497071824772,
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "attributes": {
+        "aim": 6.16860657035035,
+        "speed": 2.2495179144387505
+      },
+      "error": null
+    },
+    "object_count": 132,
+    "slider_count": 49,
+    "curve_types": {
+      "L": 39,
+      "B": 8,
+      "C": 2
+    },
+    "corner_heads": 116,
+    "minimum_start_gap_ms": 4.0,
+    "mean_head_distance_px": 383.33470115710753,
+    "mean_head_speed_px_per_second": 3542.0477581092164,
+    "max_head_speed_px_per_second": 80000.0,
+    "max_slider_length_px": 10508.75
+  }
+}

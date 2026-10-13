@@ -20,7 +20,9 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.data import DataLoader, DistributedSampler
 
 from .dataset import SparseSongDataset, collate_sparse_examples
+from .corpus import audit_training_corpus
 from .geometry import ActiveEventGeometryDiffuser, GeometryDiffusionConfig
+from .grammar import MAX_ANCHORS
 from .sparse_model import SparseEventPlanner, SparsePlannerConfig, count_trainable_parameters
 from .training import (
     CheckpointProvenance,
@@ -72,6 +74,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--mixed-precision", choices=["bf16", "fp16", "none"], default="bf16")
     parser.add_argument("--device", default="cuda", help="explicit device, e.g. cuda or cuda:0")
     parser.add_argument("--max-steps", type=int, help="optional bounded steps per epoch for a smoke run")
+    parser.add_argument("--allow-diagnostic-data", action="store_true", help="mark small/unverified runs as unsuitable for generation")
+    parser.add_argument("--bars-per-song", type=int, default=16, help="balanced bar samples per audio component per epoch")
+    parser.add_argument("--spacing-loss-weight", type=float, default=0.1)
+    parser.add_argument("--turn-loss-weight", type=float, default=0.05)
+    parser.add_argument("--slider-shape-loss-weight", type=float, default=0.1)
     parser.add_argument("--confirm-training", action="store_true", help="required acknowledgement before optimization")
     return parser.parse_args(argv)
 
@@ -107,6 +114,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.seed < 0:
         raise ValueError("seed must be non-negative")
     torch.manual_seed(args.seed)
+    output_dir = Path(args.checkpoint_dir)
+    if any(output_dir.glob("*.pt")) and not args.resume:
+        raise ValueError("Checkpoint directory already contains a run; use --resume or a new directory")
+    if args.patience < 0 or args.min_delta < 0 or args.bars_per_song < 1:
+        raise ValueError("patience/min-delta must be non-negative and bars-per-song positive")
 
     is_dist = _is_distributed()
     if is_dist:
@@ -134,6 +146,8 @@ def main(argv: list[str] | None = None) -> int:
         torch.backends.cudnn.allow_tf32 = True
 
     split_manifest = _mapping_json(args.split_manifest, "split manifest")
+    data_audit = audit_training_corpus(args.records_dir, split_manifest,
+                                     allow_diagnostic_data=args.allow_diagnostic_data)
     provenance = CheckpointProvenance(
         feature_pipeline_key=args.feature_pipeline_key,
         split_manifest_sha256=split_manifest_sha256(split_manifest),
@@ -158,6 +172,8 @@ def main(argv: list[str] | None = None) -> int:
             "geometry_config.event_feature_dim must be 4 for the documented "
             "previous/next-gap, duration, and slider-length record contract"
         )
+    if geometry_config.max_anchors != MAX_ANCHORS:
+        raise ValueError(f"geometry max_anchors must match the {MAX_ANCHORS}-control record vocabulary")
     planner = SparseEventPlanner(planner_config).to(device)
     geometry = ActiveEventGeometryDiffuser(geometry_config).to(device)
     config = TrainingConfig(
@@ -170,11 +186,15 @@ def main(argv: list[str] | None = None) -> int:
         symbolic_context_dropout=args.symbolic_context_dropout,
         mixed_precision=args.mixed_precision,
         seed=args.seed,
+        spacing_loss_weight=args.spacing_loss_weight,
+        turn_loss_weight=args.turn_loss_weight,
+        slider_shape_loss_weight=args.slider_shape_loss_weight,
     )
     optimizer = make_optimizer(planner, geometry, config)
     scaler = torch.amp.GradScaler("cuda", enabled=(device.type == "cuda" and args.mixed_precision == "fp16"))
     start_epoch = 0
     global_step = 0
+    restored = {}
     if args.resume:
         restored = load_checkpoint(
             args.resume,
@@ -187,6 +207,8 @@ def main(argv: list[str] | None = None) -> int:
             optimizer_stage=stage,
         )
         saved_stage = restored.get("_saved_training_stage")
+        if saved_stage != stage.value and any(output_dir.glob("*.pt")):
+            raise ValueError("Stage handoff requires a new checkpoint directory; existing checkpoints would be overwritten")
         if saved_stage == stage.value:
             start_epoch = int(restored["epoch"]) + 1
             global_step = int(restored["global_step"])
@@ -219,6 +241,7 @@ def main(argv: list[str] | None = None) -> int:
         expected_pipeline_key=args.feature_pipeline_key,
         clock_mode="mixed",
         sampling_mode="song",
+        bars_per_song=args.bars_per_song,
     )
     val_dataset = SparseSongDataset(
         args.records_dir,
@@ -298,6 +321,8 @@ def main(argv: list[str] | None = None) -> int:
                     "total_epochs": args.epochs,
                     "patience": args.patience,
                     "min_delta": args.min_delta,
+                    "data_audit": data_audit,
+                    "train_examples_per_epoch": len(train_dataset),
                 },
                 sort_keys=True,
             ),
@@ -305,18 +330,20 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     output_dir = Path(args.checkpoint_dir)
-    best_val_loss = float("inf")
-    epochs_without_improvement = 0
+    same_stage = restored.get("_saved_training_stage") == stage.value
+    previous_stopping = restored.get("early_stopping", {}) if same_stage else {}
+    best_val_loss = float(previous_stopping.get("best_val_loss", float("inf")))
+    epochs_without_improvement = int(previous_stopping.get("epochs_without_improvement", 0))
 
     try:
         for epoch in range(start_epoch, args.epochs):
             if train_sampler is not None:
                 train_sampler.set_epoch(epoch)
             train_dataset.set_epoch(epoch)
-            val_dataset.set_epoch(epoch)
+            val_dataset.set_epoch(0)
 
             train_order_generator.manual_seed(args.seed + epoch)
-            val_order_generator.manual_seed(args.seed + 1_000_003 + epoch)
+            val_order_generator.manual_seed(args.seed + 1_000_003)
 
             raw_train_metrics = run_epoch(
                 planner=train_planner,
@@ -331,15 +358,14 @@ def main(argv: list[str] | None = None) -> int:
             train_metrics = _reduce_metrics(raw_train_metrics, device)
             global_step += int(train_metrics["steps"])
 
-            raw_val_metrics = run_epoch(
-                planner=train_planner,
-                geometry=train_geometry,
-                loader=val_loader,
-                optimizer=None,
-                device=device,
-                config=config,
-                max_steps=args.max_steps,
-            )
+            # Fix validation diffusion noise without perturbing training RNG.
+            rng_devices = [torch.cuda.current_device()] if device.type == "cuda" else []
+            with torch.random.fork_rng(devices=rng_devices):
+                torch.manual_seed(args.seed + 1_000_003)
+                raw_val_metrics = run_epoch(
+                    planner=train_planner, geometry=train_geometry, loader=val_loader,
+                    optimizer=None, device=device, config=config, max_steps=args.max_steps,
+                )
             val_metrics = _reduce_metrics(raw_val_metrics, device)
 
             stop_training = False
@@ -356,21 +382,25 @@ def main(argv: list[str] | None = None) -> int:
                     training_config=config,
                     provenance=provenance,
                 )
-                latest_ckpt = save_checkpoint(payload, output_dir / "latest.pt", overwrite=True)
-                if (epoch + 1) % 25 == 0 or epoch == args.epochs - 1:
-                    save_checkpoint(payload, output_dir / f"{stage.value}-epoch-{epoch:04d}.pt", overwrite=True)
-
                 val_loss = float(val_metrics["loss"])
                 is_best = False
                 if val_loss < best_val_loss - args.min_delta:
                     best_val_loss = val_loss
                     epochs_without_improvement = 0
                     is_best = True
-                    save_checkpoint(payload, output_dir / "best.pt", overwrite=True)
                 else:
                     epochs_without_improvement += 1
                     if args.patience > 0 and epochs_without_improvement >= args.patience:
                         stop_training = True
+
+                payload["data_audit"] = data_audit
+                payload["early_stopping"] = {"best_val_loss": best_val_loss,
+                                              "epochs_without_improvement": epochs_without_improvement}
+                latest_ckpt = save_checkpoint(payload, output_dir / "latest.pt", overwrite=True)
+                if is_best:
+                    save_checkpoint(payload, output_dir / "best.pt", overwrite=True)
+                if (epoch + 1) % 25 == 0 or epoch == args.epochs - 1:
+                    save_checkpoint(payload, output_dir / f"{stage.value}-epoch-{epoch:04d}.pt", overwrite=True)
 
                 print(
                     json.dumps(

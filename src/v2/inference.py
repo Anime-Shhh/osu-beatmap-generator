@@ -52,7 +52,6 @@ from .generation import (
 from .geometry import (
     ActiveEventGeometryDiffuser,
     GeometryDiffusionConfig,
-    project_slider_paths,
     sample_geometry_windows,
 )
 from .grammar import BarEventCodec, EventVocabulary, PlannerEvent
@@ -224,6 +223,14 @@ def load_v2_models(path: str | Path, *, device: torch.device | str = "cpu") -> L
         raise ValueError(f"unable to load safe v2 checkpoint: {exc}") from exc
     if not isinstance(payload, Mapping) or payload.get("checkpoint_schema") != CHECKPOINT_SCHEMA:
         raise ValueError("unsupported v2 checkpoint schema")
+    training = payload.get("training_config", {})
+    if training.get("stage") != "geometry" or int(payload.get("global_step", 0)) <= 0:
+        raise ValueError(
+            "Generation requires a trained geometry-stage checkpoint. Planner checkpoints "
+            "also contain random geometry weights; train geometry on verified real maps first."
+        )
+    if payload.get("data_audit", {}).get("production_ready") is False:
+        raise ValueError("This checkpoint is marked as diagnostic/unverified data, not generation-ready")
     planner_config_payload = payload.get("planner_config")
     geometry_config_payload = payload.get("geometry_config")
     provenance_payload = payload.get("provenance")
@@ -232,22 +239,22 @@ def load_v2_models(path: str | Path, *, device: torch.device | str = "cpu") -> L
     if not isinstance(provenance_payload, Mapping):
         raise ValueError("checkpoint is missing provenance")
     planner_config = SparsePlannerConfig(**dict(planner_config_payload))
-    geometry_config = GeometryDiffusionConfig(**dict(geometry_config_payload))
+    geometry_config = GeometryDiffusionConfig(**{"coordinate_space": "legacy-logit", **dict(geometry_config_payload)})
     if geometry_config.context_dim != planner_config.model_dim:
         raise ValueError("checkpoint geometry context dimension differs from planner decoder dimension")
     if geometry_config.event_feature_dim != 4:
         raise ValueError("checkpoint geometry feature dimension differs from the v2 record contract")
     planner = SparseEventPlanner(planner_config)
     geometry = ActiveEventGeometryDiffuser(geometry_config)
+    provenance = CheckpointProvenance.from_dict(provenance_payload)
+    if provenance.vocabulary_sha256 != vocabulary_sha256(planner.vocabulary):
+        raise ValueError("checkpoint vocabulary differs; rebuild v3 records and retrain both stages")
     planner_state = payload.get("planner")
     geometry_state = payload.get("geometry")
     if not isinstance(planner_state, Mapping) or not isinstance(geometry_state, Mapping):
         raise ValueError("checkpoint does not contain both trained model state dictionaries")
     planner.load_state_dict(planner_state)
     geometry.load_state_dict(geometry_state)
-    provenance = CheckpointProvenance.from_dict(provenance_payload)
-    if provenance.vocabulary_sha256 != vocabulary_sha256(planner.vocabulary):
-        raise ValueError("checkpoint sparse vocabulary does not match its model")
     target = torch.device(device)
     planner.to(target).eval()
     geometry.to(target).eval()
@@ -734,9 +741,10 @@ def _sample_candidate_map(
             steps=geometry_steps,
             generator=generator,
         )
-        full_geometry = project_slider_paths(
-            full_geometry, kinds, anchors, target_lengths, event_mask=mask
-        )[0].cpu()
+        # Native pixelLength trims/extends the evaluated curve. Scaling the
+        # control polygon to that length distorts P/B shapes (its length is not
+        # the curve's length), and clamping controls destroys legitimate arcs.
+        full_geometry = full_geometry[0].cpu()
     else:
         full_geometry = torch.zeros((0, geometry.config.max_anchors + 1, 2))
     events = project_event_intervals(
@@ -933,7 +941,7 @@ def _load_audio_ffmpeg(path: Path, target_sr: int) -> torch.Tensor:
     process = subprocess.run(command, capture_output=True, check=True)
     if len(process.stdout) < 4 or len(process.stdout) % 4 != 0:
         raise ValueError("FFmpeg returned an empty or truncated audio stream")
-    return torch.frombuffer(process.stdout, dtype=torch.float32).unsqueeze(0).clone()
+    return torch.frombuffer(bytearray(process.stdout), dtype=torch.float32).unsqueeze(0).clone()
 
 
 def _load_audio_wave(path: Path, target_sr: int) -> torch.Tensor:
@@ -1301,7 +1309,8 @@ def extract_audio_features(
         offset_override_ms=offset_ms,
     )
 
-    raw_pcm_bytes = bytes(waveform.to(torch.float32).contiguous().cpu().untyped_storage())
+    # Bulk export avoids Python byte-by-byte iteration over tensor storage.
+    raw_pcm_bytes = waveform.to(torch.float32).contiguous().cpu().numpy().tobytes()
     raw_pcm_sha256 = pcm_sha256(raw_pcm_bytes)
     if audio_sha256 is None:
         audio_sha256 = raw_pcm_sha256
@@ -1322,10 +1331,10 @@ def extract_audio_features(
         spec=canonical_spec,
     )
 
-    rhythm_hash = hashlib.sha256(bytes(rhythm_features.contiguous().cpu().untyped_storage())).hexdigest()
-    rhythm_t_hash = hashlib.sha256(bytes(rhythm_times_ms.contiguous().cpu().untyped_storage())).hexdigest()
-    semantic_hash = hashlib.sha256(bytes(semantic_features.contiguous().cpu().untyped_storage())).hexdigest()
-    semantic_t_hash = hashlib.sha256(bytes(semantic_times_ms.contiguous().cpu().untyped_storage())).hexdigest()
+    rhythm_hash = hashlib.sha256(rhythm_features.contiguous().cpu().numpy().tobytes()).hexdigest()
+    rhythm_t_hash = hashlib.sha256(rhythm_times_ms.contiguous().cpu().numpy().tobytes()).hexdigest()
+    semantic_hash = hashlib.sha256(semantic_features.contiguous().cpu().numpy().tobytes()).hexdigest()
+    semantic_t_hash = hashlib.sha256(semantic_times_ms.contiguous().cpu().numpy().tobytes()).hexdigest()
 
     rhythm_stream = FeatureStreamManifest(
         name="rhythm_features",

@@ -31,7 +31,9 @@ from .events import BeatEvent, EventKind
 # location before the bounded microtiming residual can be represented.
 SNAP_DENOMINATORS: tuple[int, ...] = (1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 96)
 MAX_BAR_BEATS = 12  # Covers the common and unusual meters without unbounded vocabularies.
-MAX_ANCHORS = 8
+# Preserve complex native Beziers (the supplied ranked Normal has 10 controls).
+# Packed geometry attention pays for actual controls, not this padding bound.
+MAX_ANCHORS = 32
 MAX_REPEATS = 8
 # Long objects may cross a bar boundary.  Duration is therefore bounded
 # separately from a bar's event offsets instead of being silently clipped to
@@ -107,6 +109,7 @@ class GrammarState:
     current_offset_tick: int | None = None
     current_residual_steps: int | None = None
     current_kind: EventKind | None = None
+    current_curve: str | None = None
 
 
 class EventVocabulary:
@@ -143,6 +146,12 @@ class EventVocabulary:
         names.extend(f"anchors:{count}" for count in range(1, MAX_ANCHORS + 1))
         self._names = tuple(names)
         self._ids = {name: index for index, name in enumerate(self._names)}
+        # Vocabulary membership is immutable. Re-scanning every token for each
+        # grammar transition dominates real-map preprocessing and decoding.
+        families = {family: [] for family in TokenFamily}
+        for index in range(len(self._names)):
+            families[self.family_of(index)].append(index)
+        self._family_ids = {family: tuple(indices) for family, indices in families.items()}
 
     def __len__(self) -> int:
         return len(self._names)
@@ -175,7 +184,7 @@ class EventVocabulary:
         return TokenFamily(prefix)
 
     def ids_for_family(self, family: TokenFamily) -> tuple[int, ...]:
-        return tuple(index for index in range(len(self)) if self.family_of(index) == family)
+        return self._family_ids[family]
 
     def offset_tick(self, token_id: int) -> int:
         name = self.name_for(token_id)
@@ -248,6 +257,8 @@ class EventGrammar:
         if state.phase == DecodePhase.SLIDER_REPEATS:
             return vocab.ids_for_family(TokenFamily.REPEATS)
         if state.phase == DecodePhase.SLIDER_ANCHORS:
+            if state.current_curve == "P":
+                return (vocab.id_for("anchors:2"),)
             return vocab.ids_for_family(TokenFamily.ANCHORS)
         if state.phase == DecodePhase.SPINNER_DURATION:
             return vocab.ids_for_family(TokenFamily.DURATION)
@@ -413,6 +424,7 @@ class EventGrammar:
                 current_offset_tick=state.current_offset_tick,
                 current_residual_steps=state.current_residual_steps,
                 current_kind=state.current_kind,
+                current_curve=name.split(":", 1)[1],
             )
         if state.phase == DecodePhase.SLIDER_REPEATS:
             return GrammarState(
@@ -422,6 +434,7 @@ class EventGrammar:
                 current_offset_tick=state.current_offset_tick,
                 current_residual_steps=state.current_residual_steps,
                 current_kind=state.current_kind,
+                current_curve=state.current_curve,
             )
         if state.phase in {DecodePhase.SLIDER_ANCHORS, DecodePhase.SPINNER_DURATION}:
             return GrammarState(
@@ -491,7 +504,11 @@ class BarEventCodec:
                 duration_tick = max(1, int(round(duration * DURATION_TICKS_PER_BEAT)))
                 if duration_tick > MAX_DURATION_BEATS * DURATION_TICKS_PER_BEAT:
                     raise ValueError("slider duration exceeds sparse planner vocabulary")
-                anchors = min(MAX_ANCHORS, max(1, len(event.control_points)))
+                anchors = len(event.control_points)
+                if not 1 <= anchors <= MAX_ANCHORS:
+                    raise ValueError("slider anchor count exceeds sparse planner vocabulary")
+                if not 1 <= event.slider_repeats <= MAX_REPEATS:
+                    raise ValueError("slider repeat count exceeds sparse planner vocabulary")
                 event_tokens.extend((
                     self.vocabulary.id_for(f"duration:{duration_tick}"),
                     self.vocabulary.id_for(f"curve:{event.curve_type.upper()}"),

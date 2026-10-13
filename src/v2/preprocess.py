@@ -294,8 +294,10 @@ def _geometry_targets(events: Sequence[BeatEvent]) -> tuple[torch.Tensor, torch.
             for anchor_index, (x, y) in enumerate(event.control_points, start=1):
                 geometry[index, anchor_index] = torch.tensor((x / PLAYFIELD_WIDTH, y / PLAYFIELD_HEIGHT))
             lengths[index] = float(event.slider_length)
-    if (geometry < 0).any() or (geometry > 1).any():
-        raise ValueError("source event geometry lies outside the osu! playfield")
+    if not torch.isfinite(geometry).all():
+        raise ValueError("source event geometry must be finite")
+    if (geometry[:, 0] < 0).any() or (geometry[:, 0] > 1).any():
+        raise ValueError("source event head lies outside the osu! playfield")
     return geometry, kinds, anchor_counts, lengths
 
 

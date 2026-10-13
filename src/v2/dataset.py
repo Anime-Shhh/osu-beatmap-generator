@@ -28,7 +28,7 @@ from .grammar import EventVocabulary, MAX_ANCHORS
 from .data import SourceIdentity, SourceSplitAssignment, assert_source_split_disjoint
 
 
-V2_SONG_RECORD_SCHEMA = "osu-beatmap-generator/v2-song-record/2"
+V2_SONG_RECORD_SCHEMA = "osu-beatmap-generator/v2-song-record/3"
 V2_SONG_RECORD_INDEX_SCHEMA = "osu-beatmap-generator/v2-song-record-index/3"
 
 
@@ -278,8 +278,8 @@ def validate_song_record(payload: Mapping[str, Any]) -> None:
             raise RecordSchemaError("event_features must be [events,4]")
         if any(value.dtype not in (torch.int64, torch.int32, torch.int16, torch.int8) for value in (kinds, anchors, token_indices, event_positions)):
             raise RecordSchemaError("event type/topology/token-index fields must be integral")
-        if not torch.isfinite(geometry).all() or (geometry < 0).any() or (geometry > 1).any():
-            raise RecordSchemaError("geometry must be finite normalized coordinates in [0,1]")
+        if not torch.isfinite(geometry).all() or (geometry[:, 0] < 0).any() or (geometry[:, 0] > 1).any():
+            raise RecordSchemaError("geometry must be finite with heads in [0,1]; slider controls may lie outside")
         if (kinds < 0).any() or (kinds > 2).any():
             raise RecordSchemaError("event_kinds must use native EventKind IDs")
         if (anchors < 0).any() or (anchors > MAX_ANCHORS).any():
@@ -367,6 +367,7 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         cache_size: int = 2,
         clock_mode: str = "mixed",
         sampling_mode: str = "song",
+        bars_per_song: int = 1,
     ):
         if split is not None and split not in {"train", "val", "test"}:
             raise ValueError("split must be train, val, test, or None")
@@ -383,6 +384,9 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         self.cache_size = cache_size
         self.clock_mode = clock_mode
         self.sampling_mode = sampling_mode
+        if bars_per_song < 1:
+            raise ValueError("bars_per_song must be positive")
+        self.bars_per_song = bars_per_song
         self._epoch = 0
         self._records: list[Path] = []
         self._record_indexes: list[Mapping[str, Any]] = []
@@ -421,7 +425,8 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
                 )
         if sampling_mode == "song":
             self._song_groups = [tuple(indices) for _, indices in sorted(groups.items())]
-            self._index = [(group_index, -1) for group_index in range(len(self._song_groups))]
+            self._index = [(group_index, sample) for group_index in range(len(self._song_groups))
+                           for sample in range(bars_per_song)]
         if not self._index:
             qualifier = f" for split {split!r}" if split else ""
             raise RecordSchemaError(f"no v2 bar targets found in {self.records_dir}{qualifier}")
@@ -457,12 +462,13 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         record_index, target_index = self._index[index]
         if self.sampling_mode == "song":
             choices = self._song_groups[record_index]
-            record_index = choices[self._epoch % len(choices)]
+            draw = self._epoch * self.bars_per_song + target_index
+            record_index = choices[draw % len(choices)]
             # Uniformly sample a source component, then one difficulty/map
             # record, then one bar. This prevents popular songs/mapsets from
             # dominating merely because they have more cached bar targets.
             preview = self._record(record_index)
-            target_index = (self._epoch // len(choices) + record_index) % len(preview["bar_targets"])
+            target_index = (draw // len(choices) + record_index) % len(preview["bar_targets"])
         payload = self._record(record_index)
         target = _require_mapping(payload["bar_targets"][target_index], "bar target")
         previous_tokens = torch.empty((0,), dtype=torch.long)

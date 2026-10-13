@@ -21,6 +21,15 @@ full design in [plans/tempo-posterior-hierarchical-event-diffusion.md](plans/tem
 
 ## V2 status and safety
 
+**October 13 audit:** the previous `run_20261010_v2` used six synthetic sine-wave
+tracks falsely labeled as ranked data and a planner-only checkpoint with random
+geometry. It is not a usable trained model. The preserved baseline is `f499bd4`.
+See [the audit and retraining instructions](docs/v2-audit-2026-10-13.md).
+New runs require real audio/native `.osu` records (schema 3), freshly trained
+planner and geometry stages, and pinned measured difficulty. The expanded
+32-anchor vocabulary and relative slider representation require rebuilding
+records and retraining; do not resume the old run.
+
 The v2 implementation now includes canonical audio/cache manifests, audio/fingerprint-safe source splits, meter-aware timing hypotheses, a strict `MapSpec` compiler/validator, sparse grammar targets, timestamp-aligned planner and geometry models, explicit prior-bar boundary conditioning, safe record/checkpoint schemas, candidate auditing, and static iLab job templates.
 
 No training, GPU allocation, Slurm submission, audio-model download, or iLab interaction is performed by importing these modules. The only v2 optimizer entry point is deliberately guarded:
@@ -35,7 +44,7 @@ The template [configs/v2_train_a6000.sbatch](configs/v2_train_a6000.sbatch) is i
 
 Audio is the only conceptual product input. In implementation, generation takes a feature bundle produced from that audio plus clock hypotheses from a pinned beat/downbeat resolver. This is intentional: neither MERT nor Beat This! weights are silently downloaded at inference, and source `.osu` timing/settings are never allowed into the audio-only inference path.
 
-The first v2 feature stack is 24 kHz mono audio, 96-bin 100 Hz log-mel plus rhythmic auxiliaries/beat confidence, and a frozen, train-only-PCA-compressed 128-D semantic stream with explicit timestamps. Checkpoints bind to the **feature pipeline signature**, while every song record retains a separate content cache hash—do not confuse the two.
+The implemented v2 feature stack is 24 kHz mono audio, 96-bin 100 Hz log-mel plus five rhythmic auxiliaries, and a 25 Hz pooled-mel stream expanded to 128 dimensions, with explicit timestamps. The pooled stream is not MERT or a learned semantic encoder; those remain design proposals. Checkpoints bind to the **feature pipeline signature**, while every song record retains a separate content cache hash.
 
 The default bare-audio profile is 4.5★, AR9, CS4, OD8, HP6, slider multiplier 1.4, and slider tick rate 1. It samples four candidates and packages only a strict-validator-clean winner with an audit manifest. If none pass, it returns a failure report instead of an invalid `.osu` file. `style_cluster` is intentionally reserved rather than silently ignored until train-only structural clustering and novelty checks are implemented.
 
@@ -46,8 +55,8 @@ The default bare-audio profile is 4.5★, AR9, CS4, OD8, HP6, slider multiplier 
 | `src/v2/audio.py`, `clock.py` | Canonical-audio/cache identity and audio-only timing-hypothesis contracts |
 | `src/v2/mapspec.py` | Native timing/settings/event IR, deterministic `.osu` compiler, interval-aware validator |
 | `src/v2/grammar.py`, `sparse_model.py` | Meter-aware rational-snap sparse planner; no fixed two-lane grid |
-| `src/v2/geometry.py` | Active-event circle/slider-anchor diffusion and bounded path projection |
-| `src/v2/preprocess.py`, `dataset.py` | Song-level records plus tensor-free verified JSON indexes, jittered clocks, no-leakage split bindings, padded bar batches |
+| `src/v2/geometry.py` | Packed active-point diffusion, relative slider controls, spacing/turn/shape losses, overlap inpainting |
+| `src/v2/preprocess.py`, `dataset.py`, `corpus.py` | Versioned real-map records, verified source splits/checksums, balanced bar sampling; current targets use oracle clocks |
 | `src/v2/training.py`, `train.py` | Explicit stage-separated trainer, prior-bar condition dropout, provenance-checked checkpoints, guarded CLI |
 | `src/v2/inference.py`, `generate.py` | Feature-bundle generation, candidate audit/rerank, safe packaging |
 | `configs/v2_*.sbatch` | Static templates only; they never submit jobs themselves |

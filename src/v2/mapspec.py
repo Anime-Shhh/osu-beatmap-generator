@@ -117,8 +117,10 @@ class ValidationPolicy:
     require_beat_snap: bool = True
     snap_denominators: tuple[int, ...] = DEFAULT_SNAP_DENOMINATORS
     snap_tolerance_beats: float = 1.0 / 192.0
-    max_slider_control_points: int = 8
-    require_slider_path_feasibility: bool = True
+    max_slider_control_points: int = 32
+    # Optional conservative policy only. Native osu! extends a path when its
+    # declared pixelLength exceeds the computed curve, so this is not syntax validity.
+    require_slider_path_feasibility: bool = False
     slider_path_tolerance_px: float = 2.0
     slider_end_tolerance_ms: float = 2.0
     allow_custom_samples: bool = False

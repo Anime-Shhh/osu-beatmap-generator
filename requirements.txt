@@ -12,3 +12,4 @@ webdataset>=0.2.86
 tokenizers>=0.15.0
 nltk>=3.8.1
 shapely>=2.0.2
+rosu-pp-py==4.0.2

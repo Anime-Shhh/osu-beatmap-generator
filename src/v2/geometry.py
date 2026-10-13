@@ -20,7 +20,7 @@ from .events import EventKind, PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH
 from .grammar import MAX_ANCHORS
 
 
-GEOMETRY_POINTS = MAX_ANCHORS + 1  # object head plus up to eight slider anchors.
+GEOMETRY_POINTS = MAX_ANCHORS + 1  # object head plus variable slider controls.
 
 
 @dataclass(frozen=True)
@@ -36,12 +36,15 @@ class GeometryDiffusionConfig:
     # aliased to event 2047 during windowed inference.
     max_events: int = 2048
     event_feature_dim: int = 4  # prev/next gap, duration, target path length.
+    coordinate_space: str = "head-logit-relative-anchors-v1"
 
     def __post_init__(self) -> None:
         if self.hidden_dim % self.heads:
             raise ValueError("hidden_dim must be divisible by heads")
         if self.max_events < 1 or self.event_feature_dim < 1:
             raise ValueError("max_events and event_feature_dim must be positive")
+        if self.coordinate_space not in {"legacy-logit", "head-logit-relative-anchors-v1"}:
+            raise ValueError("unknown geometry coordinate space")
 
 
 def coordinates_to_logits(coordinates: torch.Tensor, eps: float = 1e-4) -> torch.Tensor:
@@ -54,6 +57,22 @@ def logits_to_coordinates(logits: torch.Tensor) -> torch.Tensor:
     """Map sampled geometry back to the legal normalized playfield domain."""
 
     return torch.sigmoid(logits)
+
+
+def encode_geometry(coordinates: torch.Tensor, space: str) -> torch.Tensor:
+    if space == "legacy-logit":
+        return coordinates_to_logits(coordinates)
+    # Heads are bounded; Bezier controls are allowed outside the canvas.
+    # Relative controls teach slider shape independently of its placement.
+    head = coordinates[..., :1, :]
+    return torch.cat((coordinates_to_logits(head), 2.0 * (coordinates[..., 1:, :] - head)), dim=-2)
+
+
+def decode_geometry(state: torch.Tensor, space: str) -> torch.Tensor:
+    if space == "legacy-logit":
+        return logits_to_coordinates(state)
+    head = logits_to_coordinates(state[..., :1, :])
+    return torch.cat((head, head + state[..., 1:, :] / 2.0), dim=-2)
 
 
 def cosine_schedule(noise_level: torch.Tensor, *, s: float = 0.008) -> tuple[torch.Tensor, torch.Tensor]:
@@ -218,16 +237,29 @@ class ActiveEventGeometryDiffuser(nn.Module):
         tokens = tokens.reshape(batch, events * (self.config.max_anchors + 1), self.config.hidden_dim)
         flat_mask = point_mask.reshape(batch, -1)
         tokens = tokens * flat_mask.unsqueeze(-1).to(tokens.dtype)
+        if tokens.shape[1] == 0:
+            return noisy_geometry_logits * 0.0
+        # Attend only to real heads/anchors. A circle uses one token, not all
+        # padded anchor slots; the old implementation paid quadratic attention
+        # cost for all of them even though their keys were masked.
+        count = max(1, int(flat_mask.sum(dim=1).max()))
+        order = torch.arange(flat_mask.shape[1], device=tokens.device).expand(batch, -1)
+        indices = (order + (~flat_mask) * flat_mask.shape[1]).argsort(dim=1)[:, :count]
+        packed = tokens.gather(1, indices.unsqueeze(-1).expand(-1, -1, tokens.shape[-1]))
+        packed_mask = flat_mask.gather(1, indices)
         # A collated batch can contain an empty bar beside a populated one.
         # Transformer attention with every key masked for that row is undefined
         # on some PyTorch versions, so reserve a zero dummy token internally
         # and remove it again from the returned epsilon.
-        attention_mask = flat_mask.clone()
-        empty_rows = ~attention_mask.any(dim=1)
+        attention_mask = packed_mask.clone()
+        empty_rows = ~packed_mask.any(dim=1)
         if empty_rows.any() and attention_mask.shape[1] > 0:
             attention_mask[empty_rows, 0] = True
-        encoded = self.sequence(tokens, src_key_padding_mask=~attention_mask)
-        epsilon = self.out(encoded).reshape_as(noisy_geometry_logits)
+        encoded = self.sequence(packed, src_key_padding_mask=~attention_mask)
+        values = self.out(encoded) * packed_mask.unsqueeze(-1)
+        epsilon = values.new_zeros((batch, flat_mask.shape[1], 2)).scatter(
+            1, indices.unsqueeze(-1).expand(-1, -1, 2), values
+        ).reshape_as(noisy_geometry_logits)
         return epsilon * point_mask.unsqueeze(-1).to(epsilon.dtype)
 
 
@@ -242,13 +274,23 @@ def geometry_diffusion_loss(
     noise_level: Optional[torch.Tensor] = None,
     event_features: Optional[torch.Tensor] = None,
     event_positions: Optional[torch.Tensor] = None,
-) -> torch.Tensor:
-    """Masked epsilon loss in logit coordinate space."""
+    spacing_weight: float = 0.1,
+    turn_weight: float = 0.05,
+    slider_shape_weight: float = 0.1,
+    return_components: bool = False,
+) -> torch.Tensor | dict[str, torch.Tensor]:
+    """Denoising plus noise-conditioned relative pattern supervision.
+
+    The auxiliary targets describe the SAME corrupted example, not a unique
+    preferred layout for an audio track. They are invariant to translations
+    and reflections and fade out at high noise, where x0 is ambiguous.
+    """
 
     batch = clean_geometry.shape[0]
     if noise_level is None:
         noise_level = torch.rand(batch, device=clean_geometry.device, dtype=clean_geometry.dtype)
-    clean_logits = coordinates_to_logits(clean_geometry)
+    model = getattr(diffuser, "module", diffuser)
+    clean_logits = encode_geometry(clean_geometry, model.config.coordinate_space)
     alpha, sigma = cosine_schedule(noise_level.reshape(batch))
     noise = torch.randn_like(clean_logits)
     noisy = alpha[:, None, None, None] * clean_logits + sigma[:, None, None, None] * noise
@@ -262,11 +304,70 @@ def geometry_diffusion_loss(
         event_features=event_features,
         event_positions=event_positions,
     )
+    # DDP exposes the forward call, but model configuration belongs to module.
+    model = getattr(diffuser, "module", diffuser)
     mask = geometry_point_mask(
-        event_mask, event_kinds, anchor_counts, max_anchors=diffuser.config.max_anchors
+        event_mask, event_kinds, anchor_counts, max_anchors=model.config.max_anchors
     ).unsqueeze(-1)
-    squared = (predicted - noise).square() * mask.to(predicted.dtype)
-    return squared.sum() / mask.sum().clamp_min(1).to(predicted.dtype) / 2.0
+    squared = (predicted.float() - noise.float()).square() * mask
+    denoising = squared.sum() / mask.sum().clamp_min(1) / 2.0
+    x0 = (noisy.float() - sigma[:, None, None, None] * predicted.float()) / alpha[:, None, None, None]
+    patterns = geometry_pattern_losses(
+        decode_geometry(x0, model.config.coordinate_space), clean_geometry.float(), event_kinds, anchor_counts,
+        event_mask, reliability=alpha.square(), event_positions=event_positions,
+    )
+    loss = (denoising + spacing_weight * patterns["spacing_loss"]
+            + turn_weight * patterns["turn_loss"] + slider_shape_weight * patterns["slider_shape_loss"])
+    result = {"geometry_loss": loss, "denoising_loss": denoising, **patterns}
+    return result if return_components else loss
+
+
+def geometry_pattern_losses(
+    predicted: torch.Tensor, target: torch.Tensor, event_kinds: torch.Tensor,
+    anchor_counts: torch.Tensor, event_mask: torch.Tensor, *,
+    reliability: torch.Tensor | None = None,
+    event_positions: torch.Tensor | None = None,
+) -> dict[str, torch.Tensor]:
+    """Compare head spacing, unsigned turns and slider control-polygon shape.
+
+    Isotropic pixel units avoid mistaking a horizontal pattern for a different
+    shape after rotation. This is a structural training signal, NOT the osu!
+    aim evaluator: it does not approximate slider lazy travel or star rating.
+    Timing is fixed by the supervised event plan, so spacing at that timing
+    also supervises the spacing/time relationship without an invented SR law.
+    """
+    scale = predicted.new_tensor((1.0, PLAYFIELD_HEIGHT / PLAYFIELD_WIDTH))
+    pred, truth = predicted * scale, target * scale
+    if reliability is None:
+        reliability = predicted.new_ones(predicted.shape[0])
+
+    def mean(values: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+        weight = reliability.reshape((-1,) + (1,) * (values.ndim - 1))
+        return (values * mask * weight).sum() / mask.sum().clamp_min(1)
+
+    playable = event_mask & event_kinds.ne(int(EventKind.SPINNER))
+    pairs = playable[:, 1:] & playable[:, :-1]
+    if event_positions is not None:
+        pairs = pairs & (event_positions[:, 1:] - event_positions[:, :-1]).eq(1)
+    dp, dt = pred[:, 1:, 0] - pred[:, :-1, 0], truth[:, 1:, 0] - truth[:, :-1, 0]
+    lp, lt = dp.norm(dim=-1), dt.norm(dim=-1)
+    spacing = mean(F.smooth_l1_loss(lp, lt, reduction="none"), pairs)
+    turns = pairs[:, 1:] & pairs[:, :-1] & lt[:, 1:].gt(1e-4) & lt[:, :-1].gt(1e-4)
+    cp = F.cosine_similarity(dp[:, 1:], dp[:, :-1], dim=-1, eps=1e-4)
+    ct = F.cosine_similarity(dt[:, 1:], dt[:, :-1], dim=-1, eps=1e-4)
+    turn = mean(F.smooth_l1_loss(cp, ct, reduction="none"), turns)
+    points = geometry_point_mask(event_mask, event_kinds, anchor_counts,
+                                 max_anchors=pred.shape[2] - 1)
+    slider = event_kinds.eq(int(EventKind.SLIDER)) & event_mask
+    segment_mask = points[:, :, 1:] & slider.unsqueeze(-1)
+    ps, ts = pred[:, :, 1:] - pred[:, :, :-1], truth[:, :, 1:] - truth[:, :, :-1]
+    lengths = mean(F.smooth_l1_loss(ps.norm(dim=-1), ts.norm(dim=-1), reduction="none"), segment_mask)
+    bend_mask = segment_mask[:, :, 1:] & segment_mask[:, :, :-1]
+    bend_mask = bend_mask & ts[:, :, 1:].norm(dim=-1).gt(1e-4) & ts[:, :, :-1].norm(dim=-1).gt(1e-4)
+    bend = mean(F.smooth_l1_loss(
+        F.cosine_similarity(ps[:, :, 1:], ps[:, :, :-1], dim=-1, eps=1e-4),
+        F.cosine_similarity(ts[:, :, 1:], ts[:, :, :-1], dim=-1, eps=1e-4), reduction="none"), bend_mask)
+    return {"spacing_loss": spacing, "turn_loss": turn, "slider_shape_loss": lengths + bend}
 
 
 @torch.no_grad()
@@ -281,8 +382,10 @@ def sample_geometry(
     generator: Optional[torch.Generator] = None,
     event_features: Optional[torch.Tensor] = None,
     event_positions: Optional[torch.Tensor] = None,
+    known_geometry: Optional[torch.Tensor] = None,
+    known_event_mask: Optional[torch.Tensor] = None,
 ) -> torch.Tensor:
-    """Deterministically sample bounded event geometry with DDIM-style steps.
+    """Sample bounded heads and relative slider controls with DDIM-style steps.
 
     The denoiser predicts epsilon under :func:`cosine_schedule`.  This sampler
     deliberately has no classifier-free or model-download side effect: callers
@@ -306,12 +409,25 @@ def sample_geometry(
     shape = (batch, event_count, diffuser.config.max_anchors + 1, 2)
     state = torch.randn(shape, device=context.device, dtype=context.dtype, generator=generator)
     state = state * point_mask.to(state.dtype)
+    fixed = None
+    if known_geometry is not None:
+        if known_geometry.shape != shape or known_event_mask is None or known_event_mask.shape != event_mask.shape:
+            raise ValueError("known geometry and event mask must match the sampled window")
+        fixed = (known_event_mask & event_mask).unsqueeze(-1).unsqueeze(-1) & point_mask
+        known_logits = encode_geometry(known_geometry, diffuser.config.coordinate_space)
+        known_noise = state.clone()
+    elif known_event_mask is not None:
+        raise ValueError("known_event_mask requires known_geometry")
     # Descend from pure noise (t=1) to data (t=0).  Eta is intentionally zero
     # for reproducibility; candidate diversity comes from the initial noise and
     # the symbolic sampler seed.
     schedule = torch.linspace(1.0, 0.0, steps, device=context.device, dtype=context.dtype)
     for current, following in zip(schedule[:-1], schedule[1:]):
         level = current.expand(batch)
+        alpha, sigma = cosine_schedule(level)
+        if fixed is not None:
+            observed = alpha[:, None, None, None] * known_logits + sigma[:, None, None, None] * known_noise
+            state = torch.where(fixed, observed, state)
         epsilon = diffuser(
             context,
             event_kinds,
@@ -322,13 +438,13 @@ def sample_geometry(
             event_features=event_features,
             event_positions=event_positions,
         )
-        alpha, sigma = cosine_schedule(level)
         x0 = (state - sigma[:, None, None, None] * epsilon) / alpha[:, None, None, None].clamp_min(1e-5)
         next_level = following.expand(batch)
         next_alpha, next_sigma = cosine_schedule(next_level)
         state = next_alpha[:, None, None, None] * x0 + next_sigma[:, None, None, None] * epsilon
         state = state * point_mask.to(state.dtype)
-    return logits_to_coordinates(state) * point_mask.to(state.dtype)
+    result = decode_geometry(state, diffuser.config.coordinate_space) * point_mask.to(state.dtype)
+    return torch.where(fixed, known_geometry, result) if fixed is not None else result
 
 
 @torch.no_grad()
@@ -346,12 +462,12 @@ def sample_geometry_windows(
     overlap_events: int = 32,
     generator: Optional[torch.Generator] = None,
 ) -> torch.Tensor:
-    """Sample long maps in overlapping active-event windows and reconcile seams.
+    """Sample long maps with the preceding overlap fixed as inpainting context.
 
     Full-song geometry attention grows quadratically with object count. Windows
-    retain the model's local flow context; shared overlap events are sampled in
-    both neighboring windows and averaged deterministically, avoiding an
-    arbitrary cut point. Absolute event positions remain part of the conditioner.
+    retain the model's local flow context. Averaging independently sampled
+    layouts collapses multimodal geometry and changes slider shapes; instead
+    the already generated overlap is re-noised and conditioned on each step.
     """
 
     if window_events < 2 or not 0 <= overlap_events < window_events:
@@ -376,11 +492,15 @@ def sample_geometry_windows(
     output = context.new_zeros((
         context.shape[0], event_count, diffuser.config.max_anchors + 1, 2
     ))
-    weights = context.new_zeros((context.shape[0], event_count, 1, 1))
+    if event_positions is None:
+        event_positions = torch.arange(event_count, device=context.device).unsqueeze(0).expand(context.shape[0], -1)
     stride = window_events - overlap_events
     start = 0
     while start < event_count:
         end = min(event_count, start + window_events)
+        known_mask = torch.zeros_like(event_mask[:, start:end])
+        if start:
+            known_mask[:, :overlap_events] = event_mask[:, start:start + overlap_events]
         sampled = sample_geometry(
             diffuser,
             context[:, start:end],
@@ -391,14 +511,15 @@ def sample_geometry_windows(
             event_positions=None if event_positions is None else event_positions[:, start:end],
             steps=steps,
             generator=generator,
+            known_geometry=output[:, start:end] if start else None,
+            known_event_mask=known_mask if start else None,
         )
         mask = event_mask[:, start:end].unsqueeze(-1).unsqueeze(-1).to(output.dtype)
-        output[:, start:end] += sampled * mask
-        weights[:, start:end] += mask
+        output[:, start:end] = sampled * mask
         if end == event_count:
             break
         start += stride
-    return output / weights.clamp_min(1.0)
+    return output
 
 
 def project_slider_paths(

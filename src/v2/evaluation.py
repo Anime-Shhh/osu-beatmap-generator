@@ -40,10 +40,16 @@ class StrictAuditPolicy:
     spinner_overlap_tolerance_ms: float = 0.5
     slider_overlap_tolerance_ms: float = 0.5
     allowed_snap_divisors: tuple[int, ...] = (1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 96)
+    max_star_error: float | None = None
+    minimum_start_gap_ms: float = 0.0
 
     def __post_init__(self) -> None:
         if self.same_tick_tolerance_ms < 0.0:
             raise ValueError("same_tick_tolerance_ms must be non-negative")
+        if self.minimum_start_gap_ms < 0 or not math.isfinite(self.minimum_start_gap_ms):
+            raise ValueError("minimum_start_gap_ms must be finite and non-negative")
+        if self.max_star_error is not None and (not math.isfinite(self.max_star_error) or self.max_star_error < 0):
+            raise ValueError("max_star_error must be finite and non-negative")
         if self.snap_tolerance_beats < 0.0 or self.max_snap_error_beats <= 0.0:
             raise ValueError("snap tolerances must be positive")
         if not self.allowed_snap_divisors or any(value <= 0 for value in self.allowed_snap_divisors):
@@ -84,6 +90,29 @@ class DifficultyCalculator(Protocol):
 
     def calculate(self, osu_content: str) -> DifficultyCalculation:
         """Calculate star rating for a compiled ``.osu`` document."""
+
+
+class RosuDifficultyCalculator:
+    """Pinned, in-process no-mod stable difficulty; version is part of the audit."""
+
+    def __init__(self) -> None:
+        from importlib.metadata import version
+        import rosu_pp_py
+
+        installed = version("rosu-pp-py")
+        if installed != "4.0.2":
+            raise ValueError(f"Expected rosu-pp-py==4.0.2, found {installed}; rebuild labels before upgrading")
+        self.backend = rosu_pp_py
+        self.calculator_id = f"rosu-pp-py/{installed}/stable/no-mods"
+
+    def calculate(self, osu_content: str) -> DifficultyCalculation:
+        beatmap = self.backend.Beatmap(content=osu_content)
+        result = self.backend.Difficulty(lazer=False).calculate(beatmap)
+        return DifficultyCalculation(
+            available=True, stars=result.stars, calculator_id=self.calculator_id,
+            attributes={name: float(getattr(result, name)) for name in ("aim", "speed")
+                        if getattr(result, name, None) is not None},
+        )
 
 
 @dataclass(frozen=True)
@@ -360,6 +389,8 @@ def _generic_strict_audit(map_spec: Any, policy: StrictAuditPolicy) -> tuple[lis
             gap_values.append(gap)
             if gap <= policy.same_tick_tolerance_ms:
                 errors.append(f"event {index}: same-tick or non-increasing start time")
+            elif gap < policy.minimum_start_gap_ms:
+                errors.append(f"event {index}: start gap {gap:.3f} ms is below requested minimum")
         previous_start = start_ms
 
         if previous_position is not None:
@@ -400,8 +431,6 @@ def _generic_strict_audit(map_spec: Any, policy: StrictAuditPolicy) -> tuple[lis
                     continue
                 if not (math.isfinite(point_x) and math.isfinite(point_y)):
                     errors.append(f"event {index}: slider point {point_index} is non-finite")
-                elif not (0.0 <= point_x <= 512.0 and 0.0 <= point_y <= 384.0):
-                    errors.append(f"event {index}: slider point {point_index} is off playfield")
 
         canonical_events.append(
             (
@@ -487,7 +516,8 @@ def _score_candidate(
     score = 1.0 - min(0.20, 0.01 * warning_count)
     if target_star is not None and difficulty.available and difficulty.stars is not None:
         tolerance = max(0.5, target_star * 0.15)
-        score -= min(0.50, 0.50 * abs(difficulty.stars - target_star) / tolerance)
+        # Preserve ordering even when every candidate is far from the target.
+        score *= math.exp(-abs(difficulty.stars - target_star) / tolerance)
     if model_quality_score is not None:
         score += 0.10 * model_quality_score
     return max(0.0, min(1.0, score))
@@ -527,6 +557,15 @@ def audit_candidate(
             )
         if not difficulty.available:
             warnings.append("realized difficulty was not calculated")
+        if policy.max_star_error is not None and target_star is not None:
+            if not difficulty.available:
+                errors.append("target-star validation requires an available difficulty calculator")
+            elif abs(difficulty.stars - target_star) > policy.max_star_error:
+                errors.append(
+                    f"realized difficulty {difficulty.stars:.3f} differs from target "
+                    f"{target_star:.3f} by more than {policy.max_star_error:.3f} stars"
+                )
+        valid = not errors
     score = _score_candidate(
         valid=valid,
         warning_count=len(warnings),
