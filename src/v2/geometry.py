@@ -56,9 +56,16 @@ def logits_to_coordinates(logits: torch.Tensor) -> torch.Tensor:
     return torch.sigmoid(logits)
 
 
-def cosine_schedule(noise_level: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+def cosine_schedule(noise_level: torch.Tensor, *, s: float = 0.008) -> tuple[torch.Tensor, torch.Tensor]:
+    """Continuous cosine schedule with bounded terminal SNR to avoid endpoint singularity."""
     level = noise_level.clamp(0.0, 1.0)
-    return torch.cos(level * math.pi / 2.0), torch.sin(level * math.pi / 2.0)
+    # Cosine schedule with offset s = 0.008
+    f_t = torch.cos(((level + s) / (1.0 + s)) * (math.pi / 2.0))
+    f_0 = math.cos((s / (1.0 + s)) * (math.pi / 2.0))
+    alpha_bar = (f_t / f_0).square().clamp(min=1e-4, max=1.0)
+    alpha = alpha_bar.sqrt()
+    sigma = (1.0 - alpha_bar).clamp(min=0.0).sqrt()
+    return alpha, sigma
 
 
 def geometry_point_mask(

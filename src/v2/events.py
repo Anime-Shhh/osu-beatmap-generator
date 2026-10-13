@@ -13,7 +13,7 @@ import math
 from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import IntEnum
-from typing import Iterable, Optional
+from typing import Any, Iterable, Optional
 
 try:
     import torch
@@ -542,4 +542,123 @@ def build_beat_grid_targets(
         end_beat_delta=end_beat_delta,
         slider_length=slider_length,
         slider_repeats=slider_repeats,
+    )
+
+
+@dataclass(frozen=True)
+class EventLanes:
+    """Frame-aligned binary event activity lanes on a uniform time grid (e.g. 10ms).
+
+    Lanes:
+    - circle_impulses: 1 at circle onset frame
+    - slider_onsets: 1 at slider head frame
+    - slider_tails: 1 at true physical slider tail frame (after all repeats)
+    - slider_spans: 1 throughout [onset, tail] span
+    - spinner_spans: 1 throughout [onset, end] span
+    """
+
+    frame_times_ms: Any  # [T] torch.Tensor
+    circle_impulses: Any  # [T] torch.Tensor
+    slider_onsets: Any  # [T] torch.Tensor
+    slider_tails: Any  # [T] torch.Tensor
+    slider_spans: Any  # [T] torch.Tensor
+    spinner_spans: Any  # [T] torch.Tensor
+
+    def as_tensor(self) -> Any:
+        """Stack lanes into [T, 5] tensor."""
+        if torch is None:
+            raise RuntimeError("EventLanes.as_tensor requires PyTorch")
+        return torch.stack(
+            [
+                self.circle_impulses,
+                self.slider_onsets,
+                self.slider_tails,
+                self.slider_spans,
+                self.spinner_spans,
+            ],
+            dim=-1,
+        )
+
+
+def build_event_lanes(
+    events: Iterable[BeatEvent],
+    timing_map: TimingMap,
+    *,
+    frame_times_ms: Any,
+    slider_multiplier: float = 1.4,
+) -> EventLanes:
+    """Compute exact frame-aligned binary event lanes from events and timing."""
+    if torch is None:
+        raise RuntimeError("build_event_lanes requires PyTorch")
+    n_frames = frame_times_ms.shape[0]
+    circle_impulses = torch.zeros(n_frames, dtype=torch.float32)
+    slider_onsets = torch.zeros(n_frames, dtype=torch.float32)
+    slider_tails = torch.zeros(n_frames, dtype=torch.float32)
+    slider_spans = torch.zeros(n_frames, dtype=torch.float32)
+    spinner_spans = torch.zeros(n_frames, dtype=torch.float32)
+
+    if n_frames == 0:
+        return EventLanes(
+            frame_times_ms=frame_times_ms,
+            circle_impulses=circle_impulses,
+            slider_onsets=slider_onsets,
+            slider_tails=slider_tails,
+            slider_spans=slider_spans,
+            spinner_spans=spinner_spans,
+        )
+
+    # Frame step estimate for indexing
+    times = frame_times_ms.cpu()
+
+    def _frame_idx(t_ms: float) -> int:
+        idx = int(torch.searchsorted(times, torch.tensor(t_ms), right=False).item())
+        if idx > 0 and idx < n_frames:
+            # Check if previous frame center is closer
+            if abs(times[idx - 1].item() - t_ms) < abs(times[idx].item() - t_ms):
+                idx = idx - 1
+        return min(max(0, idx), n_frames - 1)
+
+    for event in events:
+        start_ms = timing_map.beat_to_time(event.beat_position)
+        start_idx = _frame_idx(start_ms)
+
+        if event.kind == EventKind.CIRCLE:
+            circle_impulses[start_idx] = 1.0
+        elif event.kind == EventKind.SLIDER:
+            slider_onsets[start_idx] = 1.0
+            if event.slider_length > 0:
+                duration_ms = timing_map.slider_duration_ms(
+                    start_ms,
+                    event.slider_length,
+                    max(1, event.slider_repeats),
+                    slider_multiplier,
+                )
+                end_ms = start_ms + duration_ms
+            elif event.end_beat is not None:
+                end_ms = timing_map.beat_to_time(event.end_beat)
+            else:
+                end_ms = start_ms
+
+            end_idx = _frame_idx(end_ms)
+            slider_tails[end_idx] = 1.0
+            span_start = min(start_idx, end_idx)
+            span_end = max(start_idx, end_idx)
+            slider_spans[span_start : span_end + 1] = 1.0
+        elif event.kind == EventKind.SPINNER:
+            if event.end_beat is not None:
+                end_ms = timing_map.beat_to_time(event.end_beat)
+            else:
+                end_ms = start_ms
+            end_idx = _frame_idx(end_ms)
+            span_start = min(start_idx, end_idx)
+            span_end = max(start_idx, end_idx)
+            spinner_spans[span_start : span_end + 1] = 1.0
+
+    return EventLanes(
+        frame_times_ms=frame_times_ms,
+        circle_impulses=circle_impulses,
+        slider_onsets=slider_onsets,
+        slider_tails=slider_tails,
+        slider_spans=slider_spans,
+        spinner_spans=spinner_spans,
     )

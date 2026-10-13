@@ -61,7 +61,8 @@ class TimingPoint:
     def slider_velocity_multiplier(self) -> Optional[float]:
         if self.uninherited or self.beat_length_ms >= 0.0:
             return None
-        return -100.0 / self.beat_length_ms
+        raw = -100.0 / self.beat_length_ms
+        return max(0.1, min(10.0, raw))
 
 
 @dataclass(frozen=True)
@@ -412,11 +413,6 @@ def timing_map_from_points(points: Iterable[TimingPoint]) -> TimingMap:
         for point in points
         if point.uninherited and point.beat_length_ms > 0.0
     )
-    inherited_points = _last_point_per_time(
-        point
-        for point in points
-        if not point.uninherited and point.beat_length_ms < 0.0
-    )
     if not red_points:
         return TimingMap(
             (TimingSegment(0.0, DEFAULT_BEAT_LENGTH_MS, 0.0),),
@@ -435,13 +431,30 @@ def timing_map_from_points(points: Iterable[TimingPoint]) -> TimingMap:
         segments.append(
             TimingSegment(point.offset_ms, point.beat_length_ms, start_beat, meter=point.meter)
         )
-    # A sentinel keeps the default velocity active before the first inherited
-    # point without fabricating a source timing point at t=0.
+
+    # In native osu! (LegacyBeatmapDecoder.cs), DifficultyControlPoint state is derived
+    # from all timing points:
+    # 1. Uninherited (red) points reset active speedMultiplier to 1.0 (for positive beat length).
+    # 2. Inherited (green) points set active speedMultiplier = clamp(0.1, 10.0, -100.0 / beat_length_ms)
+    #    when beat_length_ms < 0.0, or 1.0 when beat_length_ms >= 0.0.
+    # 3. At any shared timestamp, green points take precedence over red points (matching osu!'s decoder
+    #    flushPendingPoints logic where green points are processed first).
+    unique_times = sorted(set(p.offset_ms for p in points))
     velocities = [SliderVelocitySegment(-1.0e12, 1.0)]
-    for point in inherited_points:
-        multiplier = point.slider_velocity_multiplier
-        if multiplier is not None and multiplier > 0.0:
-            velocities.append(SliderVelocitySegment(point.offset_ms, multiplier))
+    for t in unique_times:
+        points_at_t = [p for p in points if p.offset_ms == t]
+        greens = [p for p in points_at_t if not p.uninherited]
+        reds = [p for p in points_at_t if p.uninherited and p.beat_length_ms > 0.0]
+        if greens:
+            last_green = greens[-1]
+            if last_green.beat_length_ms < 0.0:
+                mult = max(0.1, min(10.0, -100.0 / last_green.beat_length_ms))
+            else:
+                mult = 1.0
+            velocities.append(SliderVelocitySegment(t, mult))
+        elif reds:
+            velocities.append(SliderVelocitySegment(t, 1.0))
+
     return TimingMap(segments, velocities, timing_points=points)
 
 

@@ -23,6 +23,7 @@ from .audio import (
     validate_timestamps_ms,
 )
 from .clock import (
+    AudioClockResolver,
     BarPosition,
     ClockEvidence,
     ClockResolver,
@@ -57,6 +58,7 @@ from .timing import (
 )
 
 __all__ = [
+    "AudioClockResolver",
     "BeatEvent",
     "BeatGridTargets",
     "BarPosition",

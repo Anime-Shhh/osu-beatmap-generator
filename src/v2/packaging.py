@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path, PurePath
@@ -25,6 +26,8 @@ class GeneratedPackage:
     osu_path: Path
     manifest_path: Path
     osu_sha256: str
+    audio_path: Path | None = None
+    audio_sha256: str | None = None
 
 
 def _safe_output_name(value: str, *, suffix: str) -> str:
@@ -38,6 +41,18 @@ def _safe_output_name(value: str, *, suffix: str) -> str:
         raise PackagingError("output filename must not contain NUL")
     if path.suffix.lower() != suffix.lower():
         raise PackagingError(f"output filename must end in {suffix}")
+    return path.name
+
+
+def _safe_asset_name(value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise PackagingError("audio filename must be non-empty")
+    normalized = value.replace("\\", "/")
+    path = PurePath(normalized)
+    if path.is_absolute() or len(path.parts) != 1 or path.name in {"", ".", ".."}:
+        raise PackagingError("audio filename must be a basename")
+    if "\x00" in value:
+        raise PackagingError("audio filename must not contain NUL")
     return path.name
 
 
@@ -101,6 +116,44 @@ def _write_atomic(path: Path, content: bytes, *, overwrite: bool) -> None:
             raise
 
 
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _copy_atomic(source: Path, destination: Path, *, overwrite: bool) -> None:
+    """Copy one asset without exposing partial bytes at the destination."""
+    if destination.exists() and not overwrite:
+        raise PackagingError(f"refusing to overwrite existing artifact: {destination.name}")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with source.open("rb") as input_handle, os.fdopen(descriptor, "wb") as output_handle:
+            shutil.copyfileobj(input_handle, output_handle, length=1024 * 1024)
+            output_handle.flush()
+            os.fsync(output_handle.fileno())
+        if overwrite:
+            os.replace(temporary_path, destination)
+        else:
+            try:
+                os.link(temporary_path, destination)
+            except FileExistsError as exc:
+                raise PackagingError(
+                    f"refusing to overwrite existing artifact: {destination.name}"
+                ) from exc
+            temporary_path.unlink()
+    except BaseException:
+        try:
+            temporary_path.unlink(missing_ok=True)
+        finally:
+            raise
+
+
 def write_generation_package(
     result: GenerationResult,
     selected_candidate: Candidate,
@@ -108,13 +161,14 @@ def write_generation_package(
     *,
     osu_filename: str = "ranked-like-draft.osu",
     manifest_filename: str = "ranked-like-draft.manifest.json",
+    audio_source_path: str | Path | None = None,
     compiler: Optional[Callable[[Any], str]] = None,
     overwrite: bool = False,
 ) -> GeneratedPackage:
-    """Write exactly one validated map and its audit manifest.
+    """Write one validated map, optional source audio, and audit manifest.
 
-    The manifest is written last, so its presence indicates that the map exists
-    and both artifacts were fully flushed.  This function refuses to serialize
+    The manifest is written last, so its presence indicates that the map and
+    any packaged audio were fully flushed. This function refuses to serialize
     invalid or unselected candidates; callers should retain rejected candidates
     only in the manifest for auditability, never as playable output files.
     """
@@ -137,6 +191,31 @@ def write_generation_package(
         raise PackagingError("output_dir is not a directory")
     osu_path = destination / osu_filename
     manifest_path = destination / manifest_filename
+    audio_source: Path | None = None
+    audio_path: Path | None = None
+    audio_digest: str | None = None
+    audio_already_present = False
+    if audio_source_path is not None:
+        audio_source = Path(audio_source_path)
+        if not audio_source.is_file():
+            raise PackagingError(f"audio source is not a file: {audio_source}")
+        audio_filename = _safe_asset_name(result.request.audio_filename)
+        if audio_filename in {osu_filename, manifest_filename}:
+            raise PackagingError("audio, map, and manifest filenames must differ")
+        audio_path = destination / audio_filename
+        if audio_path.exists():
+            try:
+                audio_already_present = os.path.samefile(audio_source, audio_path)
+            except OSError:
+                audio_already_present = False
+
+    if not overwrite:
+        for artifact_path in (osu_path, manifest_path):
+            if artifact_path.exists():
+                raise PackagingError(f"refusing to overwrite existing artifact: {artifact_path.name}")
+        if audio_path is not None and audio_path.exists() and not audio_already_present:
+            raise PackagingError(f"refusing to overwrite existing artifact: {audio_path.name}")
+
     content = _compile(selected_candidate.map_spec, compiler)
     _round_trip_validate(content)
     content_bytes = content.encode("utf-8")
@@ -147,23 +226,37 @@ def write_generation_package(
         "manifest_file": manifest_filename,
         "format": "osu file format v14",
     }
-    manifest_bytes = result.to_json(artifacts=artifacts).encode("utf-8")
-
-    # The map goes first and the manifest is the completion marker.  If a
-    # failure occurs after the map write, callers can safely remove the orphan
-    # map or retry with overwrite=True; no false "completed" manifest exists.
-    _write_atomic(osu_path, content_bytes, overwrite=overwrite)
+    # Audio and map go first; the manifest is the completion marker.  Therefore
+    # any visible manifest describes a package whose relative audio asset exists.
     try:
+        if overwrite:
+            # An old completion marker must never survive a failed overwrite.
+            manifest_path.unlink(missing_ok=True)
+        if audio_source is not None and audio_path is not None and not audio_already_present:
+            _copy_atomic(audio_source, audio_path, overwrite=overwrite)
+        if audio_path is not None:
+            audio_digest = _file_sha256(audio_path)
+            artifacts.update(
+                {
+                    "audio_file": audio_path.name,
+                    "audio_sha256": audio_digest,
+                }
+            )
+        manifest_bytes = result.to_json(artifacts=artifacts).encode("utf-8")
+        _write_atomic(osu_path, content_bytes, overwrite=overwrite)
         _write_atomic(manifest_path, manifest_bytes, overwrite=overwrite)
     except BaseException:
-        # Preserve a pre-existing map when overwriting was requested.  For new
-        # packages remove only the file we just created, never broad directories.
-        if not overwrite:
-            osu_path.unlink(missing_ok=True)
+        # Published paths may have been replaced by another process after our
+        # atomic create. Never unlink them during rollback: without an atomic
+        # compare-and-unlink primitive, doing so can delete another writer's
+        # data. The absent completion manifest identifies the retained map or
+        # audio as an incomplete package and makes retry behavior explicit.
         raise
     return GeneratedPackage(
         output_dir=destination,
         osu_path=osu_path,
         manifest_path=manifest_path,
         osu_sha256=digest,
+        audio_path=audio_path,
+        audio_sha256=audio_digest,
     )

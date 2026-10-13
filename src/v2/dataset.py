@@ -25,10 +25,11 @@ except ModuleNotFoundError as exc:  # pragma: no cover - exercised on login node
 
 from .events import IGNORE_INDEX
 from .grammar import EventVocabulary, MAX_ANCHORS
+from .data import SourceIdentity, SourceSplitAssignment, assert_source_split_disjoint
 
 
 V2_SONG_RECORD_SCHEMA = "osu-beatmap-generator/v2-song-record/2"
-V2_SONG_RECORD_INDEX_SCHEMA = "osu-beatmap-generator/v2-song-record-index/2"
+V2_SONG_RECORD_INDEX_SCHEMA = "osu-beatmap-generator/v2-song-record-index/3"
 
 
 class RecordSchemaError(ValueError):
@@ -95,18 +96,22 @@ def song_record_index(
     if validate:
         validate_song_record(payload)
     metadata = _require_mapping(payload["metadata"], "metadata")
+    source = _require_mapping(metadata.get("source"), "metadata.source")
     return {
         "schema_version": V2_SONG_RECORD_INDEX_SCHEMA,
         "record_schema_version": V2_SONG_RECORD_SCHEMA,
         "metadata": {
-            name: str(metadata[name])
-            for name in (
-                "cache_key",
-                "feature_pipeline_key",
-                "source_component_id",
-                "split",
-                "architecture_id",
-            )
+            **{
+                name: str(metadata[name])
+                for name in (
+                    "cache_key",
+                    "feature_pipeline_key",
+                    "source_component_id",
+                    "split",
+                    "architecture_id",
+                )
+            },
+            "source": dict(source),
         },
         "bar_target_count": len(payload["bar_targets"]),
         "rhythm_dim": int(_tensor(payload["rhythm_features"], "rhythm_features", dim=2).shape[1]),
@@ -129,6 +134,11 @@ def validate_song_record_index(payload: Mapping[str, Any]) -> None:
             raise RecordSchemaError(f"record index metadata.{name} must be a non-empty string")
     if metadata["split"] not in {"train", "val", "test"}:
         raise RecordSchemaError("record index metadata.split must be train, val, or test")
+    source = _require_mapping(metadata.get("source"), "record index metadata.source")
+    try:
+        SourceIdentity.from_dict(source).validate_training_provenance()
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RecordSchemaError(f"record index source provenance is invalid: {exc}") from exc
     for name in ("bar_target_count", "rhythm_dim", "semantic_dim", "clock_variant_count"):
         value = payload.get(name)
         if not isinstance(value, int) or value < 0:
@@ -178,6 +188,11 @@ def validate_song_record(payload: Mapping[str, Any]) -> None:
             raise RecordSchemaError(f"metadata.{name} must be a non-empty string")
     if metadata["split"] not in {"train", "val", "test"}:
         raise RecordSchemaError("metadata.split must be train, val, or test")
+    source = _require_mapping(metadata.get("source"), "metadata.source")
+    try:
+        SourceIdentity.from_dict(source)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RecordSchemaError(f"metadata.source is invalid: {exc}") from exc
 
     rhythm = _tensor(payload.get("rhythm_features"), "rhythm_features", dim=2)
     rhythm_times = _tensor(payload.get("rhythm_times_ms"), "rhythm_times_ms", dim=1)
@@ -306,6 +321,34 @@ def _copy_target(target: Mapping[str, Any]) -> dict[str, torch.Tensor | int]:
     }
 
 
+def validate_record_split_preflight(indexes: Sequence[Mapping[str, Any]]) -> None:
+    """Reject source/component leakage before any training sample is emitted."""
+
+    assignments: list[SourceSplitAssignment] = []
+    for index, payload in enumerate(indexes):
+        validate_song_record_index(payload)
+        metadata = _require_mapping(payload["metadata"], f"record index {index} metadata")
+        source_payload = _require_mapping(
+            metadata.get("source"), f"record index {index} metadata.source"
+        )
+        try:
+            source = SourceIdentity.from_dict(source_payload)
+            source.validate_training_provenance()
+            assignments.append(
+                SourceSplitAssignment(
+                    source=source,
+                    component_id=str(metadata["source_component_id"]),
+                    split=str(metadata["split"]),
+                )
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise RecordSchemaError(f"record index {index} source assignment is invalid: {exc}") from exc
+    try:
+        assert_source_split_disjoint(assignments)
+    except ValueError as exc:
+        raise RecordSchemaError(f"v2 record split preflight failed: {exc}") from exc
+
+
 class SparseSongDataset(Dataset[dict[str, Any]]):
     """Expand safe per-song records into bar-targeted training examples.
 
@@ -347,6 +390,7 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         self._song_groups: list[tuple[int, ...]] = []
         self._cache: OrderedDict[int, Mapping[str, Any]] = OrderedDict()
         groups: dict[str, list[int]] = {}
+        discovered: list[tuple[Path, Mapping[str, Any]]] = []
         for path in sorted(self.records_dir.glob("*.pt")):
             index_payload = _read_song_record_index(path)
             if index_payload is None:
@@ -356,6 +400,9 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
                 payload = _read_record(path)
                 validate_song_record(payload)
                 index_payload = song_record_index(payload, validate=False)
+            discovered.append((path, index_payload))
+        validate_record_split_preflight([index for _, index in discovered])
+        for path, index_payload in discovered:
             metadata = _require_mapping(index_payload["metadata"], "record index metadata")
             if expected_pipeline_key is not None and metadata["feature_pipeline_key"] != expected_pipeline_key:
                 raise RecordSchemaError(
@@ -415,7 +462,7 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
             # record, then one bar. This prevents popular songs/mapsets from
             # dominating merely because they have more cached bar targets.
             preview = self._record(record_index)
-            target_index = (self._epoch + record_index) % len(preview["bar_targets"])
+            target_index = (self._epoch // len(choices) + record_index) % len(preview["bar_targets"])
         payload = self._record(record_index)
         target = _require_mapping(payload["bar_targets"][target_index], "bar target")
         previous_tokens = torch.empty((0,), dtype=torch.long)
@@ -570,6 +617,7 @@ __all__ = [
     "move_batch_to_device",
     "song_record_index",
     "song_record_index_path",
+    "validate_record_split_preflight",
     "validate_song_record",
     "validate_song_record_index",
 ]

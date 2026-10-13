@@ -82,6 +82,29 @@ class TrainingCheckpointTests(unittest.TestCase):
         self.assertEqual(restored["_saved_training_stage"], TrainingStage.PLANNER.value)
         self.assertFalse(geometry_optimizer.state)
 
+    def test_total_epochs_ceiling_and_arg_defaults(self):
+        from src.v2.train import parse_args
+
+        args = parse_args([
+            "--records-dir", "dummy_records",
+            "--split-manifest", "dummy_splits.json",
+            "--feature-pipeline-key", "f" * 64,
+            "--checkpoint-dir", "dummy_checkpoints",
+            "--confirm-training",
+        ])
+        self.assertEqual(args.epochs, 200)
+        self.assertEqual(args.patience, 15)
+        self.assertEqual(args.min_delta, 0.001)
+
+    def test_reduce_metrics_in_non_distributed_environment(self):
+        from src.v2.train import _reduce_metrics
+
+        device = torch.device("cpu")
+        metrics = {"loss": 1.25, "token_loss": 1.25, "steps": 10.0}
+        reduced = _reduce_metrics(metrics, device)
+        self.assertEqual(reduced["loss"], 1.25)
+        self.assertEqual(reduced["steps"], 10.0)
+
 
 if __name__ == "__main__":
     unittest.main()

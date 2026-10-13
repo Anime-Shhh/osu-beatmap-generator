@@ -13,7 +13,7 @@ import json
 import math
 import os
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -23,7 +23,7 @@ except ModuleNotFoundError as exc:  # pragma: no cover - preprocessing needs the
     raise RuntimeError("src.v2.preprocess requires PyTorch") from exc
 
 from .audio import FeatureCacheManifest
-from .clock import MeterSegment, TimingHypothesis, jitter_timing_hypothesis
+from .clock import MeterSegment, TimingHypothesis
 from .data import SourceSplitAssignment
 from .dataset import (
     V2_SONG_RECORD_SCHEMA,
@@ -34,6 +34,7 @@ from .dataset import (
 from .events import BeatEvent, EventKind, PLAYFIELD_HEIGHT, PLAYFIELD_WIDTH
 from .grammar import BarEventCodec, EventVocabulary, MAX_ANCHORS
 from .mapspec import MapSpec
+from .timing import TimingMap
 
 
 ARCHITECTURE_ID = "tempo-posterior-hierarchical-event-diffusion/v2"
@@ -244,6 +245,37 @@ def _selected_events(events: Sequence[BeatEvent], bar: BarDefinition) -> tuple[B
     )
 
 
+def reproject_events_absolute(
+    events: Sequence[BeatEvent],
+    *,
+    source_timing: TimingMap,
+    target_timing: TimingMap,
+) -> tuple[BeatEvent, ...]:
+    """Move event beat coordinates between clocks without moving physical time.
+
+    This is the required primitive for any future non-oracle clock target. The
+    current record schema deliberately disables such variants because it has no
+    variant-specific bar-target container; retaining only shifted audio queries
+    with oracle tokens would teach a systematic timing error.
+    """
+
+    projected: list[BeatEvent] = []
+    for event in events:
+        start_ms = source_timing.beat_to_time(event.beat_position)
+        end_beat = None
+        if event.end_beat is not None:
+            end_ms = source_timing.beat_to_time(event.end_beat)
+            end_beat = target_timing.time_to_beat(end_ms)
+        projected.append(
+            replace(
+                event,
+                beat_position=target_timing.time_to_beat(start_ms),
+                end_beat=end_beat,
+            )
+        )
+    return tuple(sorted(projected, key=lambda event: (event.beat_position, event.source_object_index)))
+
+
 def _geometry_targets(events: Sequence[BeatEvent]) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     geometry = torch.zeros((len(events), MAX_ANCHORS + 1, 2), dtype=torch.float32)
     kinds = torch.empty((len(events),), dtype=torch.long)
@@ -356,13 +388,13 @@ def build_song_record(
     """Create one serializable song record from externally extracted features.
 
     The oracle timing hypothesis is retained strictly as a supervision target.
-    Every supplied non-oracle clock hypothesis is stored as an alternate
-    timestamp/clock variant so training can use jittered or estimated clocks
-    without changing symbolic labels or silently leaking source timing into the
-    audio-only inference contract.
+    Non-oracle clocks are rejected until the record schema carries their own
+    reprojected bars and targets. Reusing oracle labels with shifted audio
+    queries is an unsafe augmentation, not robustness training.
     """
 
     assignment_source = source_assignment.source
+    assignment_source.validate_training_provenance()
     cache_source = feature_cache.canonical_audio.source
     # A feature cache belongs to an audio asset, while a source assignment can
     # additionally name one difficulty/map/mapper. Compare immutable audio
@@ -376,6 +408,18 @@ def build_song_record(
         and assignment_source.canonical_audio_sha256 != cache_source.canonical_audio_sha256
     ):
         raise ValueError("source assignment and feature cache have different canonical audio")
+    if (
+        assignment_source.beatmap_id is not None
+        and map_spec.metadata.beatmap_id > 0
+        and assignment_source.beatmap_id != str(map_spec.metadata.beatmap_id)
+    ):
+        raise ValueError("source assignment beatmap ID does not match parsed map metadata")
+    if (
+        assignment_source.beatmap_set_id is not None
+        and map_spec.metadata.beatmap_set_id > 0
+        and assignment_source.beatmap_set_id != str(map_spec.metadata.beatmap_set_id)
+    ):
+        raise ValueError("source assignment beatmap set ID does not match parsed map metadata")
     if not architecture_id.strip():
         raise ValueError("architecture_id must be non-empty")
     rhythm_features = _feature_tensor(rhythm_features, "rhythm_features", dim=2)
@@ -383,19 +427,12 @@ def build_song_record(
     semantic_features = _feature_tensor(semantic_features, "semantic_features", dim=2)
     semantic_times_ms = _timestamps(semantic_times_ms, "semantic_times_ms", semantic_features.shape[0])
     oracle = oracle_timing_hypothesis(map_spec)
-    # External beat-tracker hypotheses should be supplied whenever available.
-    # Until that cache exists, two deterministic affine perturbations prevent a
-    # planner from seeing only exact source timing during its first baseline.
-    # They are marked non-oracle and never used as a claim that timing was
-    # inferred from audio.
     if clock_hypotheses:
-        variants = (oracle, *tuple(clock_hypotheses))
-    else:
-        variants = (
-            oracle,
-            jitter_timing_hypothesis(oracle, offset_ms=-15.0, time_scale=0.99, confidence=0.70),
-            jitter_timing_hypothesis(oracle, offset_ms=15.0, time_scale=1.01, confidence=0.70),
+        raise ValueError(
+            "non-oracle clock variants are disabled until variant-specific "
+            "absolute-time targets are represented in the song-record schema"
         )
+    variants = (oracle,)
     if any(hypothesis.meter_segments != oracle.meter_segments for hypothesis in variants):
         raise ValueError("clock hypotheses must share the canonical meter topology")
     if len({hypothesis.hypothesis_id for hypothesis in variants}) != len(variants):
@@ -557,6 +594,7 @@ __all__ = [
     "meter_segments_from_mapspec",
     "oracle_timing_hypothesis",
     "ranked_standard_source_filter",
+    "reproject_events_absolute",
     "source_manifest_line",
     "write_song_record",
 ]

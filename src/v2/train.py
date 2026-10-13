@@ -10,11 +10,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Any, Mapping
 
 import torch
-from torch.utils.data import DataLoader
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader, DistributedSampler
 
 from .dataset import SparseSongDataset, collate_sparse_examples
 from .geometry import ActiveEventGeometryDiffuser, GeometryDiffusionConfig
@@ -54,7 +57,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--resume", help="compatible v2 checkpoint to resume")
     parser.add_argument("--planner-config", help="optional JSON overrides for SparsePlannerConfig")
     parser.add_argument("--geometry-config", help="optional JSON overrides for GeometryDiffusionConfig")
-    parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--epochs", type=int, default=200, help="total target epochs (default: 200)")
+    parser.add_argument("--patience", type=int, default=15, help="early stopping patience in epochs (0 to disable)")
+    parser.add_argument("--min-delta", type=float, default=0.001, help="minimum validation loss improvement")
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--num-workers", type=int, default=2)
     parser.add_argument("--learning-rate", type=float, default=2.0e-4)
@@ -71,6 +76,25 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _is_distributed() -> bool:
+    return "WORLD_SIZE" in os.environ and int(os.environ["WORLD_SIZE"]) > 1
+
+
+def _reduce_metrics(metrics: dict[str, float], device: torch.device) -> dict[str, float]:
+    """All-reduce training or validation metrics across all distributed ranks."""
+    if not dist.is_initialized():
+        return metrics
+    reduced = {}
+    for name, value in metrics.items():
+        tensor = torch.tensor(value, dtype=torch.float64, device=device)
+        dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
+        if name == "steps":
+            reduced[name] = float(tensor.item())
+        else:
+            reduced[name] = float(tensor.item() / dist.get_world_size())
+    return reduced
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     if not args.confirm_training:
@@ -83,7 +107,25 @@ def main(argv: list[str] | None = None) -> int:
     if args.seed < 0:
         raise ValueError("seed must be non-negative")
     torch.manual_seed(args.seed)
-    device = torch.device(args.device)
+
+    is_dist = _is_distributed()
+    if is_dist:
+        local_rank = int(os.environ.get("LOCAL_RANK", 0))
+        rank = int(os.environ.get("RANK", 0))
+        world_size = int(os.environ.get("WORLD_SIZE", 1))
+        if torch.cuda.is_available():
+            device = torch.device(f"cuda:{local_rank}")
+            torch.cuda.set_device(device)
+            dist.init_process_group(backend="nccl")
+        else:
+            device = torch.device("cpu")
+            dist.init_process_group(backend="gloo")
+    else:
+        local_rank = 0
+        rank = 0
+        world_size = 1
+        device = torch.device(args.device)
+
     if device.type == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA was requested but is unavailable; choose --device cpu only for diagnostics")
     if device.type == "cuda":
@@ -149,10 +191,6 @@ def main(argv: list[str] | None = None) -> int:
             start_epoch = int(restored["epoch"]) + 1
             global_step = int(restored["global_step"])
         elif stage is TrainingStage.GEOMETRY and saved_stage == TrainingStage.PLANNER.value:
-            # This is the intentional stage handoff: retain planner weights
-            # but initialize a fresh geometry optimizer, scaler, epoch, and
-            # RNG progression instead of trying to load Adam moments belonging
-            # to the planner parameter set.
             start_epoch = 0
             global_step = 0
             torch.manual_seed(args.seed)
@@ -163,6 +201,17 @@ def main(argv: list[str] | None = None) -> int:
                 f"cannot resume {stage.value} stage from checkpoint stage {saved_stage!r}; "
                 "only same-stage resume or planner-to-geometry handoff is supported"
             )
+
+    if start_epoch >= args.epochs:
+        if rank == 0:
+            print(
+                f"Start epoch {start_epoch} is already >= total target epochs {args.epochs}. "
+                "Training is already complete.",
+                flush=True,
+            )
+        if is_dist and dist.is_initialized():
+            dist.destroy_process_group()
+        return 0
 
     train_dataset = SparseSongDataset(
         args.records_dir,
@@ -175,26 +224,35 @@ def main(argv: list[str] | None = None) -> int:
         args.records_dir,
         split="val",
         expected_pipeline_key=args.feature_pipeline_key,
-        # Records normally contain oracle plus jittered/estimated variants.
-        # ``mixed`` still permits a corpus-audit-only oracle record to run a
-        # bounded smoke check instead of failing at DataLoader construction.
         clock_mode="mixed",
         sampling_mode="bar",
     )
+
+    train_sampler = (
+        DistributedSampler(
+            train_dataset,
+            num_replicas=world_size,
+            rank=rank,
+            shuffle=True,
+            seed=args.seed,
+            drop_last=False,
+        )
+        if is_dist
+        else None
+    )
+
     train_order_generator = torch.Generator()
     val_order_generator = torch.Generator()
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
-        shuffle=True,
+        shuffle=(train_sampler is None),
+        sampler=train_sampler,
         num_workers=args.num_workers,
         pin_memory=device.type == "cuda",
-        # Workers must be recreated each epoch so their dataset copies receive
-        # ``set_epoch`` and rotate bar/clock selections correctly. Persistent
-        # workers would retain epoch zero and silently undermine sampling.
         persistent_workers=False,
         collate_fn=collate_sparse_examples,
-        generator=train_order_generator,
+        generator=train_order_generator if train_sampler is None else None,
     )
     val_loader = DataLoader(
         val_dataset,
@@ -206,65 +264,143 @@ def main(argv: list[str] | None = None) -> int:
         collate_fn=collate_sparse_examples,
         generator=val_order_generator,
     )
-    print(
-        json.dumps(
-            {
-                "planner_trainable_parameters": count_trainable_parameters(planner),
-                "geometry_trainable_parameters": count_trainable_parameters(geometry),
-                "stage": stage.value,
-                "device": str(device),
-                "start_epoch": start_epoch,
-            },
-            sort_keys=True,
-        ),
-        flush=True,
-    )
-    output_dir = Path(args.checkpoint_dir)
-    for epoch in range(start_epoch, start_epoch + args.epochs):
-        train_dataset.set_epoch(epoch)
-        val_dataset.set_epoch(epoch)
-        # Explicit per-epoch sampler seeds make a resumed run use the same
-        # song-component order as an uninterrupted run at that epoch.
-        train_order_generator.manual_seed(args.seed + epoch)
-        val_order_generator.manual_seed(args.seed + 1_000_003 + epoch)
-        train_metrics = run_epoch(
-            planner=planner,
-            geometry=geometry,
-            loader=train_loader,
-            optimizer=optimizer,
-            device=device,
-            config=config,
-            scaler=scaler,
-            max_steps=args.max_steps,
-        )
-        global_step += int(train_metrics["steps"])
-        val_metrics = run_epoch(
-            planner=planner,
-            geometry=geometry,
-            loader=val_loader,
-            optimizer=None,
-            device=device,
-            config=config,
-            max_steps=args.max_steps,
-        )
-        payload = checkpoint_payload(
-            planner=planner,
-            geometry=geometry,
-            optimizer=optimizer,
-            scaler=scaler,
-            epoch=epoch,
-            global_step=global_step,
-            training_config=config,
-            provenance=provenance,
-        )
-        checkpoint = save_checkpoint(payload, output_dir / f"{stage.value}-epoch-{epoch:04d}.pt")
+
+    # Wrap model with DistributedDataParallel if distributed
+    if is_dist:
+        if stage is TrainingStage.PLANNER:
+            train_planner: Any = DDP(
+                planner,
+                device_ids=[local_rank] if device.type == "cuda" else None,
+                find_unused_parameters=True,
+            )
+            train_geometry: Any = geometry
+        else:
+            train_planner = planner
+            train_geometry = DDP(
+                geometry,
+                device_ids=[local_rank] if device.type == "cuda" else None,
+                find_unused_parameters=True,
+            )
+    else:
+        train_planner = planner
+        train_geometry = geometry
+
+    if rank == 0:
         print(
             json.dumps(
-                {"epoch": epoch, "train": train_metrics, "val": val_metrics, "checkpoint": str(checkpoint)},
+                {
+                    "planner_trainable_parameters": count_trainable_parameters(planner),
+                    "geometry_trainable_parameters": count_trainable_parameters(geometry),
+                    "stage": stage.value,
+                    "device": str(device),
+                    "world_size": world_size,
+                    "start_epoch": start_epoch,
+                    "total_epochs": args.epochs,
+                    "patience": args.patience,
+                    "min_delta": args.min_delta,
+                },
                 sort_keys=True,
             ),
             flush=True,
         )
+
+    output_dir = Path(args.checkpoint_dir)
+    best_val_loss = float("inf")
+    epochs_without_improvement = 0
+
+    try:
+        for epoch in range(start_epoch, args.epochs):
+            if train_sampler is not None:
+                train_sampler.set_epoch(epoch)
+            train_dataset.set_epoch(epoch)
+            val_dataset.set_epoch(epoch)
+
+            train_order_generator.manual_seed(args.seed + epoch)
+            val_order_generator.manual_seed(args.seed + 1_000_003 + epoch)
+
+            raw_train_metrics = run_epoch(
+                planner=train_planner,
+                geometry=train_geometry,
+                loader=train_loader,
+                optimizer=optimizer,
+                device=device,
+                config=config,
+                scaler=scaler,
+                max_steps=args.max_steps,
+            )
+            train_metrics = _reduce_metrics(raw_train_metrics, device)
+            global_step += int(train_metrics["steps"])
+
+            raw_val_metrics = run_epoch(
+                planner=train_planner,
+                geometry=train_geometry,
+                loader=val_loader,
+                optimizer=None,
+                device=device,
+                config=config,
+                max_steps=args.max_steps,
+            )
+            val_metrics = _reduce_metrics(raw_val_metrics, device)
+
+            stop_training = False
+            if rank == 0:
+                raw_p = planner.module if isinstance(planner, DDP) else planner
+                raw_g = geometry.module if (geometry is not None and isinstance(geometry, DDP)) else geometry
+                payload = checkpoint_payload(
+                    planner=raw_p,
+                    geometry=raw_g,
+                    optimizer=optimizer,
+                    scaler=scaler,
+                    epoch=epoch,
+                    global_step=global_step,
+                    training_config=config,
+                    provenance=provenance,
+                )
+                latest_ckpt = save_checkpoint(payload, output_dir / "latest.pt", overwrite=True)
+                if (epoch + 1) % 25 == 0 or epoch == args.epochs - 1:
+                    save_checkpoint(payload, output_dir / f"{stage.value}-epoch-{epoch:04d}.pt", overwrite=True)
+
+                val_loss = float(val_metrics["loss"])
+                is_best = False
+                if val_loss < best_val_loss - args.min_delta:
+                    best_val_loss = val_loss
+                    epochs_without_improvement = 0
+                    is_best = True
+                    save_checkpoint(payload, output_dir / "best.pt", overwrite=True)
+                else:
+                    epochs_without_improvement += 1
+                    if args.patience > 0 and epochs_without_improvement >= args.patience:
+                        stop_training = True
+
+                print(
+                    json.dumps(
+                        {
+                            "epoch": epoch,
+                            "train": train_metrics,
+                            "val": val_metrics,
+                            "is_best": is_best,
+                            "best_val_loss": best_val_loss,
+                            "epochs_without_improvement": epochs_without_improvement,
+                            "checkpoint": str(latest_ckpt),
+                        },
+                        sort_keys=True,
+                    ),
+                    flush=True,
+                )
+
+            if is_dist:
+                stop_tensor = torch.tensor(1 if stop_training else 0, dtype=torch.int32, device=device)
+                dist.broadcast(stop_tensor, src=0)
+                stop_training = bool(stop_tensor.item() == 1)
+
+            if stop_training:
+                if rank == 0:
+                    print(f"Early stopping triggered at epoch {epoch} (patience={args.patience})", flush=True)
+                break
+    finally:
+        if is_dist and dist.is_initialized():
+            dist.destroy_process_group()
+
     return 0
 
 

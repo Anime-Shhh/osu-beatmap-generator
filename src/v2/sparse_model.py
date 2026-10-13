@@ -210,7 +210,8 @@ class TimestampedAudioEncoder(nn.Module):
         *,
         rhythm_mask: Optional[torch.Tensor] = None,
         semantic_mask: Optional[torch.Tensor] = None,
-    ) -> torch.Tensor:
+        return_local_frames: bool = False,
+    ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         if rhythm_features.dim() != 3 or semantic_features.dim() != 3:
             raise ValueError("audio features must be [B,T,C]")
         rhythm = self.rhythm_in(rhythm_features).transpose(1, 2)
@@ -224,7 +225,11 @@ class TimestampedAudioEncoder(nn.Module):
         semantic_at_bars = sample_features_at_times(
             semantic, semantic_times_ms, query_times_ms, valid_mask=semantic_mask
         )
-        return self.fuse(torch.cat((rhythm_at_bars, semantic_at_bars), dim=-1))
+        bar_fused = self.fuse(torch.cat((rhythm_at_bars, semantic_at_bars), dim=-1))
+        if return_local_frames:
+            # Local high-rate frame representations for fine-time cross-attention
+            return bar_fused, rhythm
+        return bar_fused
 
 
 class SparseEventPlanner(nn.Module):
@@ -389,7 +394,9 @@ class SparseEventPlanner(nn.Module):
                         enforce_sorted=False,
                     )
                     _, hidden = self.boundary_encoder(packed)
-                    summary = summary.index_copy(0, valid_rows.nonzero(as_tuple=False).squeeze(1), hidden[-1])
+                    summary = summary.index_copy(
+                        0, valid_rows.nonzero(as_tuple=False).squeeze(1), hidden[-1].to(summary.dtype)
+                    )
         if isinstance(drop_boundary, torch.Tensor):
             if drop_boundary.shape != (batch_size,):
                 raise ValueError("boundary dropout mask must be [B]")

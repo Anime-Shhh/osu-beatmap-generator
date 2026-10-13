@@ -207,7 +207,11 @@ class EventGrammar:
         if state.phase == DecodePhase.START:
             return (vocab.bos_id,)
         if state.phase == DecodePhase.BETWEEN_EVENTS:
-            return (vocab.eos_id, vocab.event_id)
+            has_next_offset = any(
+                vocab.offset_tick(token_id) > state.last_offset_tick
+                for token_id in vocab.ids_for_family(TokenFamily.OFFSET)
+            )
+            return (vocab.eos_id, vocab.event_id) if has_next_offset else (vocab.eos_id,)
         if state.phase == DecodePhase.EVENT_OFFSET:
             return tuple(
                 token_id
@@ -215,7 +219,13 @@ class EventGrammar:
                 if vocab.offset_tick(token_id) > state.last_offset_tick
             )
         if state.phase == DecodePhase.EVENT_SNAP:
-            return vocab.ids_for_family(TokenFamily.SNAP)
+            if state.current_offset_tick is None:
+                raise AssertionError("snap phase needs an offset tick")
+            return tuple(
+                token_id
+                for token_id in vocab.ids_for_family(TokenFamily.SNAP)
+                if state.current_offset_tick % (TICKS_PER_BEAT // vocab.snap_denominator(token_id)) == 0
+            )
         if state.phase == DecodePhase.EVENT_RESIDUAL:
             if state.current_offset_tick is None:
                 raise AssertionError("residual phase needs an offset tick")
@@ -255,6 +265,14 @@ class EventGrammar:
         if not 0.0 < float(meter) <= self.vocabulary.max_bar_beats:
             raise ValueError(f"bar length must be within (0, {self.vocabulary.max_bar_beats}]")
         allowed = self.allowed_ids(state)
+        if state.phase == DecodePhase.BETWEEN_EVENTS:
+            has_next_offset = any(
+                self.vocabulary.offset_tick(token_id) / TICKS_PER_BEAT < float(meter)
+                for token_id in self.allowed_ids(
+                    GrammarState(DecodePhase.EVENT_OFFSET, last_offset_tick=state.last_offset_tick)
+                )
+            )
+            return (self.vocabulary.eos_id, self.vocabulary.event_id) if has_next_offset else (self.vocabulary.eos_id,)
         if state.phase == DecodePhase.EVENT_OFFSET:
             return tuple(
                 token_id

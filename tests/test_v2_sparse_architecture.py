@@ -100,6 +100,75 @@ class SparseArchitectureTests(unittest.TestCase):
         self.assertEqual(tuple(output.shape), (1, 3, 9, 2))
         self.assertTrue(torch.isfinite(output).all())
 
+    def test_local_audio_memory_impulse_relocation_produces_differing_representations(self):
+        from src.v2.sparse_model import TimestampedAudioEncoder, SparsePlannerConfig
+
+        config = SparsePlannerConfig(
+            rhythm_dim=4,
+            semantic_dim=3,
+            model_dim=32,
+            heads=4,
+            local_layers=2,
+            dropout=0.0,
+        )
+        encoder = TimestampedAudioEncoder(config).eval()
+
+        # Create two 8s audio sequences with an isolated rhythm impulse at 500ms vs 1000ms
+        n_frames = 800  # 8 seconds at 10ms/frame
+        times = torch.arange(n_frames, dtype=torch.float32) * 10.0  # ms
+
+        rhythm_500 = torch.zeros(1, n_frames, 4)
+        rhythm_500[0, 50, :] = 10.0  # frame 50 is 500ms
+
+        rhythm_1000 = torch.zeros(1, n_frames, 4)
+        rhythm_1000[0, 100, :] = 10.0  # frame 100 is 1000ms
+
+        semantic = torch.zeros(1, 80, 3)
+        sem_times = torch.arange(80, dtype=torch.float32) * 100.0
+
+        bar_queries = torch.tensor([[2000.0, 6000.0]])
+
+        _, local_500 = encoder(
+            rhythm_500, times.unsqueeze(0), semantic, sem_times.unsqueeze(0), bar_queries, return_local_frames=True
+        )
+        _, local_1000 = encoder(
+            rhythm_1000, times.unsqueeze(0), semantic, sem_times.unsqueeze(0), bar_queries, return_local_frames=True
+        )
+
+        diff = (local_500 - local_1000).abs().max().item()
+        self.assertGreater(diff, 1e-3, "Local frame audio memory must distinguish 500ms vs 1000ms impulses")
+
+    def test_event_lanes_construction(self):
+        from src.v2.events import BeatEvent, EventKind, build_event_lanes
+        from src.v2.timing import TimingMap, TimingSegment
+
+        timing_map = TimingMap((TimingSegment(0.0, 500.0, 0.0, 4),), ())
+        events = [
+            BeatEvent(kind=EventKind.CIRCLE, beat_position=1.0, x=256.0, y=192.0),
+            BeatEvent(
+                kind=EventKind.SLIDER,
+                beat_position=2.0,
+                x=256.0,
+                y=192.0,
+                slider_length=140.0,
+                slider_repeats=1,
+            ),
+            BeatEvent(kind=EventKind.SPINNER, beat_position=4.0, end_beat=6.0, x=256.0, y=192.0),
+        ]
+        frame_times = torch.arange(400, dtype=torch.float32) * 10.0
+        lanes = build_event_lanes(events, timing_map, frame_times_ms=frame_times, slider_multiplier=1.4)
+        tensor = lanes.as_tensor()
+        self.assertEqual(tensor.shape, (400, 5))
+        # Circle at beat 1.0 = 500ms = frame 50
+        self.assertEqual(lanes.circle_impulses[50].item(), 1.0)
+        # Slider at beat 2.0 = 1000ms = frame 100
+        self.assertEqual(lanes.slider_onsets[100].item(), 1.0)
+        # Slider length 140 / (1.4 * 100 * 1.0) * 500 = 500ms duration -> end at 1500ms = frame 150
+        self.assertEqual(lanes.slider_tails[150].item(), 1.0)
+        self.assertTrue((lanes.slider_spans[100:151] == 1.0).all())
+        # Spinner at beat 4.0 = 2000ms (frame 200) to beat 6.0 = 3000ms (frame 300)
+        self.assertTrue((lanes.spinner_spans[200:301] == 1.0).all())
+
 
 if __name__ == "__main__":
     unittest.main()

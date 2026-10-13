@@ -16,6 +16,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 
 SPLIT_NAMES = ("train", "val", "test")
+SOURCE_SPLIT_MANIFEST_SCHEMA = "osu-beatmap-generator/v2-source-split-manifest/1"
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,10 @@ class SourceIdentity:
     mapper_id: str | None = None
     source_dataset: str = "project-riz/osu-beatmaps"
     source_record_id: str | None = None
+    source_revision: str | None = None
+    beatmap_status: str | None = None
+    rights_status: str | None = None
+    rights_url: str | None = None
 
     def __post_init__(self) -> None:
         _validate_sha256(self.audio_sha256, "audio_sha256")
@@ -63,6 +68,16 @@ class SourceIdentity:
                 raise ValueError("audio_duration_ms must be finite and positive when supplied")
         if not self.source_dataset.strip():
             raise ValueError("source_dataset must be non-empty")
+        for field_name in (
+            "source_record_id",
+            "source_revision",
+            "beatmap_status",
+            "rights_status",
+            "rights_url",
+        ):
+            value = getattr(self, field_name)
+            if value is not None and not value.strip():
+                raise ValueError(f"{field_name} must be non-empty when supplied")
 
     @property
     def group_id(self) -> str:
@@ -107,7 +122,27 @@ class SourceIdentity:
             "mapper_id": self.mapper_id,
             "source_dataset": self.source_dataset,
             "source_record_id": self.source_record_id,
+            "source_revision": self.source_revision,
+            "beatmap_status": self.beatmap_status,
+            "rights_status": self.rights_status,
+            "rights_url": self.rights_url,
         }
+
+    def validate_training_provenance(self) -> None:
+        """Require the source/status/rights fields needed by a training audit."""
+
+        required = {
+            "source_record_id": self.source_record_id,
+            "source_revision": self.source_revision,
+            "beatmap_status": self.beatmap_status,
+            "rights_status": self.rights_status,
+            "rights_url": self.rights_url,
+        }
+        missing = sorted(name for name, value in required.items() if not value)
+        if missing:
+            raise ValueError(
+                "training source provenance is incomplete: " + ", ".join(missing)
+            )
 
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "SourceIdentity":
@@ -124,6 +159,10 @@ class SourceIdentity:
             mapper_id=_optional_str(payload.get("mapper_id")),
             source_dataset=str(payload.get("source_dataset", "project-riz/osu-beatmaps")),
             source_record_id=_optional_str(payload.get("source_record_id")),
+            source_revision=_optional_str(payload.get("source_revision")),
+            beatmap_status=_optional_str(payload.get("beatmap_status")),
+            rights_status=_optional_str(payload.get("rights_status")),
+            rights_url=_optional_str(payload.get("rights_url")),
         )
 
 
@@ -289,7 +328,15 @@ def source_component_groups(
     source iteration order.
     """
 
-    unique_sources = tuple(sorted(set(sources), key=lambda source: source.split_keys))
+    unique_sources = tuple(
+        sorted(
+            set(sources),
+            key=lambda source: (
+                source.split_keys,
+                json.dumps(source.to_dict(), sort_keys=True, separators=(",", ":")),
+            ),
+        )
+    )
     union_find = _DisjointSet()
     for source in unique_sources:
         keys = source.split_keys
@@ -329,7 +376,12 @@ def build_source_split_assignments(
             split=assign_group_split(component_id, seed=seed, ratios=ratios),
         )
         for source, component_id in sorted(
-            components.items(), key=lambda item: (item[1], item[0].split_keys)
+            components.items(),
+            key=lambda item: (
+                item[1],
+                item[0].split_keys,
+                json.dumps(item[0].to_dict(), sort_keys=True, separators=(",", ":")),
+            ),
         )
     )
     assert_source_split_disjoint(assignments)
@@ -361,6 +413,46 @@ def build_source_split_manifest(
     return manifest
 
 
+def build_immutable_source_split_manifest(
+    sources: Iterable[SourceIdentity],
+    *,
+    seed: int = 42,
+    ratios: Sequence[float] = (0.8, 0.1, 0.1),
+) -> dict[str, Any]:
+    """Build the revision-pinned source artifact bound to a training run."""
+
+    normalized_ratios = _normalized_ratios(ratios)
+    unique_sources = tuple(set(sources))
+    for source in unique_sources:
+        source.validate_training_provenance()
+    assignments = build_source_split_assignments(
+        unique_sources, seed=seed, ratios=normalized_ratios
+    )
+    splits = {name: [] for name in SPLIT_NAMES}
+    records: list[dict[str, Any]] = []
+    for assignment in assignments:
+        if assignment.component_id not in splits[assignment.split]:
+            splits[assignment.split].append(assignment.component_id)
+        records.append(
+            {
+                "component_id": assignment.component_id,
+                "split": assignment.split,
+                "source": assignment.source.to_dict(),
+            }
+        )
+    for values in splits.values():
+        values.sort()
+    manifest: dict[str, Any] = {
+        "schema_version": SOURCE_SPLIT_MANIFEST_SCHEMA,
+        "seed": int(seed),
+        "ratios": list(normalized_ratios),
+        "splits": splits,
+        "records": records,
+    }
+    validate_source_split_manifest(manifest)
+    return manifest
+
+
 def assert_source_split_disjoint(
     assignments: Iterable[SourceSplitAssignment],
 ) -> None:
@@ -386,3 +478,62 @@ def assert_source_split_disjoint(
             raise ValueError(
                 f"source leakage between {previous} and {assignment.split}: {actual_component}"
             )
+
+
+def validate_source_split_manifest(payload: Mapping[str, Any]) -> None:
+    """Reject stale ownership and identifier overlap in an immutable manifest."""
+
+    if payload.get("schema_version") != SOURCE_SPLIT_MANIFEST_SCHEMA:
+        raise ValueError("unsupported or missing v2 source split manifest schema")
+    raw_splits = payload.get("splits")
+    raw_records = payload.get("records")
+    if not isinstance(raw_splits, Mapping) or not isinstance(raw_records, list):
+        raise ValueError("source split manifest requires splits and records")
+    splits: dict[str, list[str]] = {}
+    for name in SPLIT_NAMES:
+        values = raw_splits.get(name)
+        if not isinstance(values, list) or any(
+            not isinstance(value, str) or not value for value in values
+        ):
+            raise ValueError(f"source split manifest {name} must be a string list")
+        if values != sorted(set(values)):
+            raise ValueError(f"source split manifest {name} must be sorted and unique")
+        splits[name] = list(values)
+    assert_group_disjoint(splits)
+
+    assignments: list[SourceSplitAssignment] = []
+    seen_sources: set[SourceIdentity] = set()
+    for index, raw_record in enumerate(raw_records):
+        if not isinstance(raw_record, Mapping) or not isinstance(raw_record.get("source"), Mapping):
+            raise ValueError(f"source split manifest record {index} is malformed")
+        source = SourceIdentity.from_dict(raw_record["source"])
+        source.validate_training_provenance()
+        if source in seen_sources:
+            raise ValueError(f"source split manifest record {index} is duplicated")
+        seen_sources.add(source)
+        assignment = SourceSplitAssignment(
+            source=source,
+            component_id=str(raw_record.get("component_id", "")),
+            split=str(raw_record.get("split", "")),
+        )
+        if assignment.component_id not in splits[assignment.split]:
+            raise ValueError(
+                f"source split manifest record {index} is absent from split ownership"
+            )
+        assignments.append(assignment)
+    if not assignments:
+        raise ValueError("source split manifest must contain at least one source record")
+    assert_source_split_disjoint(assignments)
+    expected = {name: set() for name in SPLIT_NAMES}
+    for assignment in assignments:
+        expected[assignment.split].add(assignment.component_id)
+    if any(expected[name] != set(splits[name]) for name in SPLIT_NAMES):
+        raise ValueError("source split manifest contains unowned or missing components")
+
+
+def source_split_manifest_sha256(payload: Mapping[str, Any]) -> str:
+    """Return a canonical digest after fully validating the split artifact."""
+
+    validate_source_split_manifest(payload)
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()

@@ -355,6 +355,54 @@ class StaticClockResolver:
         return self._hypotheses[:max_hypotheses]
 
 
+class AudioClockResolver:
+    """Dynamic clock resolver estimating hypotheses from audio clock evidence or presets."""
+
+    def __init__(self, hypotheses: Iterable[TimingHypothesis] | None = None):
+        self._preset_hypotheses = tuple(hypotheses) if hypotheses else ()
+
+    def resolve(
+        self, evidence: ClockEvidence, *, max_hypotheses: int = 4
+    ) -> tuple[TimingHypothesis, ...]:
+        if max_hypotheses <= 0:
+            raise ValueError("max_hypotheses must be positive")
+        if self._preset_hypotheses:
+            return self._preset_hypotheses[:max_hypotheses]
+
+        beats = list(evidence.beat_times_ms)
+        if not beats:
+            return (
+                TimingHypothesis(
+                    hypothesis_id="fallback-120bpm",
+                    timing_map=TimingMap((TimingSegment(start_ms=0.0, beat_length_ms=500.0, start_beat=0.0),)),
+                    meter_segments=(MeterSegment(0.0, 4, 4),),
+                    confidence=0.5,
+                    score=0.5,
+                    source="audio_clock_fallback",
+                ),
+            )[:max_hypotheses]
+
+        if len(beats) >= 2:
+            intervals = [beats[i + 1] - beats[i] for i in range(len(beats) - 1)]
+            intervals.sort()
+            median_interval = intervals[len(intervals) // 2]
+        else:
+            median_interval = 500.0
+
+        offset_ms = float(beats[0])
+        primary = TimingHypothesis(
+            hypothesis_id=f"evidence-{round(60000.0 / median_interval, 1)}bpm-{round(offset_ms, 1)}ms",
+            timing_map=TimingMap(
+                (TimingSegment(start_ms=round(offset_ms, 2), beat_length_ms=round(median_interval, 3), start_beat=0.0),)
+            ),
+            meter_segments=(MeterSegment(0.0, 4, 4),),
+            confidence=0.9,
+            score=1.0,
+            source=evidence.source,
+        )
+        return (primary,)[:max_hypotheses]
+
+
 class OracleClockResolver(StaticClockResolver):
     """Explicit training-only resolver; never register it for audio inference."""
 
