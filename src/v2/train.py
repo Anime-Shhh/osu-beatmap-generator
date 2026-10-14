@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import time
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -281,6 +282,8 @@ def main(argv: list[str] | None = None) -> int:
         val_dataset,
         batch_size=args.batch_size,
         shuffle=False,
+        sampler=DistributedSampler(val_dataset, num_replicas=world_size, rank=rank,
+                                   shuffle=False, drop_last=False) if is_dist else None,
         num_workers=args.num_workers,
         pin_memory=device.type == "cuda",
         persistent_workers=False,
@@ -337,6 +340,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         for epoch in range(start_epoch, args.epochs):
+            epoch_started = time.monotonic()
             if train_sampler is not None:
                 train_sampler.set_epoch(epoch)
             train_dataset.set_epoch(epoch)
@@ -356,6 +360,7 @@ def main(argv: list[str] | None = None) -> int:
                 max_steps=args.max_steps,
             )
             train_metrics = _reduce_metrics(raw_train_metrics, device)
+            train_seconds = time.monotonic() - epoch_started
             global_step += int(train_metrics["steps"])
 
             # Fix validation diffusion noise without perturbing training RNG.
@@ -406,6 +411,8 @@ def main(argv: list[str] | None = None) -> int:
                     json.dumps(
                         {
                             "epoch": epoch,
+                            "train_seconds": train_seconds,
+                            "epoch_seconds": time.monotonic() - epoch_started,
                             "train": train_metrics,
                             "val": val_metrics,
                             "is_best": is_best,

@@ -1,0 +1,61 @@
+{
+  "baseline": "always predict the training-most-common token for each known token family",
+  "per_family": {
+    "control": {
+      "training_majority_token": "EVENT",
+      "test_tokens": 31722,
+      "majority_accuracy": 0.7850702982157494
+    },
+    "offset": {
+      "training_majority_token": "offset:288",
+      "test_tokens": 24904,
+      "majority_accuracy": 0.11584484420173466
+    },
+    "snap": {
+      "training_majority_token": "snap:1",
+      "test_tokens": 24904,
+      "majority_accuracy": 0.46374076453581753
+    },
+    "residual": {
+      "training_majority_token": "residual:0",
+      "test_tokens": 24904,
+      "majority_accuracy": 0.11941856729842595
+    },
+    "kind": {
+      "training_majority_token": "kind:circle",
+      "test_tokens": 24904,
+      "majority_accuracy": 0.5507548988114359
+    },
+    "combo": {
+      "training_majority_token": "combo:0",
+      "test_tokens": 24904,
+      "majority_accuracy": 0.7603196273690973
+    },
+    "hit_sound": {
+      "training_majority_token": "hit_sound:0",
+      "test_tokens": 24904,
+      "majority_accuracy": 0.6396161259235464
+    },
+    "duration": {
+      "training_majority_token": "duration:8",
+      "test_tokens": 11188,
+      "majority_accuracy": 0.4255452270289596
+    },
+    "curve": {
+      "training_majority_token": "curve:P",
+      "test_tokens": 11039,
+      "majority_accuracy": 0.41869734577407375
+    },
+    "repeats": {
+      "training_majority_token": "repeats:1",
+      "test_tokens": 11039,
+      "majority_accuracy": 0.8664734124467796
+    },
+    "anchors": {
+      "training_majority_token": "anchors:2",
+      "test_tokens": 11039,
+      "majority_accuracy": 0.5235075640909502
+    }
+  },
+  "overall_accuracy": 0.5128342744099604
+}

@@ -108,6 +108,25 @@ class SparseGrammarTests(unittest.TestCase):
         self.assertTrue(allowed)
         self.assertTrue(all(vocabulary.offset_tick(token) < 144 for token in allowed))
 
+    def test_generation_gap_mask_has_viable_residuals_and_covers_bar_boundary(self):
+        grammar, vocab = self.codec.grammar, self.codec.vocabulary
+        for last_units in (8, -8):
+            state = GrammarState(DecodePhase.EVENT_OFFSET, last_time_units=last_units)
+            allowed = grammar.allowed_ids_for_bar(state, meter=4, minimum_start_gap_beats=.025)
+            self.assertNotIn(vocab.id_for('offset:0'), allowed)
+            for token in allowed:
+                tick = vocab.offset_tick(token)
+                residual_state = GrammarState(DecodePhase.EVENT_RESIDUAL,
+                                              last_time_units=last_units, current_offset_tick=tick)
+                residuals = grammar.allowed_ids_for_bar(residual_state, meter=4, minimum_start_gap_beats=.025)
+                self.assertTrue(residuals)
+                for residual in residuals:
+                    beat = tick / TICKS_PER_BEAT + vocab.residual_steps(residual) / RESIDUAL_TICKS_PER_BEAT
+                    self.assertGreaterEqual(beat - last_units / RESIDUAL_TICKS_PER_BEAT, .025 - 1e-9)
+
+        exhausted = GrammarState(DecodePhase.BETWEEN_EVENTS, last_offset_tick=383, last_time_units=6140)
+        self.assertEqual(grammar.allowed_ids_for_bar(exhausted, meter=4, minimum_start_gap_beats=.025), (vocab.eos_id,))
+
     def test_grammar_snap_filtering_matches_transition_invariants(self):
         grammar = self.codec.grammar
         vocabulary = self.codec.vocabulary

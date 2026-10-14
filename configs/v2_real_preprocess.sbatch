@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=osu-v2-real-data
 #SBATCH --partition=unlimited
-#SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
-#SBATCH --time=1-00:00:00
+#SBATCH --time=2-00:00:00
 set -euo pipefail
 : "${SOURCE_DIR:?Set SOURCE_DIR to the revised source checkout}"
 : "${DATA_DIR:?Set DATA_DIR to a new empty record directory}"

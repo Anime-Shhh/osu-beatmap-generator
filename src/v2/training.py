@@ -275,10 +275,17 @@ def loss_for_batch(
         planner_output["decoder_hidden"], batch["event_token_indices"], batch["event_mask"]
     )
     context = _drop_symbolic_context(context, batch["event_mask"], config.symbolic_context_dropout)
-    if not batch["event_mask"].any():
-        # Empty bars are valid planner samples but carry no geometry loss.
-        zero = next(geometry.parameters()).sum() * 0.0
-        return {"loss": zero, "token_loss": token_loss.detach(), "geometry_loss": zero}
+    if batch["event_mask"].shape[1] == 0:
+        # Every DDP rank must enter the diffuser forward/backward, even when
+        # its entire batch contains empty bars. A masked dummy event keeps the
+        # graph and reducer hooks intact while contributing exactly zero loss.
+        batch = dict(batch)
+        size = context.shape[0]
+        context = context.new_zeros((size, 1, context.shape[-1]))
+        for name in ("event_mask", "event_kinds", "anchor_counts", "event_positions"):
+            batch[name] = batch[name].new_zeros((size, 1))
+        batch["geometry"] = batch["geometry"].new_zeros((size, 1, batch["geometry"].shape[2], 2))
+        batch["event_features"] = batch["event_features"].new_zeros((size, 1, 4))
     clean_geometry = batch["geometry"]
     if geometry.training and config.geometry_flip_augmentation:
         # Reflect whole patterns, never individual objects; preserve spacing,

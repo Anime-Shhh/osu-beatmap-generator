@@ -14,6 +14,8 @@ the complete slider/control-point data separately.
 
 from __future__ import annotations
 
+import math
+
 from dataclasses import dataclass
 from enum import Enum, IntEnum
 from fractions import Fraction
@@ -264,7 +266,8 @@ class EventGrammar:
             return vocab.ids_for_family(TokenFamily.DURATION)
         raise AssertionError(f"unsupported grammar phase {state.phase}")
 
-    def allowed_ids_for_bar(self, state: GrammarState, *, meter: float) -> tuple[int, ...]:
+    def allowed_ids_for_bar(self, state: GrammarState, *, meter: float,
+                            minimum_start_gap_beats: float = 0.0) -> tuple[int, ...]:
         """Apply meter bounds to the dynamic subset used during generation.
 
         The fixed grammar knows the largest supported bar vocabulary but not a
@@ -275,10 +278,19 @@ class EventGrammar:
 
         if not 0.0 < float(meter) <= self.vocabulary.max_bar_beats:
             raise ValueError(f"bar length must be within (0, {self.vocabulary.max_bar_beats}]")
+        if minimum_start_gap_beats < 0 or not math.isfinite(minimum_start_gap_beats):
+            raise ValueError("minimum_start_gap_beats must be finite and non-negative")
+        minimum_units = state.last_time_units + minimum_start_gap_beats * RESIDUAL_TICKS_PER_BEAT
+
+        def viable_offset(token_id):
+            base_units = self.vocabulary.offset_tick(token_id) * RESIDUAL_UNITS_PER_OFFSET_TICK
+            low = max(-MAX_RESIDUAL_STEPS, math.ceil(max(0.0, minimum_units) - base_units - 1e-9))
+            high = min(MAX_RESIDUAL_STEPS, math.ceil(float(meter) * RESIDUAL_TICKS_PER_BEAT - base_units - 1e-9) - 1)
+            return low <= high
         allowed = self.allowed_ids(state)
         if state.phase == DecodePhase.BETWEEN_EVENTS:
             has_next_offset = any(
-                self.vocabulary.offset_tick(token_id) / TICKS_PER_BEAT < float(meter)
+                self.vocabulary.offset_tick(token_id) / TICKS_PER_BEAT < float(meter) and viable_offset(token_id)
                 for token_id in self.allowed_ids(
                     GrammarState(DecodePhase.EVENT_OFFSET, last_offset_tick=state.last_offset_tick)
                 )
@@ -288,7 +300,7 @@ class EventGrammar:
             return tuple(
                 token_id
                 for token_id in allowed
-                if self.vocabulary.offset_tick(token_id) / TICKS_PER_BEAT < float(meter)
+                if self.vocabulary.offset_tick(token_id) / TICKS_PER_BEAT < float(meter) and viable_offset(token_id)
             )
         if state.phase == DecodePhase.EVENT_RESIDUAL:
             if state.current_offset_tick is None:
@@ -298,6 +310,8 @@ class EventGrammar:
                 token_id
                 for token_id in allowed
                 if 0.0 <= base + self.vocabulary.residual_steps(token_id) / RESIDUAL_TICKS_PER_BEAT < float(meter)
+                and state.current_offset_tick * RESIDUAL_UNITS_PER_OFFSET_TICK
+                + self.vocabulary.residual_steps(token_id) >= minimum_units - 1e-9
             )
         return allowed
 

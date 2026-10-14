@@ -682,6 +682,8 @@ class SparseEventPlanner(nn.Module):
         memory_mask: Optional[torch.Tensor] = None,
         target_bar_index: int = 0,
         bar_length_beats: float | None = None,
+        minimum_start_gap_beats: float = 0.0,
+        previous_event_relative_beat: float | None = None,
         previous_bar_tokens: Optional[Sequence[int] | torch.Tensor] = None,
         max_tokens: int = 256,
         temperature: float = 1.0,
@@ -735,7 +737,12 @@ class SparseEventPlanner(nn.Module):
             drop_boundary=False,
         )
         tokens = [self.vocabulary.bos_id]
-        state = grammar.transition(GrammarState(), tokens[0])
+        if minimum_start_gap_beats and bar_length_beats is None:
+            raise ValueError("minimum start gap requires explicit bar_length_beats")
+        from .grammar import RESIDUAL_TICKS_PER_BEAT
+        initial = GrammarState(last_time_units=round(previous_event_relative_beat * RESIDUAL_TICKS_PER_BEAT)) \
+            if previous_event_relative_beat is not None else GrammarState()
+        state = grammar.transition(initial, tokens[0])
         cache: tuple[torch.Tensor, ...] | None = None
         for _ in range(max_tokens):
             input_token = torch.tensor([[tokens[-1]]], dtype=torch.long, device=bar_memory.device)
@@ -752,7 +759,8 @@ class SparseEventPlanner(nn.Module):
             allowed = (
                 grammar.allowed_ids(state)
                 if bar_length_beats is None
-                else grammar.allowed_ids_for_bar(state, meter=float(bar_length_beats))
+                else grammar.allowed_ids_for_bar(state, meter=float(bar_length_beats),
+                                                 minimum_start_gap_beats=minimum_start_gap_beats)
             )
             if not allowed:
                 raise RuntimeError("meter-aware grammar has no legal continuation")

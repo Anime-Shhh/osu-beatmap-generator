@@ -206,6 +206,30 @@ def test_song_balancing_can_cover_multiple_bars_without_changing_split(tmp_path)
     assert all(dataset[i]['metadata']['split']=='train' for i in range(16))
 
 
+def test_empty_geometry_batch_runs_forward_and_backpropagates_zero():
+    from src.v2.training import loss_for_batch
+    model = ActiveEventGeometryDiffuser(GeometryDiffusionConfig(
+        context_dim=16, hidden_dim=16, heads=2, layers=1, dropout=0))
+    batch = {
+        'labels': torch.zeros(1, 1, dtype=torch.long),
+        'event_mask': torch.zeros(1, 0, dtype=torch.bool),
+        'event_token_indices': torch.zeros(1, 0, dtype=torch.long),
+        'event_kinds': torch.zeros(1, 0, dtype=torch.long),
+        'anchor_counts': torch.zeros(1, 0, dtype=torch.long),
+        'event_positions': torch.zeros(1, 0, dtype=torch.long),
+        'geometry': torch.zeros(1, 0, MAX_ANCHORS + 1, 2),
+        'event_features': torch.zeros(1, 0, 4),
+    }
+    output = {'logits': torch.zeros(1, 1, 2), 'decoder_hidden': torch.zeros(1, 1, 16)}
+    with patch('src.v2.training.forward_planner', return_value=output):
+        losses = loss_for_batch(torch.nn.Identity(), model, batch,
+                               TrainingConfig(stage=TrainingStage.GEOMETRY))
+    assert losses['loss'].item() == 0
+    losses['loss'].backward()
+    assert all(p.grad is not None and torch.isfinite(p.grad).all() and p.grad.abs().sum() == 0
+               for p in model.parameters())
+
+
 def test_perfect_slider_topology_is_constrained_by_grammar():
     from src.v2.grammar import EventVocabulary, EventGrammar, GrammarState, DecodePhase
     vocabulary=EventVocabulary()

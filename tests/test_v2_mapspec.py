@@ -58,6 +58,14 @@ SliderTickRate: 1
 
 
 class MapSpecTests(unittest.TestCase):
+    def test_large_absolute_beat_accepts_exact_microtiming_boundary(self):
+        from dataclasses import replace
+        spec = mapspec_from_osu(RICH_OSU)
+        event = replace(spec.events[0], beat_position=128 + 1 / 192)
+        spec = replace(spec, events=(event,))
+        self.assertTrue(validate_map_spec(spec).valid)
+        self.assertTrue(validate_map_spec(mapspec_from_osu(compile_osu(spec))).valid)
+
     def test_parser_preserves_native_timing_meter_kiai_sv_and_hit_samples(self):
         spec = mapspec_from_osu(RICH_OSU)
         timing = spec.timing_map

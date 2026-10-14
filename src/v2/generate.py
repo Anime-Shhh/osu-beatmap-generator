@@ -37,6 +37,7 @@ from .inference import (
 )
 from .mapspec import MapMetadata
 from .evaluation import RosuDifficultyCalculator, StrictAuditPolicy
+from .packaging import write_osz_archive
 
 
 def _hypotheses(path: str | Path) -> tuple[TimingHypothesis, ...]:
@@ -97,6 +98,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     # Output options
     parser.add_argument("--output-dir", help="directory to write packaged .osu and manifest")
     parser.add_argument("--output", "--output-osu", dest="output", help="explicit output .osu file path")
+    parser.add_argument("--osz-output", help="also create an importable .osz containing the map and source audio")
     parser.add_argument("--overwrite", action="store_true", help="overwrite existing output files")
 
     # Generation & sampling controls
@@ -226,10 +228,12 @@ def main(argv: list[str] | None = None) -> int:
         audio_source_path=args.audio,
         overwrite=args.overwrite,
     )
+    osz_path = write_osz_archive(package, args.osz_output, overwrite=args.overwrite) if args.osz_output else None
     print(
         json.dumps(
             {
                 "osu_path": str(package.osu_path),
+                "osz_path": str(osz_path) if osz_path else None,
                 "manifest_path": str(package.manifest_path),
                 "audio_path": str(package.audio_path) if package.audio_path is not None else None,
                 "selected_candidate_id": draft.result.selected_candidate_id,

@@ -637,6 +637,7 @@ def _sample_candidate_map(
     temperature: float,
     geometry_steps: int,
     metadata: MapMetadata | None = None,
+    minimum_start_gap_ms: float = 0.0,
 ) -> MapSpec:
     device = next(planner.parameters()).device
     if next(geometry.parameters()).device != device:
@@ -683,12 +684,19 @@ def _sample_candidate_map(
     )
     planned_bars: list[tuple[BarDefinition, list[int], list[PlannerEvent], list[int] | None]] = []
     previous_tokens: list[int] | None = None
+    last_event_beat = None
+    # Include 1 ms for the worst-case difference between two rounded native
+    # timestamps. Use the fastest beat length to cover tempo changes too.
+    gap_beats = ((minimum_start_gap_ms + 1.0) / min(s.beat_length_ms for s in hypothesis.timing_map.segments)
+                 if minimum_start_gap_ms else 0.0)
     for bar in bars:
         tokens = planner.generate_bar(
             memory,
             memory_mask=bar_mask,
             target_bar_index=bar.bar_index,
             bar_length_beats=bar.length_beats,
+            minimum_start_gap_beats=gap_beats,
+            previous_event_relative_beat=None if last_event_beat is None else last_event_beat - bar.start_beat,
             previous_bar_tokens=previous_tokens,
             max_tokens=planner.config.max_decoder_tokens - 1,
             temperature=temperature,
@@ -696,6 +704,8 @@ def _sample_candidate_map(
         )
         decoded = codec.decode(tokens, bar_start_beat=bar.start_beat, meter=bar.length_beats)
         planned_bars.append((bar, tokens, decoded, previous_tokens))
+        if decoded:
+            last_event_beat = decoded[-1].beat_position
         previous_tokens = tokens
 
     plans: list[PlannerEvent] = []
@@ -830,6 +840,7 @@ def generate_draft(
             temperature=temperature,
             geometry_steps=geometry_steps,
             metadata=metadata,
+            minimum_start_gap_ms=audit_policy.minimum_start_gap_ms,
         )
         candidates.append(
             Candidate(

@@ -6,6 +6,7 @@ import hashlib
 import os
 import shutil
 import tempfile
+import zipfile
 from dataclasses import dataclass
 from pathlib import Path, PurePath
 from typing import Any, Callable, Optional
@@ -28,6 +29,37 @@ class GeneratedPackage:
     osu_sha256: str
     audio_path: Path | None = None
     audio_sha256: str | None = None
+
+
+def write_osz_archive(package: GeneratedPackage, path: str | Path, *, overwrite: bool = False) -> Path:
+    """Atomically publish an importable mapset containing its referenced audio."""
+    destination = Path(path)
+    if destination.suffix.lower() != ".osz":
+        raise PackagingError("mapset archive must end in .osz")
+    if package.audio_path is None or not package.audio_path.is_file():
+        raise PackagingError("an .osz requires the source audio, not just a feature bundle")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent)
+    os.close(descriptor)
+    temporary = Path(name)
+    try:
+        with zipfile.ZipFile(temporary, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+            archive.write(package.osu_path, package.osu_path.name)
+            archive.write(package.audio_path, package.audio_path.name)
+        with zipfile.ZipFile(temporary) as archive:
+            if archive.testzip() is not None:
+                raise PackagingError("mapset archive failed its CRC check")
+        if overwrite:
+            os.replace(temporary, destination)
+        else:
+            try:
+                os.link(temporary, destination)
+            except FileExistsError as exc:
+                raise PackagingError(f"refusing to overwrite existing archive: {destination}") from exc
+            temporary.unlink()
+    finally:
+        temporary.unlink(missing_ok=True)
+    return destination
 
 
 def _safe_output_name(value: str, *, suffix: str) -> str:

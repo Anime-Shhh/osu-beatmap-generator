@@ -86,7 +86,10 @@ def materialize(sources, output: Path, *, seed: int = 42) -> dict:
     curves = Counter()
     pipeline_key = None
     seen_maps = set()
-    with tempfile.TemporaryDirectory(prefix='osu-v2-materialize-') as temp:
+    # iLab's node-local /tmp has a 2 GB per-user quota. Keep corpus staging
+    # alongside the output instead; progressively release staged records so
+    # finalization does not temporarily require two full corpus copies.
+    with tempfile.TemporaryDirectory(prefix='.staging-', dir=output) as temp:
         temp = Path(temp)
         for audio, maps, provenance in sources:
             if not maps:
@@ -151,6 +154,7 @@ def materialize(sources, output: Path, *, seed: int = 42) -> dict:
             record['metadata'].update(split=row['split'], source_component_id=row['component_id'])
             write_song_record(record, output / filename)
             checksums[filename] = hashlib.sha256((output / filename).read_bytes()).hexdigest()
+            (temp / filename).unlink()
     report = {
         'schema': 'osu-v2-real-corpus/1', 'feature_pipeline_key': pipeline_key,
         'calculator_id': calculator.calculator_id, 'records': len(entries),

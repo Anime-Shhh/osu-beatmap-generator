@@ -542,7 +542,9 @@ def validate_map_spec(
         _validate_event_fields(event, index, policy, errors)
         if policy.require_beat_snap and math.isfinite(event.beat_position):
             residual = _nearest_snap_residual(event.beat_position, policy.snap_denominators)
-            if residual > policy.snap_tolerance_beats:
+            # Subtracting a snapped beat from a large absolute beat can place
+            # the exact +/-1/192-beat boundary a few ulps above its limit.
+            if residual > policy.snap_tolerance_beats + 1e-9:
                 errors.append(
                     f"event {index}: beat position is {residual:.6f} beats from allowed snap"
                 )

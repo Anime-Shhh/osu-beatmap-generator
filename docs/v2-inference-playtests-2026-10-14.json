@@ -1,0 +1,2762 @@
+{
+  "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/best.pt",
+  "songs": [
+    {
+      "id": "kaguya",
+      "title": "Kaguya-sama Opening",
+      "target_star": 4.5,
+      "modes": {
+        "audio_only": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "audio_only-0",
+              "seed": 100,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 7.449 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 360.0,
+                "duration_ms": 88181.80865234375,
+                "objects_per_minute": 244.94848007890005,
+                "circle_count": 300.0,
+                "slider_count": 60.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333332149,
+                "median_start_gap_ms": 216.3828841145878,
+                "max_jump_speed_px_per_second": 22117.166532219988
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 7.449208779640436,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.214234575679696,
+                  "speed": 2.6718889734839504
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-1",
+              "seed": 101,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 6.452 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 218.0,
+                "duration_ms": 86655.37958398437,
+                "objects_per_minute": 150.94273503612283,
+                "circle_count": 175.0,
+                "slider_count": 43.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 432.20203515625144,
+                "max_jump_speed_px_per_second": 30189.7525788825
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 6.451784927123861,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.806500080613671,
+                  "speed": 1.621412327084008
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-2",
+              "seed": 102,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 13.610 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 744.0,
+                "duration_ms": 88290.70538411458,
+                "objects_per_minute": 505.60248449472357,
+                "circle_count": 561.0,
+                "slider_count": 183.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 108.33250000000044,
+                "max_jump_speed_px_per_second": 15253.753473410254
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 13.609544100815896,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 7.760598276111,
+                  "speed": 4.705079429468804
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "double-276.9bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-3",
+              "seed": 103,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 7.119 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 372.0,
+                "duration_ms": 88393.67768229167,
+                "objects_per_minute": 252.5067469216916,
+                "circle_count": 286.0,
+                "slider_count": 86.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 216.66500000000087,
+                "max_jump_speed_px_per_second": 14239.442893978761
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 7.118930409107418,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.040881156371185,
+                  "speed": 2.5128395088904356
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.5,
+              "settings": {
+                "ar": 9.0,
+                "cs": 4.0,
+                "od": 8.0,
+                "hp": 6.0,
+                "slider_multiplier": 1.4,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 100,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "audio_only-1",
+            "candidates": [
+              {
+                "candidate_id": "audio_only-1",
+                "seed": 101,
+                "valid": true,
+                "selected": true,
+                "score": 0.05549106704276466,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 218.0,
+                  "duration_ms": 86655.37958398437,
+                  "objects_per_minute": 150.94273503612283,
+                  "circle_count": 175.0,
+                  "slider_count": 43.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 432.20203515625144,
+                  "max_jump_speed_px_per_second": 30189.7525788825
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 6.451784927123861,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 3.806500080613671,
+                    "speed": 1.621412327084008
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-3",
+                "seed": 103,
+                "valid": true,
+                "selected": false,
+                "score": 0.020652954342365554,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 372.0,
+                  "duration_ms": 88393.67768229167,
+                  "objects_per_minute": 252.5067469216916,
+                  "circle_count": 286.0,
+                  "slider_count": 86.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 216.66500000000087,
+                  "max_jump_speed_px_per_second": 14239.442893978761
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 7.118930409107418,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 4.040881156371185,
+                    "speed": 2.5128395088904356
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-0",
+                "seed": 100,
+                "valid": true,
+                "selected": false,
+                "score": 0.01266138850094771,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 360.0,
+                  "duration_ms": 88181.80865234375,
+                  "objects_per_minute": 244.94848007890005,
+                  "circle_count": 300.0,
+                  "slider_count": 60.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333332149,
+                  "median_start_gap_ms": 216.3828841145878,
+                  "max_jump_speed_px_per_second": 22117.166532219988
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 7.449208779640436,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 4.214234575679696,
+                    "speed": 2.6718889734839504
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-2",
+                "seed": 102,
+                "valid": true,
+                "selected": false,
+                "score": 1.3769758312735252e-06,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 744.0,
+                  "duration_ms": 88290.70538411458,
+                  "objects_per_minute": 505.60248449472357,
+                  "circle_count": 561.0,
+                  "slider_count": 183.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 108.33250000000044,
+                  "max_jump_speed_px_per_second": 15253.753473410254
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 13.609544100815896,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 7.760598276111,
+                    "speed": 4.705079429468804
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "double-276.9bpm-210.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Kaguya-sama Opening",
+            "version": "AI audio_only - 6.45 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 6.451784927123861,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.806500080613671,
+                "speed": 1.621412327084008
+              },
+              "error": null
+            },
+            "object_count": 218,
+            "slider_count": 43,
+            "curve_types": {
+              "P": 22,
+              "B": 6,
+              "L": 15
+            },
+            "corner_heads": 0,
+            "minimum_start_gap_ms": 10.999999999998181,
+            "mean_head_distance_px": 179.30938738323417,
+            "mean_head_speed_px_per_second": 1145.7643465171654,
+            "max_head_speed_px_per_second": 30944.498436255046,
+            "max_slider_length_px": 140.0
+          }
+        }
+      },
+      "osz": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/kaguya_v2_trained.osz",
+      "bytes": 1699165
+    },
+    {
+      "id": "heldout_000002",
+      "title": "Neon Rainbow (ft. Anna Yvette)",
+      "target_star": 4.696706974636316,
+      "modes": {
+        "audio_only": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "audio_only-0",
+              "seed": 200,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 6.422 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 330.0,
+                "duration_ms": 132413.171875,
+                "objects_per_minute": 149.5319515394699,
+                "circle_count": 255.0,
+                "slider_count": 75.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 344.8399999999965,
+                "max_jump_speed_px_per_second": 27125.86468085159
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 6.4224223019367335,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.7904234782206587,
+                  "speed": 1.6044018325425895
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-87.0bpm-430.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-1",
+              "seed": 201,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.652 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 642.0,
+                "duration_ms": 129745.15197916665,
+                "objects_per_minute": 296.8897057994522,
+                "circle_count": 451.0,
+                "slider_count": 191.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333328596,
+                "median_start_gap_ms": 172.41999999999825,
+                "max_jump_speed_px_per_second": 7403.590705293024
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.651685445820979,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.478982651488046,
+                  "speed": 3.409799641735141
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "double-174.0bpm-430.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-2",
+              "seed": 202,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 5.583 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 367.0,
+                "duration_ms": 132418.56,
+                "objects_per_minute": 166.290888528013,
+                "circle_count": 279.0,
+                "slider_count": 87.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333335702,
+                "median_start_gap_ms": 344.39098958333216,
+                "max_jump_speed_px_per_second": 20531.041962886957
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 5.583256898409829,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.1686391037782466,
+                  "speed": 1.9698249018653111
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-87.0bpm-430.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-3",
+              "seed": 203,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 8.903 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 591.0,
+                "duration_ms": 135004.41098958332,
+                "objects_per_minute": 262.65808457722187,
+                "circle_count": 406.0,
+                "slider_count": 185.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.0032552083333428072,
+                "median_start_gap_ms": 172.41999999999825,
+                "max_jump_speed_px_per_second": 16826.907437190985
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 8.902790327312047,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.029580570268534,
+                  "speed": 3.2153977333761246
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "double-174.0bpm-430.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.696706974636316,
+              "settings": {
+                "ar": 9.0,
+                "cs": 4.0,
+                "od": 8.0,
+                "hp": 7.0,
+                "slider_multiplier": 1.7,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 200,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "audio_only-2",
+            "candidates": [
+              {
+                "candidate_id": "audio_only-2",
+                "seed": 202,
+                "valid": true,
+                "selected": true,
+                "score": 0.28410843170323996,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 367.0,
+                  "duration_ms": 132418.56,
+                  "objects_per_minute": 166.290888528013,
+                  "circle_count": 279.0,
+                  "slider_count": 87.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333335702,
+                  "median_start_gap_ms": 344.39098958333216,
+                  "max_jump_speed_px_per_second": 20531.041962886957
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 5.583256898409829,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 3.1686391037782466,
+                    "speed": 1.9698249018653111
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-87.0bpm-430.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-0",
+                "seed": 200,
+                "valid": true,
+                "selected": false,
+                "score": 0.08633334130319426,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 330.0,
+                  "duration_ms": 132413.171875,
+                  "objects_per_minute": 149.5319515394699,
+                  "circle_count": 255.0,
+                  "slider_count": 75.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 344.8399999999965,
+                  "max_jump_speed_px_per_second": 27125.86468085159
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 6.4224223019367335,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 3.7904234782206587,
+                    "speed": 1.6044018325425895
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-87.0bpm-430.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-3",
+                "seed": 203,
+                "valid": true,
+                "selected": false,
+                "score": 0.00255358071794464,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 591.0,
+                  "duration_ms": 135004.41098958332,
+                  "objects_per_minute": 262.65808457722187,
+                  "circle_count": 406.0,
+                  "slider_count": 185.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.0032552083333428072,
+                  "median_start_gap_ms": 172.41999999999825,
+                  "max_jump_speed_px_per_second": 16826.907437190985
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 8.902790327312047,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.029580570268534,
+                    "speed": 3.2153977333761246
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "double-174.0bpm-430.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-1",
+                "seed": 201,
+                "valid": true,
+                "selected": false,
+                "score": 0.0008820462457376772,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 642.0,
+                  "duration_ms": 129745.15197916665,
+                  "objects_per_minute": 296.8897057994522,
+                  "circle_count": 451.0,
+                  "slider_count": 191.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333328596,
+                  "median_start_gap_ms": 172.41999999999825,
+                  "max_jump_speed_px_per_second": 7403.590705293024
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.651685445820979,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.478982651488046,
+                    "speed": 3.409799641735141
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "double-174.0bpm-430.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Neon Rainbow (ft. Anna Yvette)",
+            "version": "AI audio_only - 5.58 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 5.583256898409829,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.1686391037782466,
+                "speed": 1.9698249018653111
+              },
+              "error": null
+            },
+            "object_count": 367,
+            "slider_count": 87,
+            "curve_types": {
+              "L": 32,
+              "B": 14,
+              "P": 41
+            },
+            "corner_heads": 1,
+            "minimum_start_gap_ms": 11.0,
+            "mean_head_distance_px": 185.52727679274784,
+            "mean_head_speed_px_per_second": 738.2386690217577,
+            "max_head_speed_px_per_second": 20980.313479998535,
+            "max_slider_length_px": 170.0
+          },
+          "onset_comparison": {
+            "20": {
+              "precision": 0.6103542234332425,
+              "recall": 0.4409448818897638,
+              "f1": 0.512,
+              "matches": 224
+            },
+            "50": {
+              "precision": 0.6212534059945504,
+              "recall": 0.44881889763779526,
+              "f1": 0.5211428571428571,
+              "matches": 228
+            }
+          }
+        },
+        "known_timing": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "known_timing-0",
+              "seed": 220,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.748 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 622.0,
+                "duration_ms": 110257.49820402314,
+                "objects_per_minute": 338.48038099814465,
+                "circle_count": 470.0,
+                "slider_count": 152.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333332149,
+                "median_start_gap_ms": 172.1892959770048,
+                "max_jump_speed_px_per_second": 19451.43117788303
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.747533339896911,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.525130660234233,
+                  "speed": 3.4684631381342403
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-1",
+              "seed": 221,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.943 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 679.0,
+                "duration_ms": 111716.95402298868,
+                "objects_per_minute": 364.67159668188486,
+                "circle_count": 529.0,
+                "slider_count": 150.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 100.68696120689856,
+                "max_jump_speed_px_per_second": 25622.87278858054
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.943199627289705,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.549634290043707,
+                  "speed": 3.770872298206127
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-2",
+              "seed": 222,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.860 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 607.0,
+                "duration_ms": 110171.51580459785,
+                "objects_per_minute": 330.57546439313006,
+                "circle_count": 442.0,
+                "slider_count": 165.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333330817,
+                "median_start_gap_ms": 172.18929597701572,
+                "max_jump_speed_px_per_second": 25215.292954954082
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.8595866233968,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.472864186782348,
+                  "speed": 3.8110161647531147
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-3",
+              "seed": 223,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 10.904 differs from target 4.697 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 624.0,
+                "duration_ms": 110335.62320402314,
+                "objects_per_minute": 339.32830497335544,
+                "circle_count": 476.0,
+                "slider_count": 148.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 171.96479885058943,
+                "max_jump_speed_px_per_second": 37950.3574223637
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 10.904478370305617,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 6.246114631612426,
+                  "speed": 3.6741106971353594
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.696706974636316,
+              "settings": {
+                "ar": 9.0,
+                "cs": 4.0,
+                "od": 8.0,
+                "hp": 7.0,
+                "slider_multiplier": 1.7,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 220,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "known_timing-0",
+            "candidates": [
+              {
+                "candidate_id": "known_timing-0",
+                "seed": 220,
+                "valid": true,
+                "selected": true,
+                "score": 0.0007698492414374069,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 622.0,
+                  "duration_ms": 110257.49820402314,
+                  "objects_per_minute": 338.48038099814465,
+                  "circle_count": 470.0,
+                  "slider_count": 152.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333332149,
+                  "median_start_gap_ms": 172.1892959770048,
+                  "max_jump_speed_px_per_second": 19451.43117788303
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.747533339896911,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.525130660234233,
+                    "speed": 3.4684631381342403
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-2",
+                "seed": 222,
+                "valid": true,
+                "selected": false,
+                "score": 0.0006566442784226869,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 607.0,
+                  "duration_ms": 110171.51580459785,
+                  "objects_per_minute": 330.57546439313006,
+                  "circle_count": 442.0,
+                  "slider_count": 165.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333330817,
+                  "median_start_gap_ms": 172.18929597701572,
+                  "max_jump_speed_px_per_second": 25215.292954954082
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.8595866233968,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.472864186782348,
+                    "speed": 3.8110161647531147
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-1",
+                "seed": 221,
+                "valid": true,
+                "selected": false,
+                "score": 0.0005831586513530346,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 679.0,
+                  "duration_ms": 111716.95402298868,
+                  "objects_per_minute": 364.67159668188486,
+                  "circle_count": 529.0,
+                  "slider_count": 150.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 100.68696120689856,
+                  "max_jump_speed_px_per_second": 25622.87278858054
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.943199627289705,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.549634290043707,
+                    "speed": 3.770872298206127
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-3",
+                "seed": 223,
+                "valid": true,
+                "selected": false,
+                "score": 0.000149006111572284,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 624.0,
+                  "duration_ms": 110335.62320402314,
+                  "objects_per_minute": 339.32830497335544,
+                  "circle_count": 476.0,
+                  "slider_count": 148.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 171.96479885058943,
+                  "max_jump_speed_px_per_second": 37950.3574223637
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 10.904478370305617,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 6.246114631612426,
+                    "speed": 3.6741106971353594
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Neon Rainbow (ft. Anna Yvette)",
+            "version": "AI known_timing - 9.75 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 9.747533339896911,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 5.525130660234233,
+                "speed": 3.4684631381342403
+              },
+              "error": null
+            },
+            "object_count": 622,
+            "slider_count": 152,
+            "curve_types": {
+              "B": 46,
+              "P": 47,
+              "L": 59
+            },
+            "corner_heads": 4,
+            "minimum_start_gap_ms": 13.0,
+            "mean_head_distance_px": 166.82508211205848,
+            "mean_head_speed_px_per_second": 1383.849698485835,
+            "max_head_speed_px_per_second": 19500.997125503323,
+            "max_slider_length_px": 170.0
+          },
+          "onset_comparison": {
+            "20": {
+              "precision": 0.5868167202572347,
+              "recall": 0.718503937007874,
+              "f1": 0.6460176991150443,
+              "matches": 365
+            },
+            "50": {
+              "precision": 0.5868167202572347,
+              "recall": 0.718503937007874,
+              "f1": 0.6460176991150443,
+              "matches": 365
+            }
+          }
+        }
+      },
+      "human_reference": {
+        "title": "Neon Rainbow (ft. Anna Yvette)",
+        "version": "Human reference - Milan-'s Insane",
+        "difficulty": {
+          "available": true,
+          "stars": 4.696706974638112,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.2867777124885884,
+            "speed": 2.294027142757482
+          },
+          "error": null
+        },
+        "object_count": 508,
+        "slider_count": 192,
+        "curve_types": {
+          "P": 141,
+          "B": 12,
+          "L": 39
+        },
+        "corner_heads": 0,
+        "minimum_start_gap_ms": 85.9999999999709,
+        "mean_head_distance_px": 101.70688773952473,
+        "mean_head_speed_px_per_second": 451.8763914324823,
+        "max_head_speed_px_per_second": 1185.873053039443,
+        "max_slider_length_px": 170.0
+      },
+      "osz": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/heldout_000002.osz",
+      "bytes": 3456361
+    },
+    {
+      "id": "heldout_000033",
+      "title": "Star!!",
+      "target_star": 4.657365742940826,
+      "modes": {
+        "audio_only": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "audio_only-0",
+              "seed": 300,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 8.927 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 748.0,
+                "duration_ms": 173594.97659765626,
+                "objects_per_minute": 258.53282669589606,
+                "circle_count": 493.0,
+                "slider_count": 255.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 169.7492402343778,
+                "max_jump_speed_px_per_second": 26031.977677395458
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 8.927255047796962,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.105552214417203,
+                  "speed": 3.0323337109849064
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-177.0bpm-50.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-1",
+              "seed": 301,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 5.170 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 439.0,
+                "duration_ms": 173588.35439062503,
+                "objects_per_minute": 151.73828965926612,
+                "circle_count": 341.0,
+                "slider_count": 97.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 339.05699999999933,
+                "max_jump_speed_px_per_second": 4368.088493597162
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 5.170367922145307,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 2.86277588072273,
+                  "speed": 2.012198058122487
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-88.5bpm-50.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-2",
+              "seed": 302,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.776 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 806.0,
+                "duration_ms": 172408.93931835936,
+                "objects_per_minute": 280.4958965074398,
+                "circle_count": 564.0,
+                "slider_count": 242.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 169.52850000000035,
+                "max_jump_speed_px_per_second": 17700.350918776043
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.776033242561313,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.6170552276603045,
+                  "speed": 3.2310297876261176
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-177.0bpm-50.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-3",
+              "seed": 303,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 6.435 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 450.0,
+                "duration_ms": 173583.49810546875,
+                "objects_per_minute": 155.54473953275726,
+                "circle_count": 357.0,
+                "slider_count": 92.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 339.05700000000024,
+                "max_jump_speed_px_per_second": 27025.783008127513
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 6.434758807098986,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.7616283748626453,
+                  "speed": 1.8361589112801924
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-88.5bpm-50.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.657365742940826,
+              "settings": {
+                "ar": 9.0,
+                "cs": 4.0,
+                "od": 8.0,
+                "hp": 5.0,
+                "slider_multiplier": 1.82,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 300,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "audio_only-1",
+            "candidates": [
+              {
+                "candidate_id": "audio_only-1",
+                "seed": 301,
+                "valid": true,
+                "selected": true,
+                "score": 0.4798298083951629,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 439.0,
+                  "duration_ms": 173588.35439062503,
+                  "objects_per_minute": 151.73828965926612,
+                  "circle_count": 341.0,
+                  "slider_count": 97.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 339.05699999999933,
+                  "max_jump_speed_px_per_second": 4368.088493597162
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 5.170367922145307,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 2.86277588072273,
+                    "speed": 2.012198058122487
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "half-88.5bpm-50.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-3",
+                "seed": 303,
+                "valid": true,
+                "selected": false,
+                "score": 0.07853556598781074,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 450.0,
+                  "duration_ms": 173583.49810546875,
+                  "objects_per_minute": 155.54473953275726,
+                  "circle_count": 357.0,
+                  "slider_count": 92.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 339.05700000000024,
+                  "max_jump_speed_px_per_second": 27025.783008127513
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 6.434758807098986,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 3.7616283748626453,
+                    "speed": 1.8361589112801924
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "half-88.5bpm-50.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-0",
+                "seed": 300,
+                "valid": true,
+                "selected": false,
+                "score": 0.002216062152090079,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 748.0,
+                  "duration_ms": 173594.97659765626,
+                  "objects_per_minute": 258.53282669589606,
+                  "circle_count": 493.0,
+                  "slider_count": 255.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 169.7492402343778,
+                  "max_jump_speed_px_per_second": 26031.977677395458
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 8.927255047796962,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.105552214417203,
+                    "speed": 3.0323337109849064
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-177.0bpm-50.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-2",
+                "seed": 302,
+                "valid": true,
+                "selected": false,
+                "score": 0.0006575529745673144,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 806.0,
+                  "duration_ms": 172408.93931835936,
+                  "objects_per_minute": 280.4958965074398,
+                  "circle_count": 564.0,
+                  "slider_count": 242.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 169.52850000000035,
+                  "max_jump_speed_px_per_second": 17700.350918776043
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.776033242561313,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.6170552276603045,
+                    "speed": 3.2310297876261176
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-177.0bpm-50.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Star!!",
+            "version": "AI audio_only - 5.17 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 5.170367922145307,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 2.86277588072273,
+                "speed": 2.012198058122487
+              },
+              "error": null
+            },
+            "object_count": 439,
+            "slider_count": 97,
+            "curve_types": {
+              "B": 12,
+              "P": 59,
+              "L": 26
+            },
+            "corner_heads": 2,
+            "minimum_start_gap_ms": 19.0,
+            "mean_head_distance_px": 176.74713263593316,
+            "mean_head_speed_px_per_second": 636.6023140514021,
+            "max_head_speed_px_per_second": 4364.614701877461,
+            "max_slider_length_px": 182.0
+          },
+          "onset_comparison": {
+            "20": {
+              "precision": 0.14578587699316628,
+              "recall": 0.10305958132045089,
+              "f1": 0.12075471698113208,
+              "matches": 64
+            },
+            "50": {
+              "precision": 0.36674259681093396,
+              "recall": 0.25925925925925924,
+              "f1": 0.30377358490566037,
+              "matches": 161
+            }
+          }
+        },
+        "known_timing": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "known_timing-0",
+              "seed": 320,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 10.448 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 832.0,
+                "duration_ms": 172580.75842696615,
+                "objects_per_minute": 289.2558849260445,
+                "circle_count": 556.0,
+                "slider_count": 275.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 168.53932584269933,
+                "max_jump_speed_px_per_second": 30002.454236170128
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 10.447576644778,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 6.002573434161477,
+                  "speed": 3.455398136721963
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-1",
+              "seed": 321,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.250 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 849.0,
+                "duration_ms": 172582.2945926965,
+                "objects_per_minute": 295.1635341285799,
+                "circle_count": 583.0,
+                "slider_count": 266.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 168.53932584269933,
+                "max_jump_speed_px_per_second": 33215.00224845257
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.250173789663192,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.246999113473066,
+                  "speed": 3.279645133120728
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-2",
+              "seed": 322,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.400 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 819.0,
+                "duration_ms": 172579.88061797738,
+                "objects_per_minute": 284.7377100044254,
+                "circle_count": 545.0,
+                "slider_count": 273.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 168.75877808988298,
+                "max_jump_speed_px_per_second": 29990.10006905161
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.400234238346481,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.384095142418258,
+                  "speed": 3.1664038191234
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-3",
+              "seed": 323,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 9.872 differs from target 4.657 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 833.0,
+                "duration_ms": 172582.2945926965,
+                "objects_per_minute": 289.6009704700907,
+                "circle_count": 588.0,
+                "slider_count": 244.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333371229,
+                "median_start_gap_ms": 168.5393258427066,
+                "max_jump_speed_px_per_second": 22830.932595682687
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 9.872015070937312,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.653027846321092,
+                  "speed": 3.330535812987603
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.657365742940826,
+              "settings": {
+                "ar": 9.0,
+                "cs": 4.0,
+                "od": 8.0,
+                "hp": 5.0,
+                "slider_multiplier": 1.82,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 320,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "known_timing-1",
+            "candidates": [
+              {
+                "candidate_id": "known_timing-1",
+                "seed": 321,
+                "valid": true,
+                "selected": true,
+                "score": 0.0013958423522373177,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 849.0,
+                  "duration_ms": 172582.2945926965,
+                  "objects_per_minute": 295.1635341285799,
+                  "circle_count": 583.0,
+                  "slider_count": 266.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 168.53932584269933,
+                  "max_jump_speed_px_per_second": 33215.00224845257
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.250173789663192,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.246999113473066,
+                    "speed": 3.279645133120728
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-2",
+                "seed": 322,
+                "valid": true,
+                "selected": false,
+                "score": 0.0011260296839068686,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 819.0,
+                  "duration_ms": 172579.88061797738,
+                  "objects_per_minute": 284.7377100044254,
+                  "circle_count": 545.0,
+                  "slider_count": 273.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 168.75877808988298,
+                  "max_jump_speed_px_per_second": 29990.10006905161
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.400234238346481,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.384095142418258,
+                    "speed": 3.1664038191234
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-3",
+                "seed": 323,
+                "valid": true,
+                "selected": false,
+                "score": 0.0005731426310386622,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 833.0,
+                  "duration_ms": 172582.2945926965,
+                  "objects_per_minute": 289.6009704700907,
+                  "circle_count": 588.0,
+                  "slider_count": 244.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 168.5393258427066,
+                  "max_jump_speed_px_per_second": 22830.932595682687
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 9.872015070937312,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.653027846321092,
+                    "speed": 3.330535812987603
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-0",
+                "seed": 320,
+                "valid": true,
+                "selected": false,
+                "score": 0.00025145442535208485,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 832.0,
+                  "duration_ms": 172580.75842696615,
+                  "objects_per_minute": 289.2558849260445,
+                  "circle_count": 556.0,
+                  "slider_count": 275.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333371229,
+                  "median_start_gap_ms": 168.53932584269933,
+                  "max_jump_speed_px_per_second": 30002.454236170128
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 10.447576644778,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 6.002573434161477,
+                    "speed": 3.455398136721963
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Star!!",
+            "version": "AI known_timing - 9.25 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 9.250173789663192,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 5.246999113473066,
+                "speed": 3.279645133120728
+              },
+              "error": null
+            },
+            "object_count": 849,
+            "slider_count": 266,
+            "curve_types": {
+              "P": 162,
+              "B": 16,
+              "L": 88
+            },
+            "corner_heads": 12,
+            "minimum_start_gap_ms": 11.0,
+            "mean_head_distance_px": 194.11323812781615,
+            "mean_head_speed_px_per_second": 1366.775017882524,
+            "max_head_speed_px_per_second": 34385.64306479656,
+            "max_slider_length_px": 273.0
+          },
+          "onset_comparison": {
+            "20": {
+              "precision": 0.4204946996466431,
+              "recall": 0.5748792270531401,
+              "f1": 0.4857142857142857,
+              "matches": 357
+            },
+            "50": {
+              "precision": 0.5323910482921084,
+              "recall": 0.7278582930756844,
+              "f1": 0.6149659863945578,
+              "matches": 452
+            }
+          }
+        }
+      },
+      "human_reference": {
+        "title": "Star!!",
+        "version": "Human reference - NiNo's Insane",
+        "difficulty": {
+          "available": true,
+          "stars": 4.657365742944384,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.292885948788258,
+            "speed": 2.249063900121105
+          },
+          "error": null
+        },
+        "object_count": 621,
+        "slider_count": 254,
+        "curve_types": {
+          "B": 44,
+          "P": 76,
+          "L": 134
+        },
+        "corner_heads": 0,
+        "minimum_start_gap_ms": 83.99999999998545,
+        "mean_head_distance_px": 117.11850430969874,
+        "mean_head_speed_px_per_second": 448.18871462613987,
+        "max_head_speed_px_per_second": 1423.8513292158527,
+        "max_slider_length_px": 273.00001
+      },
+      "osz": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/heldout_000033.osz",
+      "bytes": 4301944
+    },
+    {
+      "id": "heldout_000057",
+      "title": "Platinum Groove",
+      "target_star": 4.350761016214027,
+      "modes": {
+        "audio_only": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "audio_only-0",
+              "seed": 400,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 8.636 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 373.0,
+                "duration_ms": 105042.68828125,
+                "objects_per_minute": 213.05623805131427,
+                "circle_count": 288.0,
+                "slider_count": 84.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333328596,
+                "median_start_gap_ms": 234.54799999999523,
+                "max_jump_speed_px_per_second": 37959.674354792725
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 8.636228440805766,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.052362965249025,
+                  "speed": 2.4562014549136664
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-127.9bpm-310.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-1",
+              "seed": 401,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 5.318 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 238.0,
+                "duration_ms": 105072.00678125,
+                "objects_per_minute": 135.90679798977868,
+                "circle_count": 195.0,
+                "slider_count": 43.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 467.26359375000175,
+                "max_jump_speed_px_per_second": 18807.271721447538
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 5.3183612744478586,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.104222351388584,
+                  "speed": 1.536920423132858
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-64.0bpm-310.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-2",
+              "seed": 402,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 11.758 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 581.0,
+                "duration_ms": 105999.50974479166,
+                "objects_per_minute": 328.8694455656467,
+                "circle_count": 403.0,
+                "slider_count": 177.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333335702,
+                "median_start_gap_ms": 117.42670052082394,
+                "max_jump_speed_px_per_second": 28199.188738979217
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 11.757551371344944,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 6.595008201533545,
+                  "speed": 4.37778988468096
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "double-255.8bpm-310.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-3",
+              "seed": 403,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 7.085 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 390.0,
+                "duration_ms": 105061.928546875,
+                "objects_per_minute": 222.72578015317632,
+                "circle_count": 299.0,
+                "slider_count": 91.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 234.54799999999523,
+                "max_jump_speed_px_per_second": 10643.169616074081
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 7.084816671683767,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.969134688379891,
+                  "speed": 2.647219732035018
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-127.9bpm-310.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.350761016214027,
+              "settings": {
+                "ar": 8.0,
+                "cs": 4.5,
+                "od": 8.0,
+                "hp": 6.0,
+                "slider_multiplier": 2.0,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 400,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "audio_only-1",
+            "candidates": [
+              {
+                "candidate_id": "audio_only-1",
+                "seed": 401,
+                "valid": true,
+                "selected": true,
+                "score": 0.2270345912875677,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 238.0,
+                  "duration_ms": 105072.00678125,
+                  "objects_per_minute": 135.90679798977868,
+                  "circle_count": 195.0,
+                  "slider_count": 43.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 467.26359375000175,
+                  "max_jump_speed_px_per_second": 18807.271721447538
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 5.3183612744478586,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 3.104222351388584,
+                    "speed": 1.536920423132858
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "half-64.0bpm-310.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-3",
+                "seed": 403,
+                "valid": true,
+                "selected": false,
+                "score": 0.015155516442307818,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 390.0,
+                  "duration_ms": 105061.928546875,
+                  "objects_per_minute": 222.72578015317632,
+                  "circle_count": 299.0,
+                  "slider_count": 91.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 234.54799999999523,
+                  "max_jump_speed_px_per_second": 10643.169616074081
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 7.084816671683767,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 3.969134688379891,
+                    "speed": 2.647219732035018
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-127.9bpm-310.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-0",
+                "seed": 400,
+                "valid": true,
+                "selected": false,
+                "score": 0.0014065472130599466,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 373.0,
+                  "duration_ms": 105042.68828125,
+                  "objects_per_minute": 213.05623805131427,
+                  "circle_count": 288.0,
+                  "slider_count": 84.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333328596,
+                  "median_start_gap_ms": 234.54799999999523,
+                  "max_jump_speed_px_per_second": 37959.674354792725
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 8.636228440805766,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 5.052362965249025,
+                    "speed": 2.4562014549136664
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "est-127.9bpm-310.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              },
+              {
+                "candidate_id": "audio_only-2",
+                "seed": 402,
+                "valid": true,
+                "selected": false,
+                "score": 1.1776349645601724e-05,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 581.0,
+                  "duration_ms": 105999.50974479166,
+                  "objects_per_minute": 328.8694455656467,
+                  "circle_count": 403.0,
+                  "slider_count": 177.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333335702,
+                  "median_start_gap_ms": 117.42670052082394,
+                  "max_jump_speed_px_per_second": 28199.188738979217
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 11.757551371344944,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 6.595008201533545,
+                    "speed": 4.37778988468096
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "double-255.8bpm-310.0ms",
+                  "clock_source": "audio_clock_estimator",
+                  "mode": "audio_only"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Platinum Groove",
+            "version": "AI audio_only - 5.32 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 5.3183612744478586,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.104222351388584,
+                "speed": 1.536920423132858
+              },
+              "error": null
+            },
+            "object_count": 238,
+            "slider_count": 43,
+            "curve_types": {
+              "L": 31,
+              "B": 8,
+              "P": 4
+            },
+            "corner_heads": 0,
+            "minimum_start_gap_ms": 12.000000000003638,
+            "mean_head_distance_px": 173.31288048391164,
+            "mean_head_speed_px_per_second": 631.6032752918725,
+            "max_head_speed_px_per_second": 18541.014825764818,
+            "max_slider_length_px": 200.0
+          },
+          "onset_comparison": {
+            "20": {
+              "precision": 0.22268907563025211,
+              "recall": 0.1315136476426799,
+              "f1": 0.16536661466458658,
+              "matches": 53
+            },
+            "50": {
+              "precision": 0.5126050420168067,
+              "recall": 0.3027295285359802,
+              "f1": 0.3806552262090484,
+              "matches": 122
+            }
+          }
+        },
+        "known_timing": {
+          "strict_passes": 0,
+          "candidates": 4,
+          "sampling_failures": [],
+          "calibrated": false,
+          "strict_audits": [
+            {
+              "candidate_id": "known_timing-0",
+              "seed": 420,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 7.766 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 433.0,
+                "duration_ms": 104989.31884765625,
+                "objects_per_minute": 247.45374372509295,
+                "circle_count": 336.0,
+                "slider_count": 97.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 233.76464843749272,
+                "max_jump_speed_px_per_second": 13524.838559604983
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 7.765512807300808,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.407671041310758,
+                  "speed": 2.7428596319186496
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-1",
+              "seed": 421,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 8.271 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 422.0,
+                "duration_ms": 104993.89648437501,
+                "objects_per_minute": 241.15687528339396,
+                "circle_count": 303.0,
+                "slider_count": 118.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 121.4599609375,
+                "max_jump_speed_px_per_second": 16405.29536395382
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 8.270831269330966,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.736632451075876,
+                  "speed": 2.786064450416829
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-2",
+              "seed": 422,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 8.538 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 486.0,
+                "duration_ms": 104764.70947265625,
+                "objects_per_minute": 278.3380028139228,
+                "circle_count": 404.0,
+                "slider_count": 82.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 118.408203125,
+                "max_jump_speed_px_per_second": 15388.368098494433
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 8.537546529277638,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.872763065789734,
+                  "speed": 2.9322321931918895
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            },
+            {
+              "candidate_id": "known_timing-3",
+              "seed": 423,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 7.471 differs from target 4.351 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 424.0,
+                "duration_ms": 104994.20166015625,
+                "objects_per_minute": 242.29909459518376,
+                "circle_count": 318.0,
+                "slider_count": 106.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 233.7646484375,
+                "max_jump_speed_px_per_second": 11395.626215321416
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 7.471108749655703,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.193120318885456,
+                  "speed": 2.7722925228368767
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "oracle-map-timing",
+                "clock_source": "source-osu-timing",
+                "mode": "known_timing"
+              }
+            }
+          ],
+          "result": {
+            "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+            "request": {
+              "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+              "audio_filename": "audio.mp3",
+              "audio_sha256": null,
+              "target_star": 4.350761016214027,
+              "settings": {
+                "ar": 8.0,
+                "cs": 4.5,
+                "od": 8.0,
+                "hp": 6.0,
+                "slider_multiplier": 2.0,
+                "slider_tick_rate": 1.0
+              },
+              "style_cluster": null,
+              "style_seed": null,
+              "candidate_count": 4,
+              "seed": 420,
+              "feature_revision": "v2-multirate-audio-3",
+              "model_revision": "checkpoint-43200-a991a335083180d0",
+              "extra_controls": {}
+            },
+            "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+            "model_revision": "checkpoint-43200-a991a335083180d0",
+            "selected_candidate_id": "known_timing-3",
+            "candidates": [
+              {
+                "candidate_id": "known_timing-3",
+                "seed": 423,
+                "valid": true,
+                "selected": true,
+                "score": 0.008385043895693339,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 424.0,
+                  "duration_ms": 104994.20166015625,
+                  "objects_per_minute": 242.29909459518376,
+                  "circle_count": 318.0,
+                  "slider_count": 106.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 233.7646484375,
+                  "max_jump_speed_px_per_second": 11395.626215321416
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 7.471108749655703,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 4.193120318885456,
+                    "speed": 2.7722925228368767
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-0",
+                "seed": 420,
+                "valid": true,
+                "selected": false,
+                "score": 0.005340581771958442,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 433.0,
+                  "duration_ms": 104989.31884765625,
+                  "objects_per_minute": 247.45374372509295,
+                  "circle_count": 336.0,
+                  "slider_count": 97.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 233.76464843749272,
+                  "max_jump_speed_px_per_second": 13524.838559604983
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 7.765512807300808,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 4.407671041310758,
+                    "speed": 2.7428596319186496
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-1",
+                "seed": 421,
+                "valid": true,
+                "selected": false,
+                "score": 0.0024621516674975044,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 422.0,
+                  "duration_ms": 104993.89648437501,
+                  "objects_per_minute": 241.15687528339396,
+                  "circle_count": 303.0,
+                  "slider_count": 118.0,
+                  "spinner_count": 1.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 121.4599609375,
+                  "max_jump_speed_px_per_second": 16405.29536395382
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 8.270831269330966,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 4.736632451075876,
+                    "speed": 2.786064450416829
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              },
+              {
+                "candidate_id": "known_timing-2",
+                "seed": 422,
+                "valid": true,
+                "selected": false,
+                "score": 0.0016361535790693877,
+                "errors": [],
+                "warnings": [],
+                "metrics": {
+                  "object_count": 486.0,
+                  "duration_ms": 104764.70947265625,
+                  "objects_per_minute": 278.3380028139228,
+                  "circle_count": 404.0,
+                  "slider_count": 82.0,
+                  "spinner_count": 0.0,
+                  "max_snap_error_beats": 0.005208333333342807,
+                  "median_start_gap_ms": 118.408203125,
+                  "max_jump_speed_px_per_second": 15388.368098494433
+                },
+                "difficulty": {
+                  "available": true,
+                  "stars": 8.537546529277638,
+                  "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                  "attributes": {
+                    "aim": 4.872763065789734,
+                    "speed": 2.9322321931918895
+                  },
+                  "error": null
+                },
+                "provenance": {
+                  "clock_hypothesis_id": "oracle-map-timing",
+                  "clock_source": "source-osu-timing",
+                  "mode": "known_timing"
+                }
+              }
+            ],
+            "warnings": [
+              "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+            ],
+            "ranked_status": "draft_only_human_mapper_review_required"
+          },
+          "selected": {
+            "title": "Platinum Groove",
+            "version": "AI known_timing - 7.47 stars - uncalibrated draft",
+            "difficulty": {
+              "available": true,
+              "stars": 7.471108749655703,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 4.193120318885456,
+                "speed": 2.7722925228368767
+              },
+              "error": null
+            },
+            "object_count": 424,
+            "slider_count": 106,
+            "curve_types": {
+              "B": 29,
+              "L": 43,
+              "P": 34
+            },
+            "corner_heads": 0,
+            "minimum_start_gap_ms": 16.0,
+            "mean_head_distance_px": 169.49762529039086,
+            "mean_head_speed_px_per_second": 979.8101340785802,
+            "max_head_speed_px_per_second": 11102.153507315597,
+            "max_slider_length_px": 340.0
+          },
+          "onset_comparison": {
+            "20": {
+              "precision": 0.6462264150943396,
+              "recall": 0.6799007444168734,
+              "f1": 0.6626360338573155,
+              "matches": 274
+            },
+            "50": {
+              "precision": 0.6462264150943396,
+              "recall": 0.6799007444168734,
+              "f1": 0.6626360338573155,
+              "matches": 274
+            }
+          }
+        }
+      },
+      "human_reference": {
+        "title": "Platinum Groove",
+        "version": "Human reference - Insane Insane Insane Insane",
+        "difficulty": {
+          "available": true,
+          "stars": 4.350761016236328,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.3422339727294723,
+            "speed": 1.82773009849395
+          },
+          "error": null
+        },
+        "object_count": 403,
+        "slider_count": 201,
+        "curve_types": {
+          "L": 56,
+          "P": 142,
+          "B": 3
+        },
+        "corner_heads": 0,
+        "minimum_start_gap_ms": 116.0,
+        "mean_head_distance_px": 106.17220577858662,
+        "mean_head_speed_px_per_second": 457.0182291359151,
+        "max_head_speed_px_per_second": 1327.017696228717,
+        "max_slider_length_px": 255.000005
+      },
+      "osz": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/heldout_000057.osz",
+      "bytes": 2517191
+    }
+  ],
+  "archive_checks": [
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/kaguya_v2_trained.osz",
+      "sha256": "6af2cfcee6d09806fb75769f92da05af842e121f3727199048ae8c31949b0681",
+      "bytes": 1699165,
+      "members": [
+        "audio.mp3",
+        "audio_only.osu"
+      ],
+      "audio_hash_verified": true,
+      "crc_verified": true,
+      "maps_validated": true
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/heldout_000002.osz",
+      "sha256": "da0469c638b7fbb0c685e5710c221c77f8f7febcca2f96541051fcd3cd32bd4c",
+      "bytes": 3456361,
+      "members": [
+        "audio.mp3",
+        "human-reference.osu",
+        "audio_only.osu",
+        "known_timing.osu"
+      ],
+      "audio_hash_verified": true,
+      "crc_verified": true,
+      "maps_validated": true
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/heldout_000033.osz",
+      "sha256": "75ae3748917829445b850c1446eb833deae8d3ba773c074c5caf9d1b3b1369c6",
+      "bytes": 4301944,
+      "members": [
+        "audio.mp3",
+        "known_timing.osu",
+        "human-reference.osu",
+        "audio_only.osu"
+      ],
+      "audio_hash_verified": true,
+      "crc_verified": true,
+      "maps_validated": true
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/inference_20261014_v2/heldout_000057.osz",
+      "sha256": "c69c840fade123706f5fc1f9dc6be43c93c8abcabadf72bc0e7999d3d1c8c07f",
+      "bytes": 2517191,
+      "members": [
+        "audio.mp3",
+        "audio_only.osu",
+        "human-reference.osu",
+        "known_timing.osu"
+      ],
+      "audio_hash_verified": true,
+      "crc_verified": true,
+      "maps_validated": true
+    }
+  ],
+  "strict_passes": 0,
+  "candidates": 28,
+  "notes": [
+    "All delivered AI maps are explicitly labelled uncalibrated drafts.",
+    "Only target-star filtering was waived for diagnostic selection; structural and minimum-gap checks remained enabled.",
+    "Onset F1 compares one reference chart; alternative valid rhythms can differ.",
+    "No human playtest has been performed."
+  ]
+}
