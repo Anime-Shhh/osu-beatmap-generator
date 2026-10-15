@@ -1,0 +1,66 @@
+{
+  "job_id": 513971,
+  "code_commit": "45e8597",
+  "start_time_edt": "2026-10-15 00:39:25 EDT",
+  "startup_audit": {
+    "alignment_loss_weight": 0.2,
+    "checkpoint_interval": 0,
+    "data_audit": {
+      "bars": {
+        "test": 6818,
+        "train": 66903,
+        "val": 8555
+      },
+      "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+      "materialization_sha256": "75a4ff69f8f803e18dabe80578709ceadf915bf67001b306b26a2827b1ed52d8",
+      "production_ready": true,
+      "records": 773,
+      "source_components": {
+        "test": 18,
+        "train": 150,
+        "val": 20
+      }
+    },
+    "device": "cuda:0",
+    "geometry_trainable_parameters": 20383234,
+    "local_audio_tokens": 128,
+    "min_delta": 0.001,
+    "patience": 10,
+    "planner_trainable_parameters": 93580133,
+    "stage": "planner",
+    "start_epoch": 0,
+    "total_epochs": 60,
+    "train_examples_per_epoch": 2400,
+    "world_size": 5
+  },
+  "first_epoch": {
+    "best_val_loss": 0.8975066912556329,
+    "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+    "epoch": 0,
+    "epoch_seconds": 688.1222122428007,
+    "epochs_without_improvement": 0,
+    "is_best": true,
+    "train": {
+      "alignment_loss": 0.40460936337088543,
+      "loss": 0.5993466900506368,
+      "steps": 1200.0,
+      "token_loss": 0.5184248171125849
+    },
+    "train_seconds": 496.1532202116214,
+    "val": {
+      "alignment_loss": 0.35568222980206465,
+      "loss": 0.8975066912556329,
+      "steps": 4280.0,
+      "token_loss": 0.8263702458031824
+    }
+  },
+  "eta": {
+    "full_run_hours_central": 30,
+    "full_run_hours_range": [
+      26,
+      34
+    ],
+    "central_finish_edt": "2026-10-16 approximately 07:00 EDT",
+    "assumptions": "Up to 60 planner plus 100 geometry epochs; geometry time extrapolated from benchmark and shared CPU input overhead. Early stopping may shorten either stage."
+  }
+}
