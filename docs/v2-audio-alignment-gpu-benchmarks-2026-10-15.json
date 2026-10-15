@@ -1,0 +1,230 @@
+{
+  "architecture_commit": "5ad39f026fb9c77146fd0b4a2b599e66a0d2e381",
+  "benchmark_jobs": [
+    513833,
+    513834
+  ],
+  "note": "Diagnostic compute benchmark on identical preloaded batches from 32 training source groups. Optimizer steps and global batch differ by world size. Excludes loading/checkpoint overhead; production first epoch used for ETA.",
+  "results": [
+    {
+      "stage": "planner",
+      "gpu": "NVIDIA RTX 4500 Ada Generation",
+      "world_size": 1,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 4.336039872840047,
+      "examples_per_second": 11.070008903898906,
+      "peak_memory_gb": 8.162533888,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 4.738947470982869,
+        "token_loss": 4.651037752628326,
+        "alignment_loss": 0.4395485321680705,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "planner",
+      "mode": "validation",
+      "world_size": 1,
+      "examples_per_second": 35.016446850278214
+    },
+    {
+      "stage": "geometry",
+      "gpu": "NVIDIA RTX 4500 Ada Generation",
+      "world_size": 1,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 1.8752544783055782,
+      "examples_per_second": 25.596525994366008,
+      "peak_memory_gb": 8.162533888,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 0.9464365343252817,
+        "token_loss": 3.586190680662791,
+        "geometry_loss": 0.9464365343252817,
+        "denoising_loss": 0.9050102929274241,
+        "spacing_loss": 0.00590854345743234,
+        "turn_loss": 0.10814767854753882,
+        "slider_shape_loss": 0.35427992790937424,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "geometry",
+      "mode": "validation",
+      "world_size": 1,
+      "examples_per_second": 32.18956278830477
+    },
+    {
+      "stage": "planner",
+      "gpu": "NVIDIA RTX 4500 Ada Generation",
+      "world_size": 2,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 4.66437292098999,
+      "examples_per_second": 20.581544749133066,
+      "peak_memory_gb": 8.52732416,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 4.738935808340709,
+        "token_loss": 4.65103143453598,
+        "alignment_loss": 0.43952177216609317,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "planner",
+      "mode": "validation",
+      "world_size": 2,
+      "examples_per_second": 69.995203719373
+    },
+    {
+      "stage": "geometry",
+      "gpu": "NVIDIA RTX 4500 Ada Generation",
+      "world_size": 2,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 1.8881739377975464,
+      "examples_per_second": 50.842773580477896,
+      "peak_memory_gb": 8.52732416,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 0.9465914492805799,
+        "token_loss": 3.5861652890841165,
+        "geometry_loss": 0.9465914492805799,
+        "denoising_loss": 0.9051829700668653,
+        "spacing_loss": 0.005907805236347485,
+        "turn_loss": 0.10805525774291407,
+        "slider_shape_loss": 0.3541493971521656,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "geometry",
+      "mode": "validation",
+      "world_size": 2,
+      "examples_per_second": 64.99369300637721
+    },
+    {
+      "ddp_empty_rank_backward": "passed",
+      "world_size": 2
+    },
+    {
+      "stage": "planner",
+      "gpu": "NVIDIA RTX 4500 Ada Generation",
+      "world_size": 5,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 7.179656028747559,
+      "examples_per_second": 33.42778526422892,
+      "peak_memory_gb": 8.52732416,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 4.73883060614268,
+        "token_loss": 4.650920410950978,
+        "alignment_loss": 0.43955082694689435,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "planner",
+      "mode": "validation",
+      "world_size": 5,
+      "examples_per_second": 171.77236623618046
+    },
+    {
+      "stage": "geometry",
+      "gpu": "NVIDIA RTX 4500 Ada Generation",
+      "world_size": 5,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 2.7042720317840576,
+      "examples_per_second": 88.7484680458229,
+      "peak_memory_gb": 8.52732416,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 0.9466203153133392,
+        "token_loss": 3.5862531860669455,
+        "geometry_loss": 0.9466203153133392,
+        "denoising_loss": 0.905206615726153,
+        "spacing_loss": 0.005903374022940018,
+        "turn_loss": 0.10802071595874925,
+        "slider_shape_loss": 0.35422330535948277,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "geometry",
+      "mode": "validation",
+      "world_size": 5,
+      "examples_per_second": 159.3109181696335
+    },
+    {
+      "ddp_empty_rank_backward": "passed",
+      "world_size": 5
+    },
+    {
+      "stage": "planner",
+      "gpu": "NVIDIA RTX A4000",
+      "world_size": 4,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 8.307342529296875,
+      "examples_per_second": 23.112084198152196,
+      "peak_memory_gb": 8.537719296,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 4.73536358277003,
+        "token_loss": 4.647513111432393,
+        "alignment_loss": 0.4392522896329562,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "planner",
+      "mode": "validation",
+      "world_size": 4,
+      "examples_per_second": 96.6228311477485
+    },
+    {
+      "stage": "geometry",
+      "gpu": "NVIDIA RTX A4000",
+      "world_size": 4,
+      "batch_size": 4,
+      "steps": 12,
+      "local_audio_tokens": 128,
+      "seconds": 3.2728333473205566,
+      "examples_per_second": 58.66476524299318,
+      "peak_memory_gb": 8.537719296,
+      "diagnostic_only": true,
+      "metrics": {
+        "loss": 0.957611491282781,
+        "token_loss": 3.5687128702799478,
+        "geometry_loss": 0.957611491282781,
+        "denoising_loss": 0.9240535994370779,
+        "spacing_loss": 0.006025222333846614,
+        "turn_loss": 0.08842401159927249,
+        "slider_shape_loss": 0.2853417508304119,
+        "steps": 12.0
+      }
+    },
+    {
+      "stage": "geometry",
+      "mode": "validation",
+      "world_size": 4,
+      "examples_per_second": 91.83430043867551
+    },
+    {
+      "ddp_empty_rank_backward": "passed",
+      "world_size": 4
+    }
+  ]
+}

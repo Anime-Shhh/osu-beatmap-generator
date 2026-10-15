@@ -16,8 +16,10 @@ def query_grid(timing, start_beat: float, length_beats: float, count: int) -> to
         raise ValueError('alignment grid needs at least two samples and positive bar length')
     # Beat-space queries mapped individually to milliseconds handle tempo changes
     # inside a bar; interpolating its endpoints would not.
+    # Tiny meter-transition bars late in a song can collapse in float32. Keep
+    # the clock in float64; feature interpolation casts weights to feature dtype.
     return torch.tensor([timing.beat_to_time(start_beat + i * length_beats / count)
-                         for i in range(count)], dtype=torch.float32)
+                         for i in range(count)], dtype=torch.float64)
 
 
 def reference_events(record):

@@ -64,6 +64,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--planner-config", help="optional JSON overrides for SparsePlannerConfig")
     parser.add_argument("--geometry-config", help="optional JSON overrides for GeometryDiffusionConfig")
     parser.add_argument("--epochs", type=int, default=200, help="total target epochs (default: 200)")
+    parser.add_argument("--checkpoint-interval", type=int, default=25,
+                        help="numbered checkpoint interval; 0 keeps only best/latest")
+    parser.add_argument("--log-every", type=int, default=50, help="batch progress interval (0 disables)")
     parser.add_argument("--patience", type=int, default=15, help="early stopping patience in epochs (0 to disable)")
     parser.add_argument("--min-delta", type=float, default=0.001, help="minimum validation loss improvement")
     parser.add_argument("--batch-size", type=int, default=1)
@@ -117,6 +120,10 @@ def main(argv: list[str] | None = None) -> int:
         raise ValueError("epochs/batch-size must be positive and num-workers non-negative")
     if args.seed < 0:
         raise ValueError("seed must be non-negative")
+    if args.checkpoint_interval < 0:
+        raise ValueError("checkpoint-interval must be non-negative")
+    if args.log_every < 0:
+        raise ValueError("log-every must be non-negative")
     torch.manual_seed(args.seed)
     if args.initialize_planner and (args.resume or args.stage != "planner"):
         raise ValueError("--initialize-planner is only for a fresh planner run, without --resume")
@@ -284,6 +291,8 @@ def main(argv: list[str] | None = None) -> int:
         num_workers=args.num_workers,
         pin_memory=device.type == "cuda",
         persistent_workers=False,
+        # NCCL is not fork-safe: workers must not inherit initialized CUDA state.
+        multiprocessing_context="spawn" if args.num_workers else None,
         collate_fn=collate_sparse_examples,
         generator=train_order_generator if train_sampler is None else None,
     )
@@ -296,6 +305,7 @@ def main(argv: list[str] | None = None) -> int:
         num_workers=args.num_workers,
         pin_memory=device.type == "cuda",
         persistent_workers=False,
+        multiprocessing_context="spawn" if args.num_workers else None,
         collate_fn=collate_sparse_examples,
         generator=val_order_generator,
     )
@@ -329,6 +339,9 @@ def main(argv: list[str] | None = None) -> int:
                     "stage": stage.value,
                     "device": str(device),
                     "world_size": world_size,
+                    "local_audio_tokens": planner_config.local_audio_tokens,
+                    "alignment_loss_weight": args.alignment_loss_weight,
+                    "checkpoint_interval": args.checkpoint_interval,
                     "start_epoch": start_epoch,
                     "total_epochs": args.epochs,
                     "patience": args.patience,
@@ -367,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
                 config=config,
                 scaler=scaler,
                 max_steps=args.max_steps,
+                log_every=args.log_every if rank == 0 else 0,
             )
             train_metrics = _reduce_metrics(raw_train_metrics, device)
             train_seconds = time.monotonic() - epoch_started
@@ -379,6 +393,7 @@ def main(argv: list[str] | None = None) -> int:
                 raw_val_metrics = run_epoch(
                     planner=train_planner, geometry=train_geometry, loader=val_loader,
                     optimizer=None, device=device, config=config, max_steps=args.max_steps,
+                    log_every=args.log_every if rank == 0 else 0,
                 )
             val_metrics = _reduce_metrics(raw_val_metrics, device)
 
@@ -414,7 +429,7 @@ def main(argv: list[str] | None = None) -> int:
                 latest_ckpt = save_checkpoint(payload, output_dir / "latest.pt", overwrite=True)
                 if is_best:
                     save_checkpoint(payload, output_dir / "best.pt", overwrite=True)
-                if (epoch + 1) % 25 == 0 or epoch == args.epochs - 1:
+                if args.checkpoint_interval and ((epoch + 1) % args.checkpoint_interval == 0 or epoch == args.epochs - 1):
                     save_checkpoint(payload, output_dir / f"{stage.value}-epoch-{epoch:04d}.pt", overwrite=True)
 
                 print(

@@ -17,6 +17,7 @@ common=(--records-dir "$DATA_DIR" --split-manifest "$DATA_DIR/splits.json"
         --feature-pipeline-key "$FEATURE_PIPELINE_KEY" --planner-config configs/v2_audio_alignment_planner.json
         --batch-size "${BATCH_SIZE:-2}" --gradient-accumulation "${GRADIENT_ACCUMULATION:-8}"
         --bars-per-song 16 --num-workers "${NUM_WORKERS:-1}" --mixed-precision bf16 --patience 10
+        --checkpoint-interval "${CHECKPOINT_INTERVAL:-25}"
         --alignment-loss-weight "${ALIGNMENT_LOSS_WEIGHT:-0.2}" --confirm-training)
 "$VENV_PATH/bin/torchrun" --standalone --nnodes=1 --nproc_per_node="$NUM_GPUS" -m src.v2.train "${common[@]}" \
   --stage planner --initialize-planner "$INITIAL_PLANNER" --learning-rate 0.00005 \

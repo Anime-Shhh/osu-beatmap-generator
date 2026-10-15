@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import tempfile
+import time
 from dataclasses import asdict, dataclass
 from enum import Enum
 from pathlib import Path
@@ -328,6 +329,7 @@ def run_epoch(
     config: TrainingConfig,
     scaler: torch.amp.GradScaler | None = None,
     max_steps: int | None = None,
+    log_every: int = 0,
 ) -> dict[str, float]:
     """Run one explicitly requested train or evaluation epoch.
 
@@ -361,6 +363,7 @@ def run_epoch(
 
     totals: dict[str, float] = {}
     steps = 0
+    started = time.monotonic()
     if training:
         optimizer.zero_grad(set_to_none=True)
     for source_batch in loader:
@@ -395,6 +398,11 @@ def run_epoch(
         for name, value in losses.items():
             totals[name] = totals.get(name, 0.0) + float(value.detach().float().cpu())
         steps += 1
+        if log_every and steps % log_every == 0:
+            print(json.dumps({"progress": True, "stage": config.stage.value,
+                              "mode": "train" if training else "validation", "steps": steps,
+                              "seconds": time.monotonic() - started,
+                              "loss": totals["loss"] / steps}), flush=True)
     if training and steps and steps % config.gradient_accumulation:
         if scaler is not None and scaler.is_enabled():
             scaler.unscale_(optimizer)

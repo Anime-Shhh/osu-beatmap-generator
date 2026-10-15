@@ -20,24 +20,32 @@ def main():
     parser.add_argument('--batch-size', type=int, default=2)
     parser.add_argument('--steps', type=int, default=8)
     parser.add_argument('--gradient-accumulation', type=int, default=1)
+    parser.add_argument('--planner-config', help='JSON overrides for the architecture being compared')
     args = parser.parse_args()
     rank = int(os.environ.get('RANK', 0))
     world = int(os.environ.get('WORLD_SIZE', 1))
     local = int(os.environ.get('LOCAL_RANK', 0))
     torch.cuda.set_device(local)
     device = torch.device('cuda', local)
-    torch.set_num_threads(2)
+    torch.set_num_threads(1)
     torch.manual_seed(1337)
     torch.backends.cuda.matmul.allow_tf32 = True
     if world > 1:
         dist.init_process_group('nccl')
-    dataset = SparseSongDataset(args.records_dir, split='train', sampling_mode='bar')
+    overrides = {}
+    if args.planner_config:
+        with open(args.planner_config) as handle:
+            overrides = json.load(handle)
+    planner_config = SparsePlannerConfig(**overrides)
+    dataset = SparseSongDataset(args.records_dir, split='train', sampling_mode='song',
+                                alignment_frames=planner_config.local_audio_tokens)
     # Identical batches across devices/configurations isolate GPU/DDP costs.
-    samples = [sample for i in range(min(200, len(dataset)))
+    indices = [i * (len(dataset) - 1) // 31 for i in range(32)]
+    samples = [sample for i in indices
                if (sample := dataset[i])['target']['event_kinds'].numel() > 0]
     batches = [collate_sparse_examples([samples[(i * args.batch_size + j) % len(samples)]
                                        for j in range(args.batch_size)]) for i in range(args.steps)]
-    planner = SparseEventPlanner(SparsePlannerConfig()).to(device)
+    planner = SparseEventPlanner(planner_config).to(device)
     geometry = ActiveEventGeometryDiffuser(GeometryDiffusionConfig(context_dim=768)).to(device)
     for stage in (TrainingStage.PLANNER, TrainingStage.GEOMETRY):
         config = TrainingConfig(stage=stage, mixed_precision='bf16',
@@ -64,6 +72,7 @@ def main():
         if rank == 0:
             print(json.dumps(dict(stage=stage.value, gpu=torch.cuda.get_device_name(local),
                                   world_size=world, batch_size=args.batch_size, steps=args.steps,
+                                  local_audio_tokens=planner_config.local_audio_tokens,
                                   seconds=seconds, examples_per_second=args.steps * args.batch_size * world / seconds,
                                   peak_memory_gb=torch.cuda.max_memory_allocated() / 1e9,
                                   diagnostic_only=True, metrics=metrics)), flush=True)

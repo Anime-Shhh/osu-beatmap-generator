@@ -28,7 +28,8 @@ def test_alignment_has_absolute_clock_and_cross_bar_slider_occupancy():
     from src.v2.timing import timing_map_from_points, TimingPoint
     timing = timing_map_from_points([TimingPoint(0,500), TimingPoint(1000,250)])
     queries = query_grid(timing,0,4,8)
-    torch.testing.assert_close(queries, torch.tensor([0.,250,500,750,1000,1125,1250,1375]))
+    torch.testing.assert_close(queries, torch.tensor([0.,250,500,750,1000,1125,1250,1375],
+                                                    dtype=torch.float64))
     targets = chart_targets(torch.tensor([1000.,1025,1050,1075]), [(900,1060,1),(1025,1025,0)])
     assert targets[:,3].tolist()==[1,1,1,0]
     assert targets[1,0]==1 and targets[3,0]==0
@@ -51,6 +52,32 @@ def test_audio_path_gets_gradients_and_targets_are_not_inputs(tmp_path):
     assert torch.isfinite(losses['alignment_loss'])
     with pytest.raises(ValueError,match='timestamped'):
         broken=dict(batch);del broken['local_query_times_ms'];forward_planner(planner,broken)
+
+
+def test_alignment_dataset_supports_spawned_loader_workers(tmp_path):
+    from torch.utils.data import DataLoader
+    record = records_fixture.SongRecordTests()._make_record_with_bars(2)
+    write_song_record(record, tmp_path / 'record.pt')
+    dataset = SparseSongDataset(tmp_path, sampling_mode='bar', alignment_frames=32)
+    loader = DataLoader(dataset, batch_size=2, num_workers=1,
+                        multiprocessing_context='spawn', timeout=20,
+                        collate_fn=collate_sparse_examples)
+    batch = next(iter(loader))
+    assert batch['local_query_times_ms'].shape == (2, 32)
+    assert batch['alignment_targets'].shape == (2, 32, 4)
+    assert torch.isfinite(batch['alignment_targets']).all()
+
+
+def test_short_late_bar_keeps_distinct_query_times(tmp_path):
+    from src.v2.timing import timing_map_from_points, TimingPoint
+    timing = timing_map_from_points([TimingPoint(0, 500)])
+    times = query_grid(timing, 1200., 0.00001, 32)
+    assert (times[1:] > times[:-1]).all()
+    assert not (times.float()[1:] > times.float()[:-1]).all()
+    batch, planner, _, _ = batch_and_model(tmp_path)
+    batch['local_query_times_ms'] = times.expand(2, -1)
+    output = forward_planner(planner, batch)
+    assert torch.isfinite(output['logits']).all()
 
 
 def test_cached_decode_uses_same_local_audio_as_training(tmp_path):
