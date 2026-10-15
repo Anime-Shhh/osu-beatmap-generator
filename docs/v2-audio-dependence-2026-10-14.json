@@ -1,0 +1,909 @@
+{
+  "schema": "v2-audio-interventions/1",
+  "model_revision": "checkpoint-43200-a991a335083180d0",
+  "split": "val",
+  "source_components": 20,
+  "bars": 80,
+  "seed": 1731,
+  "sample_indices": [
+    3891,
+    3703,
+    3884,
+    3676,
+    2153,
+    2258,
+    2451,
+    2235,
+    5911,
+    5921,
+    5889,
+    5931,
+    7020,
+    7052,
+    7033,
+    7037,
+    8075,
+    8277,
+    8244,
+    8291,
+    1940,
+    2007,
+    1848,
+    1889,
+    1183,
+    1084,
+    1116,
+    1317,
+    557,
+    407,
+    445,
+    430,
+    2773,
+    2810,
+    2641,
+    2631,
+    5997,
+    6070,
+    6453,
+    6235,
+    3293,
+    3157,
+    3119,
+    3250,
+    4361,
+    4642,
+    4122,
+    4457,
+    2950,
+    3031,
+    2933,
+    2957,
+    8550,
+    8403,
+    8401,
+    8402,
+    3606,
+    3620,
+    3577,
+    3554,
+    7201,
+    7341,
+    7591,
+    7095,
+    7871,
+    7872,
+    7881,
+    7928,
+    178,
+    168,
+    284,
+    293,
+    5631,
+    5081,
+    5620,
+    5537,
+    7809,
+    7805,
+    7737,
+    7797
+  ],
+  "metrics": {
+    "aligned": {
+      "all": {
+        "cross_entropy": 0.9389854015608087,
+        "accuracy": 0.7002989536621823,
+        "tokens": 2676
+      },
+      "control": {
+        "cross_entropy": 0.19483517360083594,
+        "accuracy": 0.9482288828337875,
+        "tokens": 367
+      },
+      "source:source:0e861ce48904e1be06414238e1558f5400ff95b04232ffca5de27aaca03701b6": {
+        "cross_entropy": 2.459937362553596,
+        "accuracy": 0.45714285714285713,
+        "tokens": 105
+      },
+      "offset": {
+        "cross_entropy": 2.0084685825512385,
+        "accuracy": 0.6062717770034843,
+        "tokens": 287
+      },
+      "snap": {
+        "cross_entropy": 0.21147776869624652,
+        "accuracy": 0.9512195121951219,
+        "tokens": 287
+      },
+      "residual": {
+        "cross_entropy": 2.0848172732632126,
+        "accuracy": 0.2578397212543554,
+        "tokens": 287
+      },
+      "kind": {
+        "cross_entropy": 0.7297155410375848,
+        "accuracy": 0.5993031358885017,
+        "tokens": 287
+      },
+      "combo": {
+        "cross_entropy": 0.506543531131246,
+        "accuracy": 0.8257839721254355,
+        "tokens": 287
+      },
+      "hit_sound": {
+        "cross_entropy": 0.8770132500155852,
+        "accuracy": 0.7003484320557491,
+        "tokens": 287
+      },
+      "duration": {
+        "cross_entropy": 2.118676388798744,
+        "accuracy": 0.47651006711409394,
+        "tokens": 149
+      },
+      "curve": {
+        "cross_entropy": 1.0189836026258665,
+        "accuracy": 0.5068493150684932,
+        "tokens": 146
+      },
+      "repeats": {
+        "cross_entropy": 0.33458475410429545,
+        "accuracy": 0.8904109589041096,
+        "tokens": 146
+      },
+      "anchors": {
+        "cross_entropy": 0.5886325147267312,
+        "accuracy": 0.821917808219178,
+        "tokens": 146
+      },
+      "source:source:1b7f537803c545805ed001e4879185f9b44f7bf34e24e1df90b648c4df3d4cf8": {
+        "cross_entropy": 0.946528376213811,
+        "accuracy": 0.6782608695652174,
+        "tokens": 115
+      },
+      "source:source:1f3c94327fffece054e721e1ac3011fe02dcc6d4e1350d786cb2cec1d9ff2b65": {
+        "cross_entropy": 0.5632560512918721,
+        "accuracy": 0.75,
+        "tokens": 344
+      },
+      "source:source:3a6fff2435d6fa0d67ac20b131a05d6e2715559f5720c51a2607bf0e5e0c13fe": {
+        "cross_entropy": 1.3643487681761648,
+        "accuracy": 0.6466165413533834,
+        "tokens": 133
+      },
+      "source:source:4ef45d29e0f01b5e1e71a94f1c9c1cad63e8412252351db934e0c68aee3636e5": {
+        "cross_entropy": 0.9217631706280981,
+        "accuracy": 0.6666666666666666,
+        "tokens": 51
+      },
+      "source:source:519940eb88e62a629545714e724b9b4b52cc80f8846a89417e0acb02462eaa23": {
+        "cross_entropy": 0.5882157118347372,
+        "accuracy": 0.7964601769911505,
+        "tokens": 113
+      },
+      "source:source:70047cf58d67127f03d8cfc4143ae7f5c4680d8a03727460a1967054ff3c21c4": {
+        "cross_entropy": 0.5798838640863845,
+        "accuracy": 0.7714285714285715,
+        "tokens": 140
+      },
+      "source:source:7532e75be9dece3dfe2a976f08196652a03b60f3a0b1fb6bec746088d877284f": {
+        "cross_entropy": 0.8220063075589333,
+        "accuracy": 0.6867469879518072,
+        "tokens": 83
+      },
+      "source:source:825b80b782ea0e0ade3d6007d50c2b4d5ac3bd54882c83073a463f5da6a8ba91": {
+        "cross_entropy": 1.1117609450946555,
+        "accuracy": 0.6,
+        "tokens": 70
+      },
+      "source:source:a0219fafed4980f3a2462c1b158ae5608f45ca08892946cb680a5c04c275da3b": {
+        "cross_entropy": 0.5537985483571395,
+        "accuracy": 0.7723577235772358,
+        "tokens": 123
+      },
+      "source:source:b367a639f40093b0da324d36f4a3f6c2abe694c8e13faf8345604e7823667b14": {
+        "cross_entropy": 0.6303270220015043,
+        "accuracy": 0.7264150943396226,
+        "tokens": 106
+      },
+      "source:source:b480a4688c5a7d09540e932090ff3d0b0664fa25fc6ca89fa3b687783f4e0561": {
+        "cross_entropy": 0.526492755887886,
+        "accuracy": 0.7769230769230769,
+        "tokens": 130
+      },
+      "source:source:b5f9dd2fd78da6c71e89093f133fd4ae9c58e2a37650d711836512dd2133e785": {
+        "cross_entropy": 0.534177000769661,
+        "accuracy": 0.7579908675799086,
+        "tokens": 219
+      },
+      "source:source:b61f586210a0888eb54c9615e1ef8374a0550d9e2310f14c8770054125887141": {
+        "cross_entropy": 0.8226922189298742,
+        "accuracy": 0.6896551724137931,
+        "tokens": 58
+      },
+      "source:source:bd5b1f1301a119f660d01a688954c7d7814e079576f94a2da873e8914f17e8ca": {
+        "cross_entropy": 1.4685261769982256,
+        "accuracy": 0.5588235294117647,
+        "tokens": 136
+      },
+      "source:source:be9acc86cdfe556ad7f43c2daf513faaec9b5256c3f93c6de0ba19cb3e6c6d60": {
+        "cross_entropy": 0.6791419283401579,
+        "accuracy": 0.7786259541984732,
+        "tokens": 131
+      },
+      "source:source:c86bae88de9959948487ea0f73ab3aa5079d2451baa6d894c9c6a05eede40922": {
+        "cross_entropy": 0.6852198677704194,
+        "accuracy": 0.7416666666666667,
+        "tokens": 120
+      },
+      "source:source:db7be7c2963ab6b831ed52a09f9d4f448f646a6d2f533df6a47812a230df48a0": {
+        "cross_entropy": 0.7274000791453558,
+        "accuracy": 0.725,
+        "tokens": 40
+      },
+      "source:source:e5eb3443fb09a71be5d0a0e8697494498a7d5813275bb11182c0aeb24ec7eebc": {
+        "cross_entropy": 1.5000192349717962,
+        "accuracy": 0.62,
+        "tokens": 200
+      },
+      "source:source:eaa8a3f6c5c668177a84c546bacaccda645272328e8a51f18f94bf099a84f934": {
+        "cross_entropy": 1.3959853658214674,
+        "accuracy": 0.6718146718146718,
+        "tokens": 259
+      }
+    },
+    "shift_137": {
+      "all": {
+        "cross_entropy": 0.9539232363911709,
+        "accuracy": 0.6961883408071748,
+        "tokens": 2676
+      },
+      "control": {
+        "cross_entropy": 0.22864525712322836,
+        "accuracy": 0.9291553133514986,
+        "tokens": 367
+      },
+      "source:source:0e861ce48904e1be06414238e1558f5400ff95b04232ffca5de27aaca03701b6": {
+        "cross_entropy": 2.350961153743126,
+        "accuracy": 0.47619047619047616,
+        "tokens": 105
+      },
+      "offset": {
+        "cross_entropy": 2.1052032239428473,
+        "accuracy": 0.5853658536585366,
+        "tokens": 287
+      },
+      "snap": {
+        "cross_entropy": 0.20302065364961422,
+        "accuracy": 0.9372822299651568,
+        "tokens": 287
+      },
+      "residual": {
+        "cross_entropy": 2.083066978443979,
+        "accuracy": 0.23344947735191637,
+        "tokens": 287
+      },
+      "kind": {
+        "cross_entropy": 0.7416952580176229,
+        "accuracy": 0.6062717770034843,
+        "tokens": 287
+      },
+      "combo": {
+        "cross_entropy": 0.5081766873816327,
+        "accuracy": 0.818815331010453,
+        "tokens": 287
+      },
+      "hit_sound": {
+        "cross_entropy": 0.8701604768651691,
+        "accuracy": 0.735191637630662,
+        "tokens": 287
+      },
+      "duration": {
+        "cross_entropy": 2.136098139963094,
+        "accuracy": 0.46308724832214765,
+        "tokens": 149
+      },
+      "curve": {
+        "cross_entropy": 0.9697588405839793,
+        "accuracy": 0.541095890410959,
+        "tokens": 146
+      },
+      "repeats": {
+        "cross_entropy": 0.3595609026065986,
+        "accuracy": 0.8972602739726028,
+        "tokens": 146
+      },
+      "anchors": {
+        "cross_entropy": 0.6005252396292746,
+        "accuracy": 0.815068493150685,
+        "tokens": 146
+      },
+      "source:source:1b7f537803c545805ed001e4879185f9b44f7bf34e24e1df90b648c4df3d4cf8": {
+        "cross_entropy": 0.8860574177398344,
+        "accuracy": 0.6782608695652174,
+        "tokens": 115
+      },
+      "source:source:1f3c94327fffece054e721e1ac3011fe02dcc6d4e1350d786cb2cec1d9ff2b65": {
+        "cross_entropy": 0.5652216505930092,
+        "accuracy": 0.7587209302325582,
+        "tokens": 344
+      },
+      "source:source:3a6fff2435d6fa0d67ac20b131a05d6e2715559f5720c51a2607bf0e5e0c13fe": {
+        "cross_entropy": 1.367927947174546,
+        "accuracy": 0.6466165413533834,
+        "tokens": 133
+      },
+      "source:source:4ef45d29e0f01b5e1e71a94f1c9c1cad63e8412252351db934e0c68aee3636e5": {
+        "cross_entropy": 0.9875686301645527,
+        "accuracy": 0.6862745098039216,
+        "tokens": 51
+      },
+      "source:source:519940eb88e62a629545714e724b9b4b52cc80f8846a89417e0acb02462eaa23": {
+        "cross_entropy": 0.5936281357581462,
+        "accuracy": 0.7522123893805309,
+        "tokens": 113
+      },
+      "source:source:70047cf58d67127f03d8cfc4143ae7f5c4680d8a03727460a1967054ff3c21c4": {
+        "cross_entropy": 0.6132443618990572,
+        "accuracy": 0.7428571428571429,
+        "tokens": 140
+      },
+      "source:source:7532e75be9dece3dfe2a976f08196652a03b60f3a0b1fb6bec746088d877284f": {
+        "cross_entropy": 0.9033115064664848,
+        "accuracy": 0.6506024096385542,
+        "tokens": 83
+      },
+      "source:source:825b80b782ea0e0ade3d6007d50c2b4d5ac3bd54882c83073a463f5da6a8ba91": {
+        "cross_entropy": 1.1010849646109815,
+        "accuracy": 0.6428571428571429,
+        "tokens": 70
+      },
+      "source:source:a0219fafed4980f3a2462c1b158ae5608f45ca08892946cb680a5c04c275da3b": {
+        "cross_entropy": 0.5628102049282192,
+        "accuracy": 0.7886178861788617,
+        "tokens": 123
+      },
+      "source:source:b367a639f40093b0da324d36f4a3f6c2abe694c8e13faf8345604e7823667b14": {
+        "cross_entropy": 0.6523513635885175,
+        "accuracy": 0.7264150943396226,
+        "tokens": 106
+      },
+      "source:source:b480a4688c5a7d09540e932090ff3d0b0664fa25fc6ca89fa3b687783f4e0561": {
+        "cross_entropy": 0.5172891791569759,
+        "accuracy": 0.7923076923076923,
+        "tokens": 130
+      },
+      "source:source:b5f9dd2fd78da6c71e89093f133fd4ae9c58e2a37650d711836512dd2133e785": {
+        "cross_entropy": 0.5322318234872647,
+        "accuracy": 0.7579908675799086,
+        "tokens": 219
+      },
+      "source:source:b61f586210a0888eb54c9615e1ef8374a0550d9e2310f14c8770054125887141": {
+        "cross_entropy": 0.8486981897846564,
+        "accuracy": 0.6551724137931034,
+        "tokens": 58
+      },
+      "source:source:bd5b1f1301a119f660d01a688954c7d7814e079576f94a2da873e8914f17e8ca": {
+        "cross_entropy": 1.5916546943166368,
+        "accuracy": 0.5073529411764706,
+        "tokens": 136
+      },
+      "source:source:be9acc86cdfe556ad7f43c2daf513faaec9b5256c3f93c6de0ba19cb3e6c6d60": {
+        "cross_entropy": 0.6631178886893863,
+        "accuracy": 0.7709923664122137,
+        "tokens": 131
+      },
+      "source:source:c86bae88de9959948487ea0f73ab3aa5079d2451baa6d894c9c6a05eede40922": {
+        "cross_entropy": 0.665353334012509,
+        "accuracy": 0.725,
+        "tokens": 120
+      },
+      "source:source:db7be7c2963ab6b831ed52a09f9d4f448f646a6d2f533df6a47812a230df48a0": {
+        "cross_entropy": 0.818020485313778,
+        "accuracy": 0.725,
+        "tokens": 40
+      },
+      "source:source:e5eb3443fb09a71be5d0a0e8697494498a7d5813275bb11182c0aeb24ec7eebc": {
+        "cross_entropy": 1.5228444218495025,
+        "accuracy": 0.62,
+        "tokens": 200
+      },
+      "source:source:eaa8a3f6c5c668177a84c546bacaccda645272328e8a51f18f94bf099a84f934": {
+        "cross_entropy": 1.4685639220831244,
+        "accuracy": 0.6718146718146718,
+        "tokens": 259
+      }
+    },
+    "shift_997": {
+      "all": {
+        "cross_entropy": 0.9469285282505591,
+        "accuracy": 0.695067264573991,
+        "tokens": 2676
+      },
+      "control": {
+        "cross_entropy": 0.20784662953104382,
+        "accuracy": 0.9400544959128065,
+        "tokens": 367
+      },
+      "source:source:0e861ce48904e1be06414238e1558f5400ff95b04232ffca5de27aaca03701b6": {
+        "cross_entropy": 2.4692752210701916,
+        "accuracy": 0.4666666666666667,
+        "tokens": 105
+      },
+      "offset": {
+        "cross_entropy": 2.0987054305337693,
+        "accuracy": 0.5714285714285714,
+        "tokens": 287
+      },
+      "snap": {
+        "cross_entropy": 0.18939800927700357,
+        "accuracy": 0.9477351916376306,
+        "tokens": 287
+      },
+      "residual": {
+        "cross_entropy": 1.9971511677809657,
+        "accuracy": 0.2682926829268293,
+        "tokens": 287
+      },
+      "kind": {
+        "cross_entropy": 0.7425280686294277,
+        "accuracy": 0.5853658536585366,
+        "tokens": 287
+      },
+      "combo": {
+        "cross_entropy": 0.5238578821530806,
+        "accuracy": 0.8153310104529616,
+        "tokens": 287
+      },
+      "hit_sound": {
+        "cross_entropy": 0.8811737010774661,
+        "accuracy": 0.7003484320557491,
+        "tokens": 287
+      },
+      "duration": {
+        "cross_entropy": 2.2384111705492407,
+        "accuracy": 0.5033557046979866,
+        "tokens": 149
+      },
+      "curve": {
+        "cross_entropy": 0.9514619530599615,
+        "accuracy": 0.5205479452054794,
+        "tokens": 146
+      },
+      "repeats": {
+        "cross_entropy": 0.3600421924808235,
+        "accuracy": 0.8835616438356164,
+        "tokens": 146
+      },
+      "anchors": {
+        "cross_entropy": 0.5923319618984214,
+        "accuracy": 0.815068493150685,
+        "tokens": 146
+      },
+      "source:source:1b7f537803c545805ed001e4879185f9b44f7bf34e24e1df90b648c4df3d4cf8": {
+        "cross_entropy": 0.9302522434593564,
+        "accuracy": 0.6608695652173913,
+        "tokens": 115
+      },
+      "source:source:1f3c94327fffece054e721e1ac3011fe02dcc6d4e1350d786cb2cec1d9ff2b65": {
+        "cross_entropy": 0.5555282889979065,
+        "accuracy": 0.752906976744186,
+        "tokens": 344
+      },
+      "source:source:3a6fff2435d6fa0d67ac20b131a05d6e2715559f5720c51a2607bf0e5e0c13fe": {
+        "cross_entropy": 1.3925552127857654,
+        "accuracy": 0.6165413533834586,
+        "tokens": 133
+      },
+      "source:source:4ef45d29e0f01b5e1e71a94f1c9c1cad63e8412252351db934e0c68aee3636e5": {
+        "cross_entropy": 1.0145593322812274,
+        "accuracy": 0.6862745098039216,
+        "tokens": 51
+      },
+      "source:source:519940eb88e62a629545714e724b9b4b52cc80f8846a89417e0acb02462eaa23": {
+        "cross_entropy": 0.6263986266373611,
+        "accuracy": 0.7256637168141593,
+        "tokens": 113
+      },
+      "source:source:70047cf58d67127f03d8cfc4143ae7f5c4680d8a03727460a1967054ff3c21c4": {
+        "cross_entropy": 0.5875695222961799,
+        "accuracy": 0.7714285714285715,
+        "tokens": 140
+      },
+      "source:source:7532e75be9dece3dfe2a976f08196652a03b60f3a0b1fb6bec746088d877284f": {
+        "cross_entropy": 0.9247637113273477,
+        "accuracy": 0.6506024096385542,
+        "tokens": 83
+      },
+      "source:source:825b80b782ea0e0ade3d6007d50c2b4d5ac3bd54882c83073a463f5da6a8ba91": {
+        "cross_entropy": 1.051302653509847,
+        "accuracy": 0.6571428571428571,
+        "tokens": 70
+      },
+      "source:source:a0219fafed4980f3a2462c1b158ae5608f45ca08892946cb680a5c04c275da3b": {
+        "cross_entropy": 0.5546824321166586,
+        "accuracy": 0.7804878048780488,
+        "tokens": 123
+      },
+      "source:source:b367a639f40093b0da324d36f4a3f6c2abe694c8e13faf8345604e7823667b14": {
+        "cross_entropy": 0.6430844510498014,
+        "accuracy": 0.7358490566037735,
+        "tokens": 106
+      },
+      "source:source:b480a4688c5a7d09540e932090ff3d0b0664fa25fc6ca89fa3b687783f4e0561": {
+        "cross_entropy": 0.5258803538949547,
+        "accuracy": 0.7538461538461538,
+        "tokens": 130
+      },
+      "source:source:b5f9dd2fd78da6c71e89093f133fd4ae9c58e2a37650d711836512dd2133e785": {
+        "cross_entropy": 0.52628471575598,
+        "accuracy": 0.7853881278538812,
+        "tokens": 219
+      },
+      "source:source:b61f586210a0888eb54c9615e1ef8374a0550d9e2310f14c8770054125887141": {
+        "cross_entropy": 0.7477035776448089,
+        "accuracy": 0.6724137931034483,
+        "tokens": 58
+      },
+      "source:source:bd5b1f1301a119f660d01a688954c7d7814e079576f94a2da873e8914f17e8ca": {
+        "cross_entropy": 1.518971379173937,
+        "accuracy": 0.5441176470588235,
+        "tokens": 136
+      },
+      "source:source:be9acc86cdfe556ad7f43c2daf513faaec9b5256c3f93c6de0ba19cb3e6c6d60": {
+        "cross_entropy": 0.6573946501416336,
+        "accuracy": 0.7480916030534351,
+        "tokens": 131
+      },
+      "source:source:c86bae88de9959948487ea0f73ab3aa5079d2451baa6d894c9c6a05eede40922": {
+        "cross_entropy": 0.6271917690233418,
+        "accuracy": 0.775,
+        "tokens": 120
+      },
+      "source:source:db7be7c2963ab6b831ed52a09f9d4f448f646a6d2f533df6a47812a230df48a0": {
+        "cross_entropy": 0.7137700921299966,
+        "accuracy": 0.7,
+        "tokens": 40
+      },
+      "source:source:e5eb3443fb09a71be5d0a0e8697494498a7d5813275bb11182c0aeb24ec7eebc": {
+        "cross_entropy": 1.5573464333585882,
+        "accuracy": 0.59,
+        "tokens": 200
+      },
+      "source:source:eaa8a3f6c5c668177a84c546bacaccda645272328e8a51f18f94bf099a84f934": {
+        "cross_entropy": 1.4089651598878985,
+        "accuracy": 0.6756756756756757,
+        "tokens": 259
+      }
+    },
+    "zero_audio": {
+      "all": {
+        "cross_entropy": 0.9485604578382058,
+        "accuracy": 0.695067264573991,
+        "tokens": 2676
+      },
+      "control": {
+        "cross_entropy": 0.20088251268498922,
+        "accuracy": 0.9373297002724795,
+        "tokens": 367
+      },
+      "source:source:0e861ce48904e1be06414238e1558f5400ff95b04232ffca5de27aaca03701b6": {
+        "cross_entropy": 2.578292662906183,
+        "accuracy": 0.42857142857142855,
+        "tokens": 105
+      },
+      "offset": {
+        "cross_entropy": 2.1695978859673133,
+        "accuracy": 0.5958188153310104,
+        "tokens": 287
+      },
+      "snap": {
+        "cross_entropy": 0.18514610873883347,
+        "accuracy": 0.9442508710801394,
+        "tokens": 287
+      },
+      "residual": {
+        "cross_entropy": 2.0003399195454574,
+        "accuracy": 0.27526132404181186,
+        "tokens": 287
+      },
+      "kind": {
+        "cross_entropy": 0.6940467681132179,
+        "accuracy": 0.6097560975609756,
+        "tokens": 287
+      },
+      "combo": {
+        "cross_entropy": 0.4707779552477642,
+        "accuracy": 0.8153310104529616,
+        "tokens": 287
+      },
+      "hit_sound": {
+        "cross_entropy": 0.8956885953686924,
+        "accuracy": 0.6968641114982579,
+        "tokens": 287
+      },
+      "duration": {
+        "cross_entropy": 2.2516615052126197,
+        "accuracy": 0.436241610738255,
+        "tokens": 149
+      },
+      "curve": {
+        "cross_entropy": 1.0077642741778943,
+        "accuracy": 0.4931506849315068,
+        "tokens": 146
+      },
+      "repeats": {
+        "cross_entropy": 0.42009950415725655,
+        "accuracy": 0.8698630136986302,
+        "tokens": 146
+      },
+      "anchors": {
+        "cross_entropy": 0.5437111043863534,
+        "accuracy": 0.8356164383561644,
+        "tokens": 146
+      },
+      "source:source:1b7f537803c545805ed001e4879185f9b44f7bf34e24e1df90b648c4df3d4cf8": {
+        "cross_entropy": 0.8941563772930623,
+        "accuracy": 0.6869565217391305,
+        "tokens": 115
+      },
+      "source:source:1f3c94327fffece054e721e1ac3011fe02dcc6d4e1350d786cb2cec1d9ff2b65": {
+        "cross_entropy": 0.5378403737242073,
+        "accuracy": 0.7790697674418605,
+        "tokens": 344
+      },
+      "source:source:3a6fff2435d6fa0d67ac20b131a05d6e2715559f5720c51a2607bf0e5e0c13fe": {
+        "cross_entropy": 1.5391448887300703,
+        "accuracy": 0.6165413533834586,
+        "tokens": 133
+      },
+      "source:source:4ef45d29e0f01b5e1e71a94f1c9c1cad63e8412252351db934e0c68aee3636e5": {
+        "cross_entropy": 0.9559830973753579,
+        "accuracy": 0.6274509803921569,
+        "tokens": 51
+      },
+      "source:source:519940eb88e62a629545714e724b9b4b52cc80f8846a89417e0acb02462eaa23": {
+        "cross_entropy": 0.6149382867396067,
+        "accuracy": 0.7522123893805309,
+        "tokens": 113
+      },
+      "source:source:70047cf58d67127f03d8cfc4143ae7f5c4680d8a03727460a1967054ff3c21c4": {
+        "cross_entropy": 0.594317355810756,
+        "accuracy": 0.7428571428571429,
+        "tokens": 140
+      },
+      "source:source:7532e75be9dece3dfe2a976f08196652a03b60f3a0b1fb6bec746088d877284f": {
+        "cross_entropy": 0.857450584065971,
+        "accuracy": 0.6265060240963856,
+        "tokens": 83
+      },
+      "source:source:825b80b782ea0e0ade3d6007d50c2b4d5ac3bd54882c83073a463f5da6a8ba91": {
+        "cross_entropy": 0.9923649923822495,
+        "accuracy": 0.6285714285714286,
+        "tokens": 70
+      },
+      "source:source:a0219fafed4980f3a2462c1b158ae5608f45ca08892946cb680a5c04c275da3b": {
+        "cross_entropy": 0.5912794860289796,
+        "accuracy": 0.7723577235772358,
+        "tokens": 123
+      },
+      "source:source:b367a639f40093b0da324d36f4a3f6c2abe694c8e13faf8345604e7823667b14": {
+        "cross_entropy": 0.6922405481607573,
+        "accuracy": 0.7075471698113207,
+        "tokens": 106
+      },
+      "source:source:b480a4688c5a7d09540e932090ff3d0b0664fa25fc6ca89fa3b687783f4e0561": {
+        "cross_entropy": 0.51999086769588,
+        "accuracy": 0.7615384615384615,
+        "tokens": 130
+      },
+      "source:source:b5f9dd2fd78da6c71e89093f133fd4ae9c58e2a37650d711836512dd2133e785": {
+        "cross_entropy": 0.5414769818108696,
+        "accuracy": 0.7579908675799086,
+        "tokens": 219
+      },
+      "source:source:b61f586210a0888eb54c9615e1ef8374a0550d9e2310f14c8770054125887141": {
+        "cross_entropy": 0.872071475803168,
+        "accuracy": 0.6206896551724138,
+        "tokens": 58
+      },
+      "source:source:bd5b1f1301a119f660d01a688954c7d7814e079576f94a2da873e8914f17e8ca": {
+        "cross_entropy": 1.5440020640826067,
+        "accuracy": 0.5367647058823529,
+        "tokens": 136
+      },
+      "source:source:be9acc86cdfe556ad7f43c2daf513faaec9b5256c3f93c6de0ba19cb3e6c6d60": {
+        "cross_entropy": 0.68042807418033,
+        "accuracy": 0.7557251908396947,
+        "tokens": 131
+      },
+      "source:source:c86bae88de9959948487ea0f73ab3aa5079d2451baa6d894c9c6a05eede40922": {
+        "cross_entropy": 0.6263242149657628,
+        "accuracy": 0.75,
+        "tokens": 120
+      },
+      "source:source:db7be7c2963ab6b831ed52a09f9d4f448f646a6d2f533df6a47812a230df48a0": {
+        "cross_entropy": 0.8826257998811485,
+        "accuracy": 0.7,
+        "tokens": 40
+      },
+      "source:source:e5eb3443fb09a71be5d0a0e8697494498a7d5813275bb11182c0aeb24ec7eebc": {
+        "cross_entropy": 1.577391112121652,
+        "accuracy": 0.62,
+        "tokens": 200
+      },
+      "source:source:eaa8a3f6c5c668177a84c546bacaccda645272328e8a51f18f94bf099a84f934": {
+        "cross_entropy": 1.2550747503665767,
+        "accuracy": 0.7104247104247104,
+        "tokens": 259
+      }
+    },
+    "no_history": {
+      "all": {
+        "cross_entropy": 1.016862322585969,
+        "accuracy": 0.6752615844544095,
+        "tokens": 2676
+      },
+      "control": {
+        "cross_entropy": 0.2610188393419387,
+        "accuracy": 0.9237057220708447,
+        "tokens": 367
+      },
+      "source:source:0e861ce48904e1be06414238e1558f5400ff95b04232ffca5de27aaca03701b6": {
+        "cross_entropy": 2.6959219085629837,
+        "accuracy": 0.4095238095238095,
+        "tokens": 105
+      },
+      "offset": {
+        "cross_entropy": 2.36739761042506,
+        "accuracy": 0.5087108013937283,
+        "tokens": 287
+      },
+      "snap": {
+        "cross_entropy": 0.24437850141076006,
+        "accuracy": 0.9372822299651568,
+        "tokens": 287
+      },
+      "residual": {
+        "cross_entropy": 2.100078816996167,
+        "accuracy": 0.23693379790940766,
+        "tokens": 287
+      },
+      "kind": {
+        "cross_entropy": 0.7443037038143295,
+        "accuracy": 0.5818815331010453,
+        "tokens": 287
+      },
+      "combo": {
+        "cross_entropy": 0.5617359437158767,
+        "accuracy": 0.7874564459930313,
+        "tokens": 287
+      },
+      "hit_sound": {
+        "cross_entropy": 0.8864145170206055,
+        "accuracy": 0.7003484320557491,
+        "tokens": 287
+      },
+      "duration": {
+        "cross_entropy": 2.2369884011529435,
+        "accuracy": 0.47651006711409394,
+        "tokens": 149
+      },
+      "curve": {
+        "cross_entropy": 1.0840653703127006,
+        "accuracy": 0.4726027397260274,
+        "tokens": 146
+      },
+      "repeats": {
+        "cross_entropy": 0.36193610738053095,
+        "accuracy": 0.8904109589041096,
+        "tokens": 146
+      },
+      "anchors": {
+        "cross_entropy": 0.6805853690801161,
+        "accuracy": 0.8287671232876712,
+        "tokens": 146
+      },
+      "source:source:1b7f537803c545805ed001e4879185f9b44f7bf34e24e1df90b648c4df3d4cf8": {
+        "cross_entropy": 1.047167607196542,
+        "accuracy": 0.6608695652173913,
+        "tokens": 115
+      },
+      "source:source:1f3c94327fffece054e721e1ac3011fe02dcc6d4e1350d786cb2cec1d9ff2b65": {
+        "cross_entropy": 0.573793110825469,
+        "accuracy": 0.7674418604651163,
+        "tokens": 344
+      },
+      "source:source:3a6fff2435d6fa0d67ac20b131a05d6e2715559f5720c51a2607bf0e5e0c13fe": {
+        "cross_entropy": 1.4283748840301764,
+        "accuracy": 0.6090225563909775,
+        "tokens": 133
+      },
+      "source:source:4ef45d29e0f01b5e1e71a94f1c9c1cad63e8412252351db934e0c68aee3636e5": {
+        "cross_entropy": 0.9671010133845747,
+        "accuracy": 0.6078431372549019,
+        "tokens": 51
+      },
+      "source:source:519940eb88e62a629545714e724b9b4b52cc80f8846a89417e0acb02462eaa23": {
+        "cross_entropy": 0.6766465826361235,
+        "accuracy": 0.7699115044247787,
+        "tokens": 113
+      },
+      "source:source:70047cf58d67127f03d8cfc4143ae7f5c4680d8a03727460a1967054ff3c21c4": {
+        "cross_entropy": 0.6502722442856302,
+        "accuracy": 0.7428571428571429,
+        "tokens": 140
+      },
+      "source:source:7532e75be9dece3dfe2a976f08196652a03b60f3a0b1fb6bec746088d877284f": {
+        "cross_entropy": 0.9798255620372844,
+        "accuracy": 0.6385542168674698,
+        "tokens": 83
+      },
+      "source:source:825b80b782ea0e0ade3d6007d50c2b4d5ac3bd54882c83073a463f5da6a8ba91": {
+        "cross_entropy": 1.1911408684130464,
+        "accuracy": 0.6,
+        "tokens": 70
+      },
+      "source:source:a0219fafed4980f3a2462c1b158ae5608f45ca08892946cb680a5c04c275da3b": {
+        "cross_entropy": 0.6061497235223312,
+        "accuracy": 0.7479674796747967,
+        "tokens": 123
+      },
+      "source:source:b367a639f40093b0da324d36f4a3f6c2abe694c8e13faf8345604e7823667b14": {
+        "cross_entropy": 0.7152735013108708,
+        "accuracy": 0.7075471698113207,
+        "tokens": 106
+      },
+      "source:source:b480a4688c5a7d09540e932090ff3d0b0664fa25fc6ca89fa3b687783f4e0561": {
+        "cross_entropy": 0.581261650250408,
+        "accuracy": 0.7384615384615385,
+        "tokens": 130
+      },
+      "source:source:b5f9dd2fd78da6c71e89093f133fd4ae9c58e2a37650d711836512dd2133e785": {
+        "cross_entropy": 0.5655336548864519,
+        "accuracy": 0.730593607305936,
+        "tokens": 219
+      },
+      "source:source:b61f586210a0888eb54c9615e1ef8374a0550d9e2310f14c8770054125887141": {
+        "cross_entropy": 1.0376748412885817,
+        "accuracy": 0.6724137931034483,
+        "tokens": 58
+      },
+      "source:source:bd5b1f1301a119f660d01a688954c7d7814e079576f94a2da873e8914f17e8ca": {
+        "cross_entropy": 1.699761836965335,
+        "accuracy": 0.5367647058823529,
+        "tokens": 136
+      },
+      "source:source:be9acc86cdfe556ad7f43c2daf513faaec9b5256c3f93c6de0ba19cb3e6c6d60": {
+        "cross_entropy": 0.7286754622066387,
+        "accuracy": 0.7251908396946565,
+        "tokens": 131
+      },
+      "source:source:c86bae88de9959948487ea0f73ab3aa5079d2451baa6d894c9c6a05eede40922": {
+        "cross_entropy": 0.7892127794156331,
+        "accuracy": 0.6916666666666667,
+        "tokens": 120
+      },
+      "source:source:db7be7c2963ab6b831ed52a09f9d4f448f646a6d2f533df6a47812a230df48a0": {
+        "cross_entropy": 0.8593530042307542,
+        "accuracy": 0.7,
+        "tokens": 40
+      },
+      "source:source:e5eb3443fb09a71be5d0a0e8697494498a7d5813275bb11182c0aeb24ec7eebc": {
+        "cross_entropy": 1.506060183622431,
+        "accuracy": 0.6,
+        "tokens": 200
+      },
+      "source:source:eaa8a3f6c5c668177a84c546bacaccda645272328e8a51f18f94bf099a84f934": {
+        "cross_entropy": 1.4743238589779923,
+        "accuracy": 0.637065637065637,
+        "tokens": 259
+      }
+    }
+  },
+  "seconds": 20.83046298008412,
+  "limitations": [
+    "Reference current prefixes and oracle clocks remain fixed.",
+    "Zero features are an out-of-distribution control, not literal digital silence.",
+    "Shifts wrap within valid audio frames; shifts are rounded to each stream frame rate.",
+    "Sensitivity does not prove correct musical attribution; no instrument labels are available."
+  ]
+}

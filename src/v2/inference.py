@@ -662,7 +662,23 @@ def _sample_candidate_map(
         profile,
         clock,
         bar_mask=bar_mask,
+        return_local_frames=bool(planner.config.local_audio_tokens),
     )
+    local_frames = None
+    if planner.config.local_audio_tokens:
+        memory, local_frames = memory
+
+    def memory_for_bar(bar):
+        if not planner.config.local_audio_tokens:
+            return memory, bar_mask
+        from .alignment import query_grid
+        queries = query_grid(hypothesis.timing_map, bar.start_beat, bar.length_beats,
+                             planner.config.local_audio_tokens).to(device).unsqueeze(0)
+        augmented, mask, _, _ = planner.local_audio_memory(
+            memory, local_frames, rhythm, rhythm_times, queries,
+            torch.tensor([bar.bar_index], device=device), bar_mask=bar_mask)
+        return augmented, mask
+
     generator = torch.Generator(device=device)
     generator.manual_seed(int(seed))
     codec = BarEventCodec(planner.vocabulary)
@@ -690,9 +706,10 @@ def _sample_candidate_map(
     gap_beats = ((minimum_start_gap_ms + 1.0) / min(s.beat_length_ms for s in hypothesis.timing_map.segments)
                  if minimum_start_gap_ms else 0.0)
     for bar in bars:
+        decode_memory, decode_mask = memory_for_bar(bar)
         tokens = planner.generate_bar(
-            memory,
-            memory_mask=bar_mask,
+            decode_memory,
+            memory_mask=decode_mask,
             target_bar_index=bar.bar_index,
             bar_length_beats=bar.length_beats,
             minimum_start_gap_beats=gap_beats,
@@ -719,11 +736,12 @@ def _sample_candidate_map(
             if prior_tokens is None
             else torch.tensor(prior_tokens, dtype=torch.long, device=device).unsqueeze(0)
         )
+        decode_memory, decode_mask = memory_for_bar(bar)
         hidden = planner.decode_hidden(
             token_tensor,
-            memory,
+            decode_memory,
             target_bar_index=torch.tensor([bar.bar_index], device=device),
-            memory_mask=bar_mask,
+            memory_mask=decode_mask,
             previous_bar_tokens=prior_tensor,
             previous_bar_mask=None if prior_tensor is None else torch.ones_like(prior_tensor, dtype=torch.bool),
         )

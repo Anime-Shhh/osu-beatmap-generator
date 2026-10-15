@@ -21,6 +21,12 @@ full design in [plans/tempo-posterior-hierarchical-event-diffusion.md](plans/tem
 
 ## V2 status and safety
 
+**Audio alignment follow-up (October 14):** the trained planner showed weak
+paired sensitivity to shifted/zeroed audio in a validation diagnostic. The new
+opt-in [local-audio preset and research report](docs/v2-audio-alignment-2026-10-14.md)
+adds within-bar decoder memory and chart-alignment supervision while preserving
+legacy checkpoints. It requires fine-tuning; improved map quality is not yet established.
+
 **October 13 audit:** the previous `run_20261010_v2` used six synthetic sine-wave
 tracks falsely labeled as ranked data and a planner-only checkpoint with random
 geometry. It is not a usable trained model. The preserved baseline is `f499bd4`.

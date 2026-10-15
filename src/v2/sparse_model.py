@@ -43,8 +43,11 @@ class SparsePlannerConfig:
     max_bars: int = 512
     max_decoder_tokens: int = 2048
     profile_dropout: float = 0.15
+    local_audio_tokens: int = 0  # 0 preserves trained legacy checkpoint behavior.
 
     def __post_init__(self) -> None:
+        if self.local_audio_tokens != 0 and not 2 <= self.local_audio_tokens <= 512:
+            raise ValueError("local_audio_tokens must be zero or in [2,512]")
         if self.model_dim % self.heads:
             raise ValueError("model_dim must be divisible by heads")
         if self.profile_dropout < 0.0 or self.profile_dropout >= 1.0:
@@ -285,6 +288,10 @@ class SparseEventPlanner(nn.Module):
         self.no_boundary = nn.Parameter(torch.zeros(config.model_dim))
         self.output_norm = nn.LayerNorm(config.model_dim)
         self.output = nn.Linear(config.model_dim, len(self.vocabulary))
+        if config.local_audio_tokens:
+            self.local_audio_projection = nn.Linear(config.model_dim // 2 + config.rhythm_dim, config.model_dim)
+            self.local_audio_norm = nn.LayerNorm(config.model_dim)
+            self.alignment_head = nn.Linear(config.model_dim, 4)
 
     def _profile_embedding(
         self,
@@ -320,7 +327,8 @@ class SparseEventPlanner(nn.Module):
         rhythm_mask: Optional[torch.Tensor] = None,
         semantic_mask: Optional[torch.Tensor] = None,
         drop_profile: bool | torch.Tensor = False,
-    ) -> torch.Tensor:
+        return_local_frames: bool = False,
+    ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         if bar_mid_times_ms.dim() != 2:
             raise ValueError("bar_mid_times_ms must be [B,bars]")
         bars = self.audio_encoder(
@@ -331,7 +339,10 @@ class SparseEventPlanner(nn.Module):
             bar_mid_times_ms,
             rhythm_mask=rhythm_mask,
             semantic_mask=semantic_mask,
+            return_local_frames=return_local_frames,
         )
+        if return_local_frames:
+            bars, local_frames = bars
         if bars.shape[1] > self.config.max_bars:
             raise ValueError("bar count exceeds configured max_bars")
         positions = torch.arange(bars.shape[1], device=bars.device).unsqueeze(0)
@@ -344,7 +355,47 @@ class SparseEventPlanner(nn.Module):
             raise ValueError("bar_mask must be [B,bars]")
         bars = bars * bar_mask.unsqueeze(-1).to(bars.dtype)
         encoded = self.bar_encoder(bars, src_key_padding_mask=~bar_mask)
-        return encoded * bar_mask.unsqueeze(-1).to(encoded.dtype)
+        encoded = encoded * bar_mask.unsqueeze(-1).to(encoded.dtype)
+        return (encoded, local_frames) if return_local_frames else encoded
+
+    def local_audio_memory(self, bar_memory, local_frames, rhythm_features, rhythm_times_ms,
+                           query_times_ms, target_bar_index, *, rhythm_mask=None,
+                           bar_mask=None, query_mask=None):
+        """Append ordered target-bar audio frames; keep bar indices unchanged.
+
+        Chart labels never enter this path. The auxiliary head sees only audio
+        plus clock/profile-conditioned bar context, not token-prefix history.
+        """
+        if not self.config.local_audio_tokens:
+            raise ValueError("local audio memory is disabled in this checkpoint")
+        if query_times_ms.shape != (bar_memory.shape[0], self.config.local_audio_tokens):
+            raise ValueError("query grid does not match checkpoint local_audio_tokens")
+        if not torch.isfinite(query_times_ms).all() or (query_times_ms[:,1:] <= query_times_ms[:,:-1]).any():
+            raise ValueError("local query times must be finite and strictly increasing")
+        sampled = sample_features_at_times(local_frames, rhythm_times_ms, query_times_ms, valid_mask=rhythm_mask)
+        raw = sample_features_at_times(rhythm_features, rhythm_times_ms, query_times_ms, valid_mask=rhythm_mask)
+        # Raw features bypass temporal normalization, preserving relative energy
+        # and sharp attacks alongside the learned receptive-field features.
+        audio = self.local_audio_projection(torch.cat((sampled, raw), dim=-1))
+        phase = torch.arange(query_times_ms.shape[1], device=audio.device).float()
+        frequencies = torch.exp(torch.arange((audio.shape[-1]+1)//2, device=audio.device).float()
+                                * (-math.log(10000.) / max(audio.shape[-1]//2-1, 1)))
+        angles = phase[:,None] * frequencies[None,:]
+        position = torch.cat((angles.sin(), angles.cos()), dim=-1)[:,:audio.shape[-1]]
+        context = bar_memory.gather(1, target_bar_index[:,None,None].expand(-1,1,bar_memory.shape[-1]))
+        audio = self.local_audio_norm(audio + position.unsqueeze(0) + context)
+        if bar_mask is None:
+            bar_mask = torch.ones(bar_memory.shape[:2], device=audio.device, dtype=torch.bool)
+        if rhythm_mask is None:
+            rhythm_mask = torch.ones(rhythm_times_ms.shape, device=audio.device, dtype=torch.bool)
+        first = rhythm_times_ms.masked_fill(~rhythm_mask, float('inf')).min(dim=1).values
+        last = rhythm_times_ms.masked_fill(~rhythm_mask, -float('inf')).max(dim=1).values
+        valid = (query_times_ms >= first[:,None]) & (query_times_ms <= last[:,None])
+        if query_mask is not None:
+            valid = valid & query_mask
+        audio = audio * valid.unsqueeze(-1)
+        return (torch.cat((bar_memory, audio), dim=1), torch.cat((bar_mask, valid), dim=1),
+                self.alignment_head(audio), valid)
 
     def _boundary_embedding(
         self,
@@ -648,6 +699,8 @@ class SparseEventPlanner(nn.Module):
         previous_bar_tokens: Optional[torch.Tensor] = None,
         previous_bar_mask: Optional[torch.Tensor] = None,
         drop_boundary: bool | torch.Tensor = False,
+        local_query_times_ms: Optional[torch.Tensor] = None,
+        local_query_mask: Optional[torch.Tensor] = None,
     ) -> dict[str, torch.Tensor]:
         memory = self.encode_bars(
             rhythm_features,
@@ -661,18 +714,29 @@ class SparseEventPlanner(nn.Module):
             rhythm_mask=rhythm_mask,
             semantic_mask=semantic_mask,
             drop_profile=drop_profile,
+            return_local_frames=bool(self.config.local_audio_tokens),
         )
+        extra = {}
+        decoder_memory_mask = bar_mask
+        if self.config.local_audio_tokens:
+            if local_query_times_ms is None or target_bar_index is None:
+                raise ValueError("alignment planner requires timestamped local queries and target bar")
+            memory, local_frames = memory
+            memory, decoder_memory_mask, logits, mask = self.local_audio_memory(
+                memory, local_frames, rhythm_features, rhythm_times_ms, local_query_times_ms,
+                target_bar_index, rhythm_mask=rhythm_mask, bar_mask=bar_mask, query_mask=local_query_mask)
+            extra = {"alignment_logits": logits, "alignment_mask": mask}
         hidden = self.decode_hidden(
             decoder_tokens,
             memory,
             target_bar_index=target_bar_index,
             token_mask=token_mask,
-            memory_mask=bar_mask,
+            memory_mask=decoder_memory_mask,
             previous_bar_tokens=previous_bar_tokens,
             previous_bar_mask=previous_bar_mask,
             drop_boundary=drop_boundary,
         )
-        return {"logits": self.output(hidden), "bar_memory": memory, "decoder_hidden": hidden}
+        return {**extra, "logits": self.output(hidden), "bar_memory": memory, "decoder_hidden": hidden}
 
     @torch.no_grad()
     def generate_bar(

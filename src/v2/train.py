@@ -31,6 +31,7 @@ from .training import (
     TrainingStage,
     checkpoint_payload,
     load_checkpoint,
+    initialize_planner,
     make_optimizer,
     run_epoch,
     save_checkpoint,
@@ -57,6 +58,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--feature-pipeline-key", required=True, help="shared FeatureCacheManifest.pipeline_key")
     parser.add_argument("--checkpoint-dir", required=True)
     parser.add_argument("--stage", choices=[stage.value for stage in TrainingStage], default="planner")
+    parser.add_argument("--initialize-planner", help="transfer legacy planner weights into local-audio architecture; fresh optimizer/run")
+    parser.add_argument("--alignment-loss-weight", type=float, default=0.2)
     parser.add_argument("--resume", help="compatible v2 checkpoint to resume")
     parser.add_argument("--planner-config", help="optional JSON overrides for SparsePlannerConfig")
     parser.add_argument("--geometry-config", help="optional JSON overrides for GeometryDiffusionConfig")
@@ -115,6 +118,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.seed < 0:
         raise ValueError("seed must be non-negative")
     torch.manual_seed(args.seed)
+    if args.initialize_planner and (args.resume or args.stage != "planner"):
+        raise ValueError("--initialize-planner is only for a fresh planner run, without --resume")
     output_dir = Path(args.checkpoint_dir)
     if any(output_dir.glob("*.pt")) and not args.resume:
         raise ValueError("Checkpoint directory already contains a run; use --resume or a new directory")
@@ -190,7 +195,9 @@ def main(argv: list[str] | None = None) -> int:
         spacing_loss_weight=args.spacing_loss_weight,
         turn_loss_weight=args.turn_loss_weight,
         slider_shape_loss_weight=args.slider_shape_loss_weight,
+        alignment_loss_weight=args.alignment_loss_weight,
     )
+    initialization = initialize_planner(args.initialize_planner, planner, expected_provenance=provenance) if args.initialize_planner else None
     optimizer = make_optimizer(planner, geometry, config)
     scaler = torch.amp.GradScaler("cuda", enabled=(device.type == "cuda" and args.mixed_precision == "fp16"))
     start_epoch = 0
@@ -242,6 +249,7 @@ def main(argv: list[str] | None = None) -> int:
         expected_pipeline_key=args.feature_pipeline_key,
         clock_mode="mixed",
         sampling_mode="song",
+        alignment_frames=planner_config.local_audio_tokens,
         bars_per_song=args.bars_per_song,
     )
     val_dataset = SparseSongDataset(
@@ -250,6 +258,7 @@ def main(argv: list[str] | None = None) -> int:
         expected_pipeline_key=args.feature_pipeline_key,
         clock_mode="mixed",
         sampling_mode="bar",
+        alignment_frames=planner_config.local_audio_tokens,
     )
 
     train_sampler = (
@@ -398,6 +407,7 @@ def main(argv: list[str] | None = None) -> int:
                     if args.patience > 0 and epochs_without_improvement >= args.patience:
                         stop_training = True
 
+                payload["initialization"] = initialization or restored.get("initialization")
                 payload["data_audit"] = data_audit
                 payload["early_stopping"] = {"best_val_loss": best_val_loss,
                                               "epochs_without_improvement": epochs_without_improvement}

@@ -34,7 +34,8 @@ def main():
     models.planner.eval()
     models.geometry.eval()
     dataset = SparseSongDataset(args.records_dir, split=args.split, sampling_mode='bar',
-                                expected_pipeline_key=models.checkpoint_provenance.feature_pipeline_key)
+                                expected_pipeline_key=models.checkpoint_provenance.feature_pipeline_key,
+                                alignment_frames=models.planner.config.local_audio_tokens)
     loader = DataLoader(dataset, batch_size=args.batch_size, num_workers=1,
                         collate_fn=collate_sparse_examples, pin_memory=True)
     family_list = list(TokenFamily)

@@ -20,3 +20,9 @@ OpenSSH ControlMaster. Do not add SSH keys or use the Hermes container for acces
 The `run_20261010_v2` records were generated from synthetic sine waves and fixed
 objects, despite claiming ranked provenance. They and their planner checkpoints
 are unsuitable for production training/generation. See `docs/v2-audit-2026-10-13.md`.
+
+Audio-alignment follow-up: use `configs/v2_audio_alignment_planner.json` for the
+new within-bar audio path, with `--initialize-planner` for legacy weight transfer.
+Keep legacy checkpoints unchanged. Do not use `--resume` to silently change
+`local_audio_tokens`. See `docs/v2-audio-alignment-2026-10-14.md` for evidence,
+commands, and the distinction between implementation validation and map quality.

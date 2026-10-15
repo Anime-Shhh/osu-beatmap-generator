@@ -55,6 +55,7 @@ class TrainingConfig:
     turn_loss_weight: float = 0.05
     slider_shape_loss_weight: float = 0.1
     geometry_flip_augmentation: bool = True
+    alignment_loss_weight: float = 0.2
 
     def __post_init__(self) -> None:
         if self.learning_rate <= 0.0 or self.weight_decay < 0.0:
@@ -63,7 +64,7 @@ class TrainingConfig:
             raise ValueError("gradient accumulation and max gradient norm must be positive")
         if self.seed < 0:
             raise ValueError("seed must be non-negative")
-        for name in ("spacing_loss_weight", "turn_loss_weight", "slider_shape_loss_weight"):
+        for name in ("spacing_loss_weight", "turn_loss_weight", "slider_shape_loss_weight", "alignment_loss_weight"):
             if not 0 <= getattr(self, name) < float("inf"):
                 raise ValueError(f"{name} must be finite and non-negative")
         for name in ("profile_dropout", "boundary_context_dropout", "symbolic_context_dropout"):
@@ -237,6 +238,8 @@ def forward_planner(
         previous_bar_tokens=batch["previous_bar_tokens"],
         previous_bar_mask=batch["previous_bar_mask"],
         drop_boundary=drop_boundary,
+        local_query_times_ms=batch.get("local_query_times_ms"),
+        local_query_mask=batch.get("local_query_mask"),
     )
 
 
@@ -256,6 +259,12 @@ def loss_for_batch(
             boundary_context_dropout=config.boundary_context_dropout,
         )
         token_loss = planner_token_loss(planner_output["logits"], batch["labels"])
+        if 'alignment_logits' in planner_output:
+            from .alignment import alignment_loss
+            auxiliary = alignment_loss(planner_output['alignment_logits'], batch['alignment_targets'],
+                                       planner_output['alignment_mask'])
+            return {'loss': token_loss + config.alignment_loss_weight * auxiliary,
+                    'token_loss': token_loss, 'alignment_loss': auxiliary}
         return {"loss": token_loss, "token_loss": token_loss}
     if geometry is None:
         raise ValueError("geometry stage requires a geometry diffuser")
@@ -478,6 +487,38 @@ def save_checkpoint(payload: Mapping[str, Any], path: str | Path, *, overwrite: 
     return destination
 
 
+def initialize_planner(path, planner, *, expected_provenance):
+    """Explicit weight transfer only; no optimizer, RNG, epoch or trained-geometry claim."""
+    payload = torch.load(path, map_location='cpu', weights_only=True)
+    if payload.get('checkpoint_schema') != CHECKPOINT_SCHEMA or int(payload.get('global_step', 0)) <= 0:
+        raise ValueError('initialization requires a trained V2 checkpoint')
+    actual = CheckpointProvenance.from_dict(_mapping(payload.get('provenance'), 'provenance'))
+    for name in ('feature_pipeline_key', 'split_manifest_sha256', 'architecture_id', 'record_schema'):
+        if getattr(actual, name) != getattr(expected_provenance, name):
+            raise ValueError(f'initialization {name} differs from requested run')
+    if actual.vocabulary_sha256 != vocabulary_sha256(planner.vocabulary):
+        raise ValueError('initialization vocabulary differs')
+    original = SparsePlannerConfig(**dict(payload['planner_config']))
+    current = asdict(planner.config)
+    for name, value in asdict(original).items():
+        if name != 'local_audio_tokens' and current[name] != value:
+            raise ValueError(f'initialization planner setting differs: {name}')
+    if original.local_audio_tokens or not planner.config.local_audio_tokens:
+        raise ValueError('weight transfer supports only legacy planner to local-audio planner')
+    # Validate all names/shapes before mutation; strict=False is limited to the
+    # explicitly added modules, never a general ignore-mismatches escape hatch.
+    state = payload['planner']; expected = planner.state_dict()
+    added = ('local_audio_projection.', 'local_audio_norm.', 'alignment_head.')
+    missing = set(expected) - set(state)
+    if set(state) - set(expected) or any(not key.startswith(added) for key in missing):
+        raise ValueError('unexpected initialization state keys')
+    if any(state[key].shape != expected[key].shape for key in state):
+        raise ValueError('initialization state shape differs')
+    planner.load_state_dict(state, strict=False)
+    return {'checkpoint': str(path), 'new_parameters': sorted(missing),
+            'source_global_step': payload['global_step']}
+
+
 def load_checkpoint(
     path: str | Path,
     *,
@@ -513,6 +554,9 @@ def load_checkpoint(
         if raw_stage is not None:
             saved_stage = str(raw_stage)
     optimizer_compatible = optimizer_stage is None or saved_stage == optimizer_stage.value
+    saved_planner_config = SparsePlannerConfig(**dict(payload['planner_config']))
+    if saved_planner_config.local_audio_tokens != planner.config.local_audio_tokens:
+        raise ValueError('checkpoint local_audio_tokens differs; use matching config for resume or explicit --initialize-planner for legacy transfer')
     if geometry is not None and saved_stage == TrainingStage.GEOMETRY.value:
         saved_space = payload.get("geometry_config", {}).get("coordinate_space", "legacy-logit")
         if geometry.config.coordinate_space != saved_space:

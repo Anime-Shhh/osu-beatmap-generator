@@ -1,0 +1,2 @@
+# Optional plotting dependency; core training does not import it.
+matplotlib==3.11.2

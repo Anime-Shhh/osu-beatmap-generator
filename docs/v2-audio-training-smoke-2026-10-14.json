@@ -1,0 +1,41 @@
+{
+  "kind": "three-step-training-path-check-not-quality-evaluation",
+  "source_component": "source:225e05ae282a718a4f620ab08658d3c0b87c4d60f54cec7d8f216982ec037cf0",
+  "split": "train",
+  "history": [
+    {
+      "loss": 0.7341828346252441,
+      "token_loss": 0.6095853447914124,
+      "alignment_loss": 0.6229875683784485,
+      "gradient_norm": 3.6014564037323
+    },
+    {
+      "loss": 0.7258079051971436,
+      "token_loss": 0.5973328948020935,
+      "alignment_loss": 0.6423751711845398,
+      "gradient_norm": 3.6009697914123535
+    },
+    {
+      "loss": 0.6542707681655884,
+      "token_loss": 0.5319778323173523,
+      "alignment_loss": 0.6114646196365356,
+      "gradient_norm": 3.218108892440796
+    }
+  ],
+  "local_audio_projection_updated": true,
+  "weights_saved": false,
+  "max_gpu_memory_bytes": 2492522496,
+  "seconds": 1.5047384398058057,
+  "initialization": {
+    "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/best.pt",
+    "new_parameters": [
+      "alignment_head.bias",
+      "alignment_head.weight",
+      "local_audio_norm.bias",
+      "local_audio_norm.weight",
+      "local_audio_projection.bias",
+      "local_audio_projection.weight"
+    ],
+    "source_global_step": 24000
+  }
+}

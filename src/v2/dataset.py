@@ -368,6 +368,7 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         clock_mode: str = "mixed",
         sampling_mode: str = "song",
         bars_per_song: int = 1,
+        alignment_frames: int = 0,
     ):
         if split is not None and split not in {"train", "val", "test"}:
             raise ValueError("split must be train, val, test, or None")
@@ -387,6 +388,9 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         if bars_per_song < 1:
             raise ValueError("bars_per_song must be positive")
         self.bars_per_song = bars_per_song
+        if alignment_frames != 0 and alignment_frames < 2:
+            raise ValueError("alignment_frames must be zero or at least two")
+        self.alignment_frames = alignment_frames
         self._epoch = 0
         self._records: list[Path] = []
         self._record_indexes: list[Mapping[str, Any]] = []
@@ -453,6 +457,10 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
                 raise RecordSchemaError(
                     f"{self._records[record_index].name} does not match its v2 song-record index sidecar"
                 )
+        if self.alignment_frames and '_alignment_events' not in cached:
+            from .alignment import reference_events
+            cached = dict(cached)
+            cached['_alignment_events'] = reference_events(cached)
         self._cache[record_index] = cached
         while len(self._cache) > self.cache_size:
             self._cache.popitem(last=False)
@@ -511,7 +519,17 @@ class SparseSongDataset(Dataset[dict[str, Any]]):
         clock_source = payload["clock_features"] if selected_variant is None else selected_variant["clock_features"]
         if selected_variant is not None:
             metadata["clock_hypothesis_id"] = str(selected_variant["hypothesis_id"])
+        alignment = {}
+        if self.alignment_frames:
+            from .alignment import query_grid, chart_targets
+            from .clock import TimingHypothesis
+            hypothesis = payload['oracle_timing_hypothesis'] if selected_variant is None else selected_variant['hypothesis']
+            timing = TimingHypothesis.from_dict(hypothesis).timing_map
+            times = query_grid(timing, target['bar_start_beat'], target['bar_length_beats'], self.alignment_frames)
+            alignment = {'local_query_times_ms': times,
+                         'alignment_targets': chart_targets(times, payload['_alignment_events'])}
         return {
+            **alignment,
             "rhythm_features": _as_cpu_contiguous(_tensor(payload["rhythm_features"], "rhythm_features", dim=2), dtype=torch.float32),
             "rhythm_times_ms": _as_cpu_contiguous(_tensor(payload["rhythm_times_ms"], "rhythm_times_ms", dim=1), dtype=torch.float32),
             "semantic_features": _as_cpu_contiguous(_tensor(payload["semantic_features"], "semantic_features", dim=2), dtype=torch.float32),
@@ -576,7 +594,16 @@ def collate_sparse_examples(examples: Sequence[Mapping[str, Any]]) -> dict[str, 
     event_features, _ = _pad_time_series([target["event_features"] for target in targets], pad_value=0)
     event_positions, _ = _pad_time_series([target["event_positions"].unsqueeze(-1) for target in targets], pad_value=0)
 
+    alignment = {}
+    if any('local_query_times_ms' in example for example in examples):
+        if not all('local_query_times_ms' in example for example in examples):
+            raise RecordSchemaError('cannot mix alignment-enabled and legacy examples')
+        queries, query_mask = _pad_time_series([e['local_query_times_ms'] for e in examples])
+        targets_alignment, _ = _pad_time_series([e['alignment_targets'] for e in examples])
+        alignment = {'local_query_times_ms': queries, 'local_query_mask': query_mask,
+                     'alignment_targets': targets_alignment}
     return {
+        **alignment,
         "rhythm_features": rhythm,
         "rhythm_times_ms": rhythm_times.squeeze(-1),
         "rhythm_mask": rhythm_mask,
