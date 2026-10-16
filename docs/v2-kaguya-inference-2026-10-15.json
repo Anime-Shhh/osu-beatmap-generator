@@ -1,0 +1,793 @@
+{
+  "selected": {
+    "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/best.pt",
+    "osz": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/output/kaguya_4_5.osz",
+    "selected": "tight-01",
+    "candidates_attempted": 2,
+    "map": {
+      "title": "Kaguya-sama Opening",
+      "version": "AI 4.5 target - Audio Alignment V2",
+      "difficulty": {
+        "available": true,
+        "stars": 4.473217133153576,
+        "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+        "attributes": {
+          "aim": 2.5248298216621254,
+          "speed": 1.616866771931099
+        },
+        "error": null
+      },
+      "object_count": 99,
+      "slider_count": 30,
+      "curve_types": {
+        "P": 16,
+        "L": 9,
+        "B": 5
+      },
+      "corner_heads": 1,
+      "minimum_start_gap_ms": 73.0,
+      "mean_head_distance_px": 220.9343145626303,
+      "mean_head_speed_px_per_second": 688.0854282733465,
+      "max_head_speed_px_per_second": 5944.143356000626,
+      "max_slider_length_px": 140.0
+    }
+  },
+  "first_pass": {
+    "id": "kaguya",
+    "title": "Kaguya-sama Opening",
+    "target_star": 4.5,
+    "modes": {
+      "audio_only": {
+        "strict_passes": 1,
+        "candidates": 8,
+        "sampling_failures": [],
+        "calibrated": true,
+        "strict_audits": [
+          {
+            "candidate_id": "audio_only-1",
+            "seed": 1501,
+            "valid": true,
+            "selected": false,
+            "score": 0.5654374990975596,
+            "errors": [],
+            "warnings": [],
+            "metrics": {
+              "object_count": 138.0,
+              "duration_ms": 72799.52399999999,
+              "objects_per_minute": 113.73700740131214,
+              "circle_count": 82.0,
+              "slider_count": 55.0,
+              "spinner_count": 1.0,
+              "max_snap_error_beats": 0.005208333333342807,
+              "median_start_gap_ms": 433.89473242187523,
+              "max_jump_speed_px_per_second": 14618.627073187095
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 4.884854971134722,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 2.8436713908703752,
+                "speed": 1.4472661162940794
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-0",
+            "seed": 1500,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 6.568 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 274.0,
+              "duration_ms": 81438.11052734374,
+              "objects_per_minute": 201.87108828464395,
+              "circle_count": 180.0,
+              "slider_count": 93.0,
+              "spinner_count": 1.0,
+              "max_snap_error_beats": 0.005208333333342807,
+              "median_start_gap_ms": 216.94711588541395,
+              "max_jump_speed_px_per_second": 8209.87366836481
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 6.56805248590506,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.5835665178866485,
+                "speed": 2.6707646595182934
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-2",
+            "seed": 1502,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 11.012 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 285.0,
+              "duration_ms": 48316.01288411458,
+              "objects_per_minute": 353.9199321147248,
+              "circle_count": 177.0,
+              "slider_count": 108.0,
+              "spinner_count": 0.0,
+              "max_snap_error_beats": 0.005208333333342807,
+              "median_start_gap_ms": 108.40302897135552,
+              "max_jump_speed_px_per_second": 9051.934441834586
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 11.0115045800899,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 6.196111899557547,
+                "speed": 4.047768227710821
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "double-276.9bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-3",
+            "seed": 1503,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 5.903 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 174.0,
+              "duration_ms": 69549.18288411459,
+              "objects_per_minute": 150.10959966841756,
+              "circle_count": 112.0,
+              "slider_count": 60.0,
+              "spinner_count": 2.0,
+              "max_snap_error_beats": 0.005208333333342807,
+              "median_start_gap_ms": 216.94711588541395,
+              "max_jump_speed_px_per_second": 3380.9430933871176
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 5.903016749128535,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.2277663086219746,
+                "speed": 2.3857649126480363
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-4",
+            "seed": 1504,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 5.508 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 182.0,
+              "duration_ms": 76255.44758398437,
+              "objects_per_minute": 143.2028838067365,
+              "circle_count": 140.0,
+              "slider_count": 42.0,
+              "spinner_count": 0.0,
+              "max_snap_error_beats": 0.005208333333335702,
+              "median_start_gap_ms": 432.76626757811755,
+              "max_jump_speed_px_per_second": 32557.305113758768
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 5.507900695572572,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.210787147628028,
+                "speed": 1.6138474701022945
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-5",
+            "seed": 1505,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 10.413 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 274.0,
+              "duration_ms": 77999.4,
+              "objects_per_minute": 210.7708520834776,
+              "circle_count": 155.0,
+              "slider_count": 115.0,
+              "spinner_count": 4.0,
+              "max_snap_error_beats": 0.004557291666671404,
+              "median_start_gap_ms": 108.4735579427088,
+              "max_jump_speed_px_per_second": 10107.444237496895
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 10.412651561991115,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 5.818426251234985,
+                "speed": 3.9325015344504095
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "double-276.9bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-6",
+            "seed": 1506,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 7.733 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 315.0,
+              "duration_ms": 79732.72,
+              "objects_per_minute": 237.0419571789348,
+              "circle_count": 216.0,
+              "slider_count": 98.0,
+              "spinner_count": 1.0,
+              "max_snap_error_beats": 0.005208333333342807,
+              "median_start_gap_ms": 216.9471158854103,
+              "max_jump_speed_px_per_second": 9824.751074963968
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 7.732975084704547,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 4.441723775871765,
+                "speed": 2.5573205115633746
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          },
+          {
+            "candidate_id": "audio_only-7",
+            "seed": 1507,
+            "valid": false,
+            "selected": false,
+            "score": null,
+            "errors": [
+              "realized difficulty 6.507 differs from target 4.500 by more than 0.500 stars"
+            ],
+            "warnings": [],
+            "metrics": {
+              "object_count": 193.0,
+              "duration_ms": 86232.7695,
+              "objects_per_minute": 134.28769674386953,
+              "circle_count": 139.0,
+              "slider_count": 54.0,
+              "spinner_count": 0.0,
+              "max_snap_error_beats": 0.005208333333333037,
+              "median_start_gap_ms": 432.7662675781249,
+              "max_jump_speed_px_per_second": 21372.58441320498
+            },
+            "difficulty": {
+              "available": true,
+              "stars": 6.506651943261381,
+              "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+              "attributes": {
+                "aim": 3.794609209794074,
+                "speed": 1.9042397379190097
+              },
+              "error": null
+            },
+            "provenance": {
+              "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+              "clock_source": "audio_clock_estimator",
+              "mode": "audio_only"
+            }
+          }
+        ],
+        "result": {
+          "schema_version": "osu-beatmap-generator/v2-generation-result/1",
+          "request": {
+            "schema_version": "osu-beatmap-generator/v2-generation-request/1",
+            "audio_filename": "audio.mp3",
+            "audio_sha256": null,
+            "target_star": 4.5,
+            "settings": {
+              "ar": 9.0,
+              "cs": 4.0,
+              "od": 8.0,
+              "hp": 6.0,
+              "slider_multiplier": 1.4,
+              "slider_tick_rate": 1.0
+            },
+            "style_cluster": null,
+            "style_seed": null,
+            "candidate_count": 8,
+            "seed": 1500,
+            "feature_revision": "v2-multirate-audio-3",
+            "model_revision": "checkpoint-40800-7d980e615f1a5ca3",
+            "extra_controls": {}
+          },
+          "architecture_id": "tempo-posterior-hierarchical-event-diffusion/v2",
+          "model_revision": "checkpoint-40800-7d980e615f1a5ca3",
+          "selected_candidate_id": "audio_only-1",
+          "candidates": [
+            {
+              "candidate_id": "audio_only-1",
+              "seed": 1501,
+              "valid": true,
+              "selected": true,
+              "score": 0.5654374990975596,
+              "errors": [],
+              "warnings": [],
+              "metrics": {
+                "object_count": 138.0,
+                "duration_ms": 72799.52399999999,
+                "objects_per_minute": 113.73700740131214,
+                "circle_count": 82.0,
+                "slider_count": 55.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 433.89473242187523,
+                "max_jump_speed_px_per_second": 14618.627073187095
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 4.884854971134722,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 2.8436713908703752,
+                  "speed": 1.4472661162940794
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-0",
+              "seed": 1500,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 6.568 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 274.0,
+                "duration_ms": 81438.11052734374,
+                "objects_per_minute": 201.87108828464395,
+                "circle_count": 180.0,
+                "slider_count": 93.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 216.94711588541395,
+                "max_jump_speed_px_per_second": 8209.87366836481
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 6.56805248590506,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.5835665178866485,
+                  "speed": 2.6707646595182934
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-2",
+              "seed": 1502,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 11.012 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 285.0,
+                "duration_ms": 48316.01288411458,
+                "objects_per_minute": 353.9199321147248,
+                "circle_count": 177.0,
+                "slider_count": 108.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 108.40302897135552,
+                "max_jump_speed_px_per_second": 9051.934441834586
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 11.0115045800899,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 6.196111899557547,
+                  "speed": 4.047768227710821
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "double-276.9bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-3",
+              "seed": 1503,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 5.903 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 174.0,
+                "duration_ms": 69549.18288411459,
+                "objects_per_minute": 150.10959966841756,
+                "circle_count": 112.0,
+                "slider_count": 60.0,
+                "spinner_count": 2.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 216.94711588541395,
+                "max_jump_speed_px_per_second": 3380.9430933871176
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 5.903016749128535,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.2277663086219746,
+                  "speed": 2.3857649126480363
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-4",
+              "seed": 1504,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 5.508 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 182.0,
+                "duration_ms": 76255.44758398437,
+                "objects_per_minute": 143.2028838067365,
+                "circle_count": 140.0,
+                "slider_count": 42.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333335702,
+                "median_start_gap_ms": 432.76626757811755,
+                "max_jump_speed_px_per_second": 32557.305113758768
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 5.507900695572572,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.210787147628028,
+                  "speed": 1.6138474701022945
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-5",
+              "seed": 1505,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 10.413 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 274.0,
+                "duration_ms": 77999.4,
+                "objects_per_minute": 210.7708520834776,
+                "circle_count": 155.0,
+                "slider_count": 115.0,
+                "spinner_count": 4.0,
+                "max_snap_error_beats": 0.004557291666671404,
+                "median_start_gap_ms": 108.4735579427088,
+                "max_jump_speed_px_per_second": 10107.444237496895
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 10.412651561991115,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 5.818426251234985,
+                  "speed": 3.9325015344504095
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "double-276.9bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-6",
+              "seed": 1506,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 7.733 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 315.0,
+                "duration_ms": 79732.72,
+                "objects_per_minute": 237.0419571789348,
+                "circle_count": 216.0,
+                "slider_count": 98.0,
+                "spinner_count": 1.0,
+                "max_snap_error_beats": 0.005208333333342807,
+                "median_start_gap_ms": 216.9471158854103,
+                "max_jump_speed_px_per_second": 9824.751074963968
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 7.732975084704547,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 4.441723775871765,
+                  "speed": 2.5573205115633746
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            },
+            {
+              "candidate_id": "audio_only-7",
+              "seed": 1507,
+              "valid": false,
+              "selected": false,
+              "score": null,
+              "errors": [
+                "realized difficulty 6.507 differs from target 4.500 by more than 0.500 stars"
+              ],
+              "warnings": [],
+              "metrics": {
+                "object_count": 193.0,
+                "duration_ms": 86232.7695,
+                "objects_per_minute": 134.28769674386953,
+                "circle_count": 139.0,
+                "slider_count": 54.0,
+                "spinner_count": 0.0,
+                "max_snap_error_beats": 0.005208333333333037,
+                "median_start_gap_ms": 432.7662675781249,
+                "max_jump_speed_px_per_second": 21372.58441320498
+              },
+              "difficulty": {
+                "available": true,
+                "stars": 6.506651943261381,
+                "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+                "attributes": {
+                  "aim": 3.794609209794074,
+                  "speed": 1.9042397379190097
+                },
+                "error": null
+              },
+              "provenance": {
+                "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+                "clock_source": "audio_clock_estimator",
+                "mode": "audio_only"
+              }
+            }
+          ],
+          "warnings": [
+            "Generated maps are playable drafts for human mapper review; they are not automatically ranked maps."
+          ],
+          "ranked_status": "draft_only_human_mapper_review_required"
+        },
+        "selected": {
+          "title": "Kaguya-sama Opening",
+          "version": "AI audio_only - 4.88 stars",
+          "difficulty": {
+            "available": true,
+            "stars": 4.884854971134722,
+            "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+            "attributes": {
+              "aim": 2.8436713908703752,
+              "speed": 1.4472661162940794
+            },
+            "error": null
+          },
+          "object_count": 138,
+          "slider_count": 55,
+          "curve_types": {
+            "P": 21,
+            "B": 15,
+            "L": 19
+          },
+          "corner_heads": 0,
+          "minimum_start_gap_ms": 11.0,
+          "mean_head_distance_px": 136.0065966233643,
+          "mean_head_speed_px_per_second": 663.7832450825597,
+          "max_head_speed_px_per_second": 15030.822327295029,
+          "max_slider_length_px": 140.0
+        }
+      }
+    },
+    "osz": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/output/kaguya_20261015/kaguya_v2_trained.osz",
+    "bytes": 1698613
+  },
+  "tight_pass": {
+    "audits": [
+      {
+        "candidate_id": "tight-00",
+        "seed": 1600,
+        "valid": false,
+        "selected": false,
+        "score": null,
+        "errors": [
+          "realized difficulty 6.538 differs from target 4.500 by more than 0.100 stars"
+        ],
+        "warnings": [],
+        "metrics": {
+          "object_count": 206.0,
+          "duration_ms": 63481.716536458334,
+          "objects_per_minute": 194.701729479881,
+          "circle_count": 119.0,
+          "slider_count": 86.0,
+          "spinner_count": 1.0,
+          "max_snap_error_beats": 0.0052083333333143855,
+          "median_start_gap_ms": 217.2292317708343,
+          "max_jump_speed_px_per_second": 37704.644377892604
+        },
+        "difficulty": {
+          "available": true,
+          "stars": 6.537819424172662,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 3.8110523377311942,
+            "speed": 1.9222123168884744
+          },
+          "error": null
+        },
+        "provenance": {
+          "clock_hypothesis_id": "est-138.5bpm-210.0ms",
+          "clock_source": "audio_clock_estimator",
+          "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/best.pt",
+          "mode": "audio_only"
+        }
+      },
+      {
+        "candidate_id": "tight-01",
+        "seed": 1601,
+        "valid": true,
+        "selected": false,
+        "score": 0.9610985544095556,
+        "errors": [],
+        "warnings": [],
+        "metrics": {
+          "object_count": 99.0,
+          "duration_ms": 46796.30860546875,
+          "objects_per_minute": 126.9330888912429,
+          "circle_count": 69.0,
+          "slider_count": 30.0,
+          "spinner_count": 0.0,
+          "max_snap_error_beats": 0.005208333333332149,
+          "median_start_gap_ms": 433.8947324218716,
+          "max_jump_speed_px_per_second": 5910.037583068093
+        },
+        "difficulty": {
+          "available": true,
+          "stars": 4.473217133153576,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.5248298216621254,
+            "speed": 1.616866771931099
+          },
+          "error": null
+        },
+        "provenance": {
+          "clock_hypothesis_id": "half-69.2bpm-210.0ms",
+          "clock_source": "audio_clock_estimator",
+          "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/best.pt",
+          "mode": "audio_only"
+        }
+      }
+    ],
+    "failures": []
+  },
+  "validation": {
+    "path": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/output/kaguya_4_5.osz",
+    "bytes": 1698027,
+    "sha256": "3a46020ac12be0b4ba50babdb398b8a4e144f2c39b9a024b9c793e3156808bc6",
+    "contents": [
+      "Kaguya - AI 4.5.osu",
+      "audio.mp3"
+    ],
+    "stars": 4.473217133153576,
+    "objects": 99,
+    "audio_matches_original": true,
+    "zip_crc_valid": true,
+    "structural_validation": true
+  }
+}

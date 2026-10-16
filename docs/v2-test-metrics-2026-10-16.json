@@ -1,0 +1,194 @@
+{
+  "evaluation": "teacher-forced-oracle-clock/v1",
+  "split": "test",
+  "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/best.pt",
+  "model_revision": "checkpoint-40800-7d980e615f1a5ca3",
+  "bars": 6818,
+  "audio_components": 18,
+  "tokens": 225451,
+  "token_weighted_cross_entropy": 0.7667305027824696,
+  "token_perplexity": 2.1527164349891024,
+  "batch_mean_cross_entropy": 0.7323738151705395,
+  "token_accuracy": 0.7289122691848783,
+  "per_family": {
+    "control": {
+      "tokens": 31722,
+      "accuracy": 0.9613202194060904
+    },
+    "offset": {
+      "tokens": 24904,
+      "accuracy": 0.6779232251847093
+    },
+    "snap": {
+      "tokens": 24904,
+      "accuracy": 0.9775939608095086
+    },
+    "residual": {
+      "tokens": 24904,
+      "accuracy": 0.23112752971410216
+    },
+    "kind": {
+      "tokens": 24904,
+      "accuracy": 0.6595326052039833
+    },
+    "combo": {
+      "tokens": 24904,
+      "accuracy": 0.8598217153870864
+    },
+    "hit_sound": {
+      "tokens": 24904,
+      "accuracy": 0.7127369097333761
+    },
+    "duration": {
+      "tokens": 11188,
+      "accuracy": 0.5627457990704327
+    },
+    "curve": {
+      "tokens": 11039,
+      "accuracy": 0.5923543799257179
+    },
+    "repeats": {
+      "tokens": 11039,
+      "accuracy": 0.8955521333454117
+    },
+    "anchors": {
+      "tokens": 11039,
+      "accuracy": 0.7740737385632757
+    }
+  },
+  "geometry_batch_mean": {
+    "geometry_loss": 0.3727462117240663,
+    "denoising_loss": 0.3586166582444459,
+    "spacing_loss": 0.002487995247617153,
+    "turn_loss": 0.07173757944584064,
+    "slider_shape_loss": 0.1029387537910427
+  },
+  "per_audio": {
+    "source:66746932b9a2b29cb4accf38f33a499b274a73f0ef4f4c1c292ab38b44a96f9b": {
+      "cross_entropy": 0.5872912370622706,
+      "tokens": 15419,
+      "token_accuracy": 0.7887022504701992
+    },
+    "source:e4f460c5a92c59328dded18d1a9ecdcbfac8984f27a531169e587c1ce4a2fb6d": {
+      "cross_entropy": 1.1231286231166848,
+      "tokens": 13464,
+      "token_accuracy": 0.6567142008318478
+    },
+    "source:c16f94cfd8ecfa8eb8b8a67d198d1bde5afea6a6685dec27576f3a6ed590cd6b": {
+      "cross_entropy": 1.0827544035702668,
+      "tokens": 25206,
+      "token_accuracy": 0.6685709751646434
+    },
+    "source:de042b4c1b244577fea9393dc6991e001580384d0fcf35d5188595574108e1e9": {
+      "cross_entropy": 0.506143211134482,
+      "tokens": 12780,
+      "token_accuracy": 0.7906103286384977
+    },
+    "source:551cdef20f336a14c35b681b8478ae9eff739162fab5dbdc862c018bfefa44db": {
+      "cross_entropy": 1.0389488665912643,
+      "tokens": 7834,
+      "token_accuracy": 0.6596885371457748
+    },
+    "source:822f05f4f168e5d992d848b43887d729d85133e89f16a52aa104ad70e3e9699e": {
+      "cross_entropy": 0.7804089121879213,
+      "tokens": 5175,
+      "token_accuracy": 0.722512077294686
+    },
+    "source:beed97ed4d41c94176fc320910b01d52465f7d5c824e66f8aba2982728325683": {
+      "cross_entropy": 0.584220804830497,
+      "tokens": 9842,
+      "token_accuracy": 0.7773826458036984
+    },
+    "source:0c4b71b99ce3571697cfb8f672e0d8a2e1d56b7955f872e915a8551640ac9a4b": {
+      "cross_entropy": 0.6940484181436397,
+      "tokens": 4423,
+      "token_accuracy": 0.725525661315849
+    },
+    "source:9714d67708bd34101d2afbc9a00e8b1dbe7b361197c475e0bef32077809bd0a0": {
+      "cross_entropy": 0.7440332641941512,
+      "tokens": 7037,
+      "token_accuracy": 0.714082705698451
+    },
+    "source:344966e8c8c51ce118dc7e2ae07d8d624df9ab84ecce96e095697d00adbd164a": {
+      "cross_entropy": 0.5824254750302985,
+      "tokens": 25559,
+      "token_accuracy": 0.7677921671426895
+    },
+    "source:50602bfaf7f8ebba30b3fbff9b39a5e0b98357ce50c6dca8bcbf35136f502e1d": {
+      "cross_entropy": 0.6920100600401613,
+      "tokens": 12519,
+      "token_accuracy": 0.7215432542535346
+    },
+    "source:3c8054783e72d6278378ed6f58f1b31e8b71571d0a0fd2b70f610676c61a2a37": {
+      "cross_entropy": 0.5599139962986669,
+      "tokens": 8255,
+      "token_accuracy": 0.7618413082980012
+    },
+    "source:86bff9ea2bc8a25075041f347f5f12b7c52bec41c2f332a5a15451287c554051": {
+      "cross_entropy": 0.7590594718892477,
+      "tokens": 6937,
+      "token_accuracy": 0.731007640190284
+    },
+    "source:20f367c4c6399aa886924edb6fa6ea6e03fa46397ee0f460ca211bdd81e52e5a": {
+      "cross_entropy": 0.6199929139986813,
+      "tokens": 29022,
+      "token_accuracy": 0.736406863758528
+    },
+    "source:c13b299d03c595b1240f11124e8a23ebdff5a326d69d22a230d26e0a5a3155d6": {
+      "cross_entropy": 0.5868952005478963,
+      "tokens": 8672,
+      "token_accuracy": 0.764760147601476
+    },
+    "source:72cd000a19caa4695fca570ba2b0c46e3731504f72fc103823b67bf550c7a26a": {
+      "cross_entropy": 0.6654024401270379,
+      "tokens": 18245,
+      "token_accuracy": 0.7530282269114826
+    },
+    "source:60dcacbceafacef88fde7f94b53c087a39df5cdbf7c8d6f757a75e93d61eb73d": {
+      "cross_entropy": 0.6499617443896003,
+      "tokens": 7503,
+      "token_accuracy": 0.7403705184592829
+    },
+    "source:5d70c15f52dc7129332e5c70a7b9b67abfe42910334f2d81dd93de7ec1e9ac29": {
+      "cross_entropy": 2.0045271382317926,
+      "tokens": 7559,
+      "token_accuracy": 0.5646249503902633
+    }
+  },
+  "planner_config": {
+    "rhythm_dim": 101,
+    "semantic_dim": 128,
+    "profile_dim": 6,
+    "clock_dim": 4,
+    "model_dim": 768,
+    "local_layers": 4,
+    "global_layers": 3,
+    "decoder_layers": 7,
+    "heads": 12,
+    "ff_dim": 2560,
+    "dropout": 0.1,
+    "boundary_context_layers": 1,
+    "max_bars": 512,
+    "max_decoder_tokens": 2048,
+    "profile_dropout": 0.15,
+    "local_audio_tokens": 128
+  },
+  "geometry_config": {
+    "context_dim": 768,
+    "hidden_dim": 512,
+    "heads": 8,
+    "layers": 6,
+    "dropout": 0.1,
+    "max_anchors": 32,
+    "max_events": 2048,
+    "event_feature_dim": 4,
+    "coordinate_space": "head-logit-relative-anchors-v1"
+  },
+  "seconds": 573.7034869678319,
+  "limitations": [
+    "Ground-truth token prefixes and previous-bar tokens supplied.",
+    "Timing targets use source/oracle clocks.",
+    "Geometry conditioned on human event plans, not sampled planner output.",
+    "No autoregressive full-song rollout or playability test."
+  ]
+}

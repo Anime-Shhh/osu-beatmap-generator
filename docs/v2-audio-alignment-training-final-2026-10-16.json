@@ -1,0 +1,1518 @@
+{
+  "job_id": 513971,
+  "completed": "2026-10-15 10:01:03 EDT",
+  "elapsed_seconds": 33698,
+  "stages": {
+    "planner": [
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 0,
+        "epoch_seconds": 688.1222122428007,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "alignment_loss": 0.40460936337088543,
+          "loss": 0.5993466900506368,
+          "steps": 1200.0,
+          "token_loss": 0.5184248171125849
+        },
+        "train_seconds": 496.1532202116214,
+        "val": {
+          "alignment_loss": 0.35568222980206465,
+          "loss": 0.8975066912556329,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 1,
+        "epoch_seconds": 627.3748673717491,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.3392466462527712,
+          "loss": 0.5445604363231299,
+          "steps": 1200.0,
+          "token_loss": 0.4767111066666742
+        },
+        "train_seconds": 472.984241920989,
+        "val": {
+          "alignment_loss": 0.3357650753313014,
+          "loss": 0.9156069035339387,
+          "steps": 4280.0,
+          "token_loss": 0.8484538885686442
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 2,
+        "epoch_seconds": 550.2116641239263,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.3296617102879099,
+          "loss": 0.534559093786714,
+          "steps": 1200.0,
+          "token_loss": 0.4686267508504292
+        },
+        "train_seconds": 396.9425040939823,
+        "val": {
+          "alignment_loss": 0.3296534183404678,
+          "loss": 0.9117866885017116,
+          "steps": 4280.0,
+          "token_loss": 0.8458560045216684
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 3,
+        "epoch_seconds": 540.1241743862629,
+        "epochs_without_improvement": 3,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.3288660701633974,
+          "loss": 0.5307320470463794,
+          "steps": 1200.0,
+          "token_loss": 0.4649588323446611
+        },
+        "train_seconds": 392.34455228596926,
+        "val": {
+          "alignment_loss": 0.32476574158900917,
+          "loss": 0.907295906679078,
+          "steps": 4280.0,
+          "token_loss": 0.842342758203082
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 4,
+        "epoch_seconds": 680.6162564498372,
+        "epochs_without_improvement": 4,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.32080692378183207,
+          "loss": 0.5423135604538644,
+          "steps": 1200.0,
+          "token_loss": 0.4781521750117341
+        },
+        "train_seconds": 460.84751982986927,
+        "val": {
+          "alignment_loss": 0.3214921594847638,
+          "loss": 0.9064034139401297,
+          "steps": 4280.0,
+          "token_loss": 0.8421049819893648
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 5,
+        "epoch_seconds": 833.1538233091123,
+        "epochs_without_improvement": 5,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.310718700553601,
+          "loss": 0.5226771211042068,
+          "steps": 1200.0,
+          "token_loss": 0.46053338098805396
+        },
+        "train_seconds": 604.7093236250803,
+        "val": {
+          "alignment_loss": 0.3188070671108473,
+          "loss": 0.9126515064694238,
+          "steps": 4280.0,
+          "token_loss": 0.8488900927461197
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 6,
+        "epoch_seconds": 845.5642848350108,
+        "epochs_without_improvement": 6,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.30491304603094854,
+          "loss": 0.516383463703096,
+          "steps": 1200.0,
+          "token_loss": 0.45540085419391596
+        },
+        "train_seconds": 625.0694130081683,
+        "val": {
+          "alignment_loss": 0.3190005597188442,
+          "loss": 0.905356032493694,
+          "steps": 4280.0,
+          "token_loss": 0.8415559207933528
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 7,
+        "epoch_seconds": 841.7137641091831,
+        "epochs_without_improvement": 7,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.30104158290351435,
+          "loss": 0.5045996211612753,
+          "steps": 1200.0,
+          "token_loss": 0.44439130384474995
+        },
+        "train_seconds": 622.7520546517335,
+        "val": {
+          "alignment_loss": 0.3157136014847642,
+          "loss": 0.9083984469629881,
+          "steps": 4280.0,
+          "token_loss": 0.845255726297325
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 8,
+        "epoch_seconds": 827.2296369369142,
+        "epochs_without_improvement": 8,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.30548389049091684,
+          "loss": 0.5051830979221268,
+          "steps": 1200.0,
+          "token_loss": 0.4440863195511822
+        },
+        "train_seconds": 599.0137193799019,
+        "val": {
+          "alignment_loss": 0.3138176351581117,
+          "loss": 0.9147320577621277,
+          "steps": 4280.0,
+          "token_loss": 0.8519685304993503
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 9,
+        "epoch_seconds": 841.3476859009825,
+        "epochs_without_improvement": 9,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.3016961108895096,
+          "loss": 0.5077597905196792,
+          "steps": 1200.0,
+          "token_loss": 0.44742056732997304
+        },
+        "train_seconds": 621.0399816916324,
+        "val": {
+          "alignment_loss": 0.3131679916404031,
+          "loss": 0.9023435176942044,
+          "steps": 4280.0,
+          "token_loss": 0.839709920129765
+        }
+      },
+      {
+        "best_val_loss": 0.8975066912556329,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/planner/latest.pt",
+        "epoch": 10,
+        "epoch_seconds": 850.8243375499733,
+        "epochs_without_improvement": 10,
+        "is_best": false,
+        "train": {
+          "alignment_loss": 0.29438007374837377,
+          "loss": 0.5074641579327483,
+          "steps": 1200.0,
+          "token_loss": 0.4485881426309546
+        },
+        "train_seconds": 627.9740221779794,
+        "val": {
+          "alignment_loss": 0.3094770362383085,
+          "loss": 0.9166258698281459,
+          "steps": 4280.0,
+          "token_loss": 0.8547304626519434
+        }
+      }
+    ],
+    "geometry": [
+      {
+        "best_val_loss": 0.4976159730034001,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 0,
+        "epoch_seconds": 845.2971796002239,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.6063378344095932,
+          "geometry_loss": 0.6348694531052994,
+          "loss": 0.6348694531052994,
+          "slider_shape_loss": 0.24157464540616974,
+          "spacing_loss": 0.0038465525069090725,
+          "steps": 1200.0,
+          "token_loss": 0.4290428537627061,
+          "turn_loss": 0.07978996502992305
+        },
+        "train_seconds": 624.3316319412552,
+        "val": {
+          "denoising_loss": 0.47397559416811114,
+          "geometry_loss": 0.4976159730034001,
+          "loss": 0.4976159730034001,
+          "slider_shape_loss": 0.19484852245024567,
+          "spacing_loss": 0.0030622127150875594,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07698609534979484
+        }
+      },
+      {
+        "best_val_loss": 0.4589429397806721,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 1,
+        "epoch_seconds": 821.1143315117806,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.4935239870411655,
+          "geometry_loss": 0.5187690335760513,
+          "loss": 0.5187690335760513,
+          "slider_shape_loss": 0.20678951542973442,
+          "spacing_loss": 0.0029899451453851947,
+          "steps": 1200.0,
+          "token_loss": 0.4864413922590514,
+          "turn_loss": 0.08534201217657217
+        },
+        "train_seconds": 599.3452032026835,
+        "val": {
+          "denoising_loss": 0.4368113266992292,
+          "geometry_loss": 0.4589429397806721,
+          "loss": 0.4589429397806721,
+          "slider_shape_loss": 0.1796639914832118,
+          "spacing_loss": 0.0030525214034920023,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07719923300280823
+        }
+      },
+      {
+        "best_val_loss": 0.44839159533703504,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 2,
+        "epoch_seconds": 822.5829149400815,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.4778166201928009,
+          "geometry_loss": 0.5021772792655974,
+          "loss": 0.5021772792655974,
+          "slider_shape_loss": 0.20042668364682026,
+          "spacing_loss": 0.0031535923203287555,
+          "steps": 1200.0,
+          "token_loss": 0.4982898460701108,
+          "turn_loss": 0.08005262603036283
+        },
+        "train_seconds": 605.8955848240294,
+        "val": {
+          "denoising_loss": 0.4212200930412798,
+          "geometry_loss": 0.44839159533703504,
+          "loss": 0.44839159533703504,
+          "slider_shape_loss": 0.23049533196396416,
+          "spacing_loss": 0.002688435035198799,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07706250327580064
+        }
+      },
+      {
+        "best_val_loss": 0.42240564640759376,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 3,
+        "epoch_seconds": 838.0030883210711,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.4496862209526201,
+          "geometry_loss": 0.4734047578228637,
+          "loss": 0.4734047578228637,
+          "slider_shape_loss": 0.19419002795225043,
+          "spacing_loss": 0.0029156948304346368,
+          "steps": 1200.0,
+          "token_loss": 0.5017066603961091,
+          "turn_loss": 0.08015929624752573
+        },
+        "train_seconds": 619.9840471060015,
+        "val": {
+          "denoising_loss": 0.40157970692396655,
+          "geometry_loss": 0.42240564640759376,
+          "loss": 0.42240564640759376,
+          "slider_shape_loss": 0.16712644651746839,
+          "spacing_loss": 0.0027263474104114787,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07681320821360318
+        }
+      },
+      {
+        "best_val_loss": 0.41689866363069816,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 4,
+        "epoch_seconds": 826.0490845199674,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.44035710104663545,
+          "geometry_loss": 0.463771640494621,
+          "loss": 0.463771640494621,
+          "slider_shape_loss": 0.1920769113212638,
+          "spacing_loss": 0.0031256645381778137,
+          "steps": 1200.0,
+          "token_loss": 0.5272986318543553,
+          "turn_loss": 0.07788564718274495
+        },
+        "train_seconds": 601.262998577673,
+        "val": {
+          "denoising_loss": 0.3982624847244441,
+          "geometry_loss": 0.41689866363069816,
+          "loss": 0.41689866363069816,
+          "slider_shape_loss": 0.14532802052048452,
+          "spacing_loss": 0.002686374303450472,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07669478666865029
+        }
+      },
+      {
+        "best_val_loss": 0.41689866363069816,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 5,
+        "epoch_seconds": 707.7768966038711,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4458696342504117,
+          "geometry_loss": 0.4670635063531033,
+          "loss": 0.4670635063531033,
+          "slider_shape_loss": 0.16928888630777758,
+          "spacing_loss": 0.002935443401870123,
+          "steps": 1200.0,
+          "token_loss": 0.5162991032625238,
+          "turn_loss": 0.07942878841854603
+        },
+        "train_seconds": 553.1947979805991,
+        "val": {
+          "denoising_loss": 0.40604715193197494,
+          "geometry_loss": 0.4255811344794102,
+          "loss": 0.4255811344794102,
+          "slider_shape_loss": 0.1541676311918644,
+          "spacing_loss": 0.0027488908935582633,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07684661391252985
+        }
+      },
+      {
+        "best_val_loss": 0.41689866363069816,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 6,
+        "epoch_seconds": 537.7132982057519,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4490186780514584,
+          "geometry_loss": 0.46963972258284536,
+          "loss": 0.46963972258284536,
+          "slider_shape_loss": 0.1678133931297046,
+          "spacing_loss": 0.0029142370409110598,
+          "steps": 1200.0,
+          "token_loss": 0.5093292517215013,
+          "turn_loss": 0.07096562742775836
+        },
+        "train_seconds": 390.3106430149637,
+        "val": {
+          "denoising_loss": 0.40205508987966027,
+          "geometry_loss": 0.4264115477221524,
+          "loss": 0.4264115477221524,
+          "slider_shape_loss": 0.20236157348282607,
+          "spacing_loss": 0.002600880636898876,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07720425628020641
+        }
+      },
+      {
+        "best_val_loss": 0.41689866363069816,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 7,
+        "epoch_seconds": 542.6460919571109,
+        "epochs_without_improvement": 3,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4498434797379499,
+          "geometry_loss": 0.47064199329043427,
+          "loss": 0.47064199329043427,
+          "slider_shape_loss": 0.16770754192286239,
+          "spacing_loss": 0.003027383649071638,
+          "steps": 1200.0,
+          "token_loss": 0.49627124568447467,
+          "turn_loss": 0.07450041526047255
+        },
+        "train_seconds": 394.0767975561321,
+        "val": {
+          "denoising_loss": 0.4375273622866452,
+          "geometry_loss": 0.45836829245202004,
+          "loss": 0.45836829245202004,
+          "slider_shape_loss": 0.1668221967282699,
+          "spacing_loss": 0.0031346418376685817,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07690493117617318
+        }
+      },
+      {
+        "best_val_loss": 0.4113585188984327,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 8,
+        "epoch_seconds": 525.5153234926984,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.43274988602429704,
+          "geometry_loss": 0.4538298814298468,
+          "loss": 0.4538298814298468,
+          "slider_shape_loss": 0.16705390028752773,
+          "spacing_loss": 0.002960141515930583,
+          "steps": 1200.0,
+          "token_loss": 0.4995534114756932,
+          "turn_loss": 0.08157180282751357
+        },
+        "train_seconds": 376.1655561910011,
+        "val": {
+          "denoising_loss": 0.3919585754189131,
+          "geometry_loss": 0.4113585188984327,
+          "loss": 0.4113585188984327,
+          "slider_shape_loss": 0.15338602144294505,
+          "spacing_loss": 0.0026934489606510637,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07583992580751725
+        }
+      },
+      {
+        "best_val_loss": 0.4077030974785171,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 9,
+        "epoch_seconds": 537.9778067017905,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.4228676808431434,
+          "geometry_loss": 0.4431487044785172,
+          "loss": 0.4431487044785172,
+          "slider_shape_loss": 0.15951227687770586,
+          "spacing_loss": 0.00274969778706172,
+          "steps": 1200.0,
+          "token_loss": 0.5019569206920764,
+          "turn_loss": 0.08109651643886535
+        },
+        "train_seconds": 383.3331660060212,
+        "val": {
+          "denoising_loss": 0.38897955058997713,
+          "geometry_loss": 0.4077030974785171,
+          "loss": 0.4077030974785171,
+          "slider_shape_loss": 0.14732034562382604,
+          "spacing_loss": 0.0025795666205903393,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07467111252369708
+        }
+      },
+      {
+        "best_val_loss": 0.4077030974785171,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 10,
+        "epoch_seconds": 530.6982143232599,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.43157737622736025,
+          "geometry_loss": 0.4507752521072204,
+          "loss": 0.4507752521072204,
+          "slider_shape_loss": 0.15037988205637057,
+          "spacing_loss": 0.002733053722480475,
+          "steps": 1200.0,
+          "token_loss": 0.5036581384452681,
+          "turn_loss": 0.07773162932607043
+        },
+        "train_seconds": 385.65725404489785,
+        "val": {
+          "denoising_loss": 0.40462306823530325,
+          "geometry_loss": 0.42428016524438783,
+          "loss": 0.42428016524438783,
+          "slider_shape_loss": 0.15619803227954693,
+          "spacing_loss": 0.0027390744653448497,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07526773031083947
+        }
+      },
+      {
+        "best_val_loss": 0.4077030974785171,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 11,
+        "epoch_seconds": 523.9186584278941,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4475588549813255,
+          "geometry_loss": 0.46752848137713343,
+          "loss": 0.46752848137713343,
+          "slider_shape_loss": 0.15736422012521115,
+          "spacing_loss": 0.0028804587611591615,
+          "steps": 1200.0,
+          "token_loss": 0.4990558581054211,
+          "turn_loss": 0.07890316843596794
+        },
+        "train_seconds": 378.5541919507086,
+        "val": {
+          "denoising_loss": 0.3980507904575011,
+          "geometry_loss": 0.4165850712228501,
+          "loss": 0.4165850712228501,
+          "slider_shape_loss": 0.144184554499832,
+          "spacing_loss": 0.0028056010171889022,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.0767053025135009
+        }
+      },
+      {
+        "best_val_loss": 0.4054439309223937,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 12,
+        "epoch_seconds": 529.5271509340964,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.421236546379514,
+          "geometry_loss": 0.44078613893982643,
+          "loss": 0.44078613893982643,
+          "slider_shape_loss": 0.1519072651906101,
+          "spacing_loss": 0.0027404839676889677,
+          "steps": 1200.0,
+          "token_loss": 0.500238707230116,
+          "turn_loss": 0.0816963654022098
+        },
+        "train_seconds": 382.4112526969984,
+        "val": {
+          "denoising_loss": 0.38619233452503904,
+          "geometry_loss": 0.4054439309223937,
+          "loss": 0.4054439309223937,
+          "slider_shape_loss": 0.15272656942674562,
+          "spacing_loss": 0.002560321478689646,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07445814478879123
+        }
+      },
+      {
+        "best_val_loss": 0.40196714503608993,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 13,
+        "epoch_seconds": 539.8535060337745,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.419815559660395,
+          "geometry_loss": 0.440756773284326,
+          "loss": 0.440756773284326,
+          "slider_shape_loss": 0.16836605995729997,
+          "spacing_loss": 0.0027922815601138158,
+          "steps": 1200.0,
+          "token_loss": 0.5066736527966956,
+          "turn_loss": 0.07650760163631595
+        },
+        "train_seconds": 385.0616224729456,
+        "val": {
+          "denoising_loss": 0.3844579579784626,
+          "geometry_loss": 0.40196714503608993,
+          "loss": 0.40196714503608993,
+          "slider_shape_loss": 0.1354072171090603,
+          "spacing_loss": 0.0025999465893662586,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07416940705066769
+        }
+      },
+      {
+        "best_val_loss": 0.40196714503608993,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 14,
+        "epoch_seconds": 529.1231456180103,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4150472991069546,
+          "geometry_loss": 0.4349353536173779,
+          "loss": 0.4349353536173779,
+          "slider_shape_loss": 0.15726430220429644,
+          "spacing_loss": 0.002885623092813739,
+          "steps": 1200.0,
+          "token_loss": 0.5257225679109494,
+          "turn_loss": 0.0774612293313207
+        },
+        "train_seconds": 383.0245557939634,
+        "val": {
+          "denoising_loss": 0.3896720847568614,
+          "geometry_loss": 0.4087023598632653,
+          "loss": 0.4087023598632653,
+          "slider_shape_loss": 0.15028855641422206,
+          "spacing_loss": 0.0026094209809425484,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07480953733576733
+        }
+      },
+      {
+        "best_val_loss": 0.40196714503608993,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 15,
+        "epoch_seconds": 536.5268312101252,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4392825956157564,
+          "geometry_loss": 0.45770655655728965,
+          "loss": 0.45770655655728965,
+          "slider_shape_loss": 0.1446834442593945,
+          "spacing_loss": 0.0027922545891313653,
+          "steps": 1200.0,
+          "token_loss": 0.4909627027250827,
+          "turn_loss": 0.0735278265172638
+        },
+        "train_seconds": 387.1893869857304,
+        "val": {
+          "denoising_loss": 0.3882826075637028,
+          "geometry_loss": 0.4038216157862318,
+          "loss": 0.4038216157862318,
+          "slider_shape_loss": 0.11609743639945809,
+          "spacing_loss": 0.0025789887222086904,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07342731216963214
+        }
+      },
+      {
+        "best_val_loss": 0.39930012213407845,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 16,
+        "epoch_seconds": 539.2137306430377,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.436304819791112,
+          "geometry_loss": 0.4564418172937197,
+          "loss": 0.4564418172937197,
+          "slider_shape_loss": 0.16106116039265492,
+          "spacing_loss": 0.0029307314990909936,
+          "steps": 1200.0,
+          "token_loss": 0.4914459625942012,
+          "turn_loss": 0.07475617415363153
+        },
+        "train_seconds": 382.9789049047977,
+        "val": {
+          "denoising_loss": 0.38362462407306586,
+          "geometry_loss": 0.39930012213407845,
+          "loss": 0.39930012213407845,
+          "slider_shape_loss": 0.11767869772924142,
+          "spacing_loss": 0.0025086586533732925,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.0731352407276711
+        }
+      },
+      {
+        "best_val_loss": 0.39138538952145474,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 17,
+        "epoch_seconds": 540.2209437531419,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.416847146062646,
+          "geometry_loss": 0.4360732000879944,
+          "loss": 0.4360732000879944,
+          "slider_shape_loss": 0.15070525872883425,
+          "spacing_loss": 0.0030910482001969912,
+          "steps": 1200.0,
+          "token_loss": 0.498416119540731,
+          "turn_loss": 0.07692846411246142
+        },
+        "train_seconds": 390.90332666411996,
+        "val": {
+          "denoising_loss": 0.37219510794085203,
+          "geometry_loss": 0.39138538952145474,
+          "loss": 0.39138538952145474,
+          "slider_shape_loss": 0.1530288641543181,
+          "spacing_loss": 0.0025023567391619255,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07274318257956455
+        }
+      },
+      {
+        "best_val_loss": 0.39138538952145474,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 18,
+        "epoch_seconds": 540.1796524720266,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4289671100427707,
+          "geometry_loss": 0.4477974717939893,
+          "loss": 0.4477974717939893,
+          "slider_shape_loss": 0.14749047564246137,
+          "spacing_loss": 0.0027775700638277443,
+          "steps": 1200.0,
+          "token_loss": 0.49785002112388616,
+          "turn_loss": 0.07607115358250877
+        },
+        "train_seconds": 393.61299780523404,
+        "val": {
+          "denoising_loss": 0.39619751728975394,
+          "geometry_loss": 0.4195728592844419,
+          "loss": 0.4195728592844419,
+          "slider_shape_loss": 0.19518000718006623,
+          "spacing_loss": 0.0024580943616498716,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07223063585878294
+        }
+      },
+      {
+        "best_val_loss": 0.39138538952145474,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 19,
+        "epoch_seconds": 542.3991632270627,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4194296320900321,
+          "geometry_loss": 0.4393632744516556,
+          "loss": 0.4393632744516556,
+          "slider_shape_loss": 0.158306224480876,
+          "spacing_loss": 0.0027317636216030445,
+          "steps": 1200.0,
+          "token_loss": 0.5010067367988328,
+          "turn_loss": 0.0765968680884389
+        },
+        "train_seconds": 390.84855181816965,
+        "val": {
+          "denoising_loss": 0.41420441398431895,
+          "geometry_loss": 0.43866751898933093,
+          "loss": 0.43866751898933093,
+          "slider_shape_loss": 0.20590847131151618,
+          "spacing_loss": 0.002581211641138914,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07228273637182608
+        }
+      },
+      {
+        "best_val_loss": 0.38468022188142503,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 20,
+        "epoch_seconds": 535.4322992921807,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.4261224510590546,
+          "geometry_loss": 0.44484920617503426,
+          "loss": 0.44484920617503426,
+          "slider_shape_loss": 0.1427121984602561,
+          "spacing_loss": 0.002766022269583221,
+          "steps": 1200.0,
+          "token_loss": 0.48790632826586566,
+          "turn_loss": 0.08357864636585005
+        },
+        "train_seconds": 385.32049271604046,
+        "val": {
+          "denoising_loss": 0.3686414251773454,
+          "geometry_loss": 0.38468022188142503,
+          "loss": 0.38468022188142503,
+          "slider_shape_loss": 0.1215976782163188,
+          "spacing_loss": 0.0025663397783185493,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07244789841448473
+        }
+      },
+      {
+        "best_val_loss": 0.38468022188142503,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 21,
+        "epoch_seconds": 536.028789002914,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.40691937077072604,
+          "geometry_loss": 0.42613662394597973,
+          "loss": 0.42613662394597973,
+          "slider_shape_loss": 0.1513587947055885,
+          "spacing_loss": 0.00276781658798645,
+          "steps": 1200.0,
+          "token_loss": 0.4992540874456366,
+          "turn_loss": 0.07609183012946112
+        },
+        "train_seconds": 390.29727919911966,
+        "val": {
+          "denoising_loss": 0.3759132009132321,
+          "geometry_loss": 0.39209318294921003,
+          "loss": 0.39209318294921003,
+          "slider_shape_loss": 0.12309747651695013,
+          "spacing_loss": 0.002478516621966343,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07244764908497325
+        }
+      },
+      {
+        "best_val_loss": 0.38468022188142503,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 22,
+        "epoch_seconds": 532.1585540189408,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.42498376573746405,
+          "geometry_loss": 0.44302184188505633,
+          "loss": 0.44302184188505633,
+          "slider_shape_loss": 0.13993973497897666,
+          "spacing_loss": 0.0027786677348564824,
+          "steps": 1200.0,
+          "token_loss": 0.4973563171674808,
+          "turn_loss": 0.07532471404133768
+        },
+        "train_seconds": 383.8931060163304,
+        "val": {
+          "denoising_loss": 0.3762023979840935,
+          "geometry_loss": 0.3916102893123399,
+          "loss": 0.3916102893123399,
+          "slider_shape_loss": 0.11557544011312879,
+          "spacing_loss": 0.0025293509555641886,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07194823906831462
+        }
+      },
+      {
+        "best_val_loss": 0.38468022188142503,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 23,
+        "epoch_seconds": 538.7635811632499,
+        "epochs_without_improvement": 3,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.42331267211799667,
+          "geometry_loss": 0.4413793655739088,
+          "loss": 0.4413793655739088,
+          "slider_shape_loss": 0.14043176823658943,
+          "spacing_loss": 0.0028936590780941534,
+          "steps": 1200.0,
+          "token_loss": 0.49009363799045486,
+          "turn_loss": 0.0746830137145316
+        },
+        "train_seconds": 392.9339431342669,
+        "val": {
+          "denoising_loss": 0.3795556897663611,
+          "geometry_loss": 0.3968445135653128,
+          "loss": 0.3968445135653128,
+          "slider_shape_loss": 0.1344281991965641,
+          "spacing_loss": 0.0024337378067951906,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07205260924140437
+        }
+      },
+      {
+        "best_val_loss": 0.3827440900172686,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 24,
+        "epoch_seconds": 545.3988788798451,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.40413098309072665,
+          "geometry_loss": 0.42160454573381384,
+          "loss": 0.42160454573381384,
+          "slider_shape_loss": 0.13316103886867192,
+          "spacing_loss": 0.0026845705026232146,
+          "steps": 1200.0,
+          "token_loss": 0.4889399581278364,
+          "turn_loss": 0.07778004888513275
+        },
+        "train_seconds": 393.176017194055,
+        "val": {
+          "denoising_loss": 0.3677259113964359,
+          "geometry_loss": 0.3827440900172686,
+          "loss": 0.3827440900172686,
+          "slider_shape_loss": 0.11276946086895319,
+          "spacing_loss": 0.0025010788964801465,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06982249056085031
+        }
+      },
+      {
+        "best_val_loss": 0.3827440900172686,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 25,
+        "epoch_seconds": 532.607615660876,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.39990917700614464,
+          "geometry_loss": 0.41729585974787675,
+          "loss": 0.41729585974787675,
+          "slider_shape_loss": 0.134485821526706,
+          "spacing_loss": 0.0027405984657000696,
+          "steps": 1200.0,
+          "token_loss": 0.5137832226852576,
+          "turn_loss": 0.073280816180004
+        },
+        "train_seconds": 384.179458275903,
+        "val": {
+          "denoising_loss": 0.3670288264664667,
+          "geometry_loss": 0.38300577625428284,
+          "loss": 0.38300577625428284,
+          "slider_shape_loss": 0.12248104072342544,
+          "spacing_loss": 0.002382123966735865,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06981266156429262
+        }
+      },
+      {
+        "best_val_loss": 0.3827440900172686,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 26,
+        "epoch_seconds": 545.8502673837356,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.39823930357970916,
+          "geometry_loss": 0.41497755314766743,
+          "loss": 0.41497755314766743,
+          "slider_shape_loss": 0.12787829571898465,
+          "spacing_loss": 0.0026706357629885367,
+          "steps": 1200.0,
+          "token_loss": 0.5085006335936486,
+          "turn_loss": 0.07366712449478297
+        },
+        "train_seconds": 395.1278721196577,
+        "val": {
+          "denoising_loss": 0.36768318618088525,
+          "geometry_loss": 0.3832869257933512,
+          "loss": 0.3832869257933512,
+          "slider_shape_loss": 0.11854175645652645,
+          "spacing_loss": 0.002393388743562804,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07020450122832947
+        }
+      },
+      {
+        "best_val_loss": 0.38018024756641344,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 27,
+        "epoch_seconds": 548.0731794196181,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.4063900113288158,
+          "geometry_loss": 0.42467181982472535,
+          "loss": 0.42467181982472535,
+          "slider_shape_loss": 0.1381740227780341,
+          "spacing_loss": 0.0027047179744308873,
+          "steps": 1200.0,
+          "token_loss": 0.4945418266858906,
+          "turn_loss": 0.08387869008226104
+        },
+        "train_seconds": 397.0586886620149,
+        "val": {
+          "denoising_loss": 0.3648149004937703,
+          "geometry_loss": 0.38018024756641344,
+          "loss": 0.38018024756641344,
+          "slider_shape_loss": 0.11570698213185952,
+          "spacing_loss": 0.002426303239604133,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07104037968277029
+        }
+      },
+      {
+        "best_val_loss": 0.37640127615152347,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 28,
+        "epoch_seconds": 546.7202286450192,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.40820951574870074,
+          "geometry_loss": 0.4259044862270821,
+          "loss": 0.4259044862270821,
+          "slider_shape_loss": 0.1344969078035202,
+          "spacing_loss": 0.0027743025641325638,
+          "steps": 1200.0,
+          "token_loss": 0.49777243760103984,
+          "turn_loss": 0.07935699044865249
+        },
+        "train_seconds": 395.020092966035,
+        "val": {
+          "denoising_loss": 0.3638668102427673,
+          "geometry_loss": 0.37640127615152347,
+          "loss": 0.37640127615152347,
+          "slider_shape_loss": 0.08835038375814169,
+          "spacing_loss": 0.002422131936533123,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.0691442863744219
+        }
+      },
+      {
+        "best_val_loss": 0.37640127615152347,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 29,
+        "epoch_seconds": 534.5619125389494,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.38834069068000343,
+          "geometry_loss": 0.40579749800264836,
+          "loss": 0.40579749800264836,
+          "slider_shape_loss": 0.13400755430540442,
+          "spacing_loss": 0.0026267790950011026,
+          "steps": 1200.0,
+          "token_loss": 0.49714160007735086,
+          "turn_loss": 0.07586748035889096
+        },
+        "train_seconds": 385.8851860417053,
+        "val": {
+          "denoising_loss": 0.36535041090868037,
+          "geometry_loss": 0.37940927388159573,
+          "loss": 0.37940927388159573,
+          "slider_shape_loss": 0.10336722742161034,
+          "spacing_loss": 0.002385427393620356,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.0696719466191653
+        }
+      },
+      {
+        "best_val_loss": 0.37640127615152347,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 30,
+        "epoch_seconds": 537.644736899063,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4147647717005262,
+          "geometry_loss": 0.4325533676849834,
+          "loss": 0.4325533676849834,
+          "slider_shape_loss": 0.1348409176913889,
+          "spacing_loss": 0.002640280233380956,
+          "steps": 1200.0,
+          "token_loss": 0.5055273373921713,
+          "turn_loss": 0.08080953588073905
+        },
+        "train_seconds": 389.09225105214864,
+        "val": {
+          "denoising_loss": 0.3751617477137528,
+          "geometry_loss": 0.39227585788311925,
+          "loss": 0.39227585788311925,
+          "slider_shape_loss": 0.13398707954458544,
+          "spacing_loss": 0.002429415471957095,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.069449212540071
+        }
+      },
+      {
+        "best_val_loss": 0.37640127615152347,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 31,
+        "epoch_seconds": 555.1972474800423,
+        "epochs_without_improvement": 3,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.40557228698938463,
+          "geometry_loss": 0.42220549029142906,
+          "loss": 0.42220549029142906,
+          "slider_shape_loss": 0.1257279251534936,
+          "spacing_loss": 0.0026857005416040876,
+          "steps": 1200.0,
+          "token_loss": 0.49844368810455003,
+          "turn_loss": 0.0758368071896183
+        },
+        "train_seconds": 407.2025931980461,
+        "val": {
+          "denoising_loss": 0.3775823243132903,
+          "geometry_loss": 0.3953939017649059,
+          "loss": 0.3953939017649059,
+          "slider_shape_loss": 0.14041033535857447,
+          "spacing_loss": 0.002408765894960257,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07059334944335127
+        }
+      },
+      {
+        "best_val_loss": 0.37640127615152347,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 32,
+        "epoch_seconds": 530.0563963847235,
+        "epochs_without_improvement": 4,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4051766437579257,
+          "geometry_loss": 0.42113916592982903,
+          "loss": 0.42113916592982903,
+          "slider_shape_loss": 0.12324697784154219,
+          "spacing_loss": 0.0024791115483324094,
+          "steps": 1200.0,
+          "token_loss": 0.5010684877447784,
+          "turn_loss": 0.06779827706882033
+        },
+        "train_seconds": 382.0334868389182,
+        "val": {
+          "denoising_loss": 0.37532875997908677,
+          "geometry_loss": 0.3952428256049448,
+          "loss": 0.3952428256049448,
+          "slider_shape_loss": 0.16193179407125774,
+          "spacing_loss": 0.002396309757263426,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06962511042597487
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 33,
+        "epoch_seconds": 537.9956862772815,
+        "epochs_without_improvement": 0,
+        "is_best": true,
+        "train": {
+          "denoising_loss": 0.405570073077688,
+          "geometry_loss": 0.4232197561258605,
+          "loss": 0.4232197561258605,
+          "slider_shape_loss": 0.1379501569331198,
+          "spacing_loss": 0.0025744377696761945,
+          "steps": 1200.0,
+          "token_loss": 0.4985970063693822,
+          "turn_loss": 0.07194449454846423
+        },
+        "train_seconds": 389.03780528437346,
+        "val": {
+          "denoising_loss": 0.35953567768882294,
+          "geometry_loss": 0.37420956655612186,
+          "loss": 0.37420956655612186,
+          "slider_shape_loss": 0.1099597420375424,
+          "spacing_loss": 0.002387361936982189,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06878357217251022
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 34,
+        "epoch_seconds": 537.658645756077,
+        "epochs_without_improvement": 1,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.39757800375538255,
+          "geometry_loss": 0.4138655785428515,
+          "loss": 0.4138655785428515,
+          "slider_shape_loss": 0.12228480487528012,
+          "spacing_loss": 0.002718517730073564,
+          "steps": 1200.0,
+          "token_loss": 0.4931338288014134,
+          "turn_loss": 0.07574484932909678
+        },
+        "train_seconds": 390.4081708271988,
+        "val": {
+          "denoising_loss": 0.3614405711598707,
+          "geometry_loss": 0.37396665360097486,
+          "loss": 0.37396665360097486,
+          "slider_shape_loss": 0.08802000725150998,
+          "spacing_loss": 0.0024031927347493423,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06967525306868337
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 35,
+        "epoch_seconds": 541.3605943219736,
+        "epochs_without_improvement": 2,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.40923081853426996,
+          "geometry_loss": 0.42575880734793226,
+          "loss": 0.42575880734793226,
+          "slider_shape_loss": 0.1261161048084962,
+          "spacing_loss": 0.002636050462853809,
+          "steps": 1200.0,
+          "token_loss": 0.473151292130351,
+          "turn_loss": 0.07305548131173942
+        },
+        "train_seconds": 393.6356714749709,
+        "val": {
+          "denoising_loss": 0.3594176332725111,
+          "geometry_loss": 0.37326624003377973,
+          "loss": 0.37326624003377973,
+          "slider_shape_loss": 0.1011539381249833,
+          "spacing_loss": 0.0024418915777004993,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06978046279341267
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 36,
+        "epoch_seconds": 541.0259736250155,
+        "epochs_without_improvement": 3,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.40696379841111285,
+          "geometry_loss": 0.423981327288008,
+          "loss": 0.423981327288008,
+          "slider_shape_loss": 0.12900254614796136,
+          "spacing_loss": 0.0026357634422212685,
+          "steps": 1200.0,
+          "token_loss": 0.4575608963270982,
+          "turn_loss": 0.07707395814848374
+        },
+        "train_seconds": 392.64929592981935,
+        "val": {
+          "denoising_loss": 0.3624645932682542,
+          "geometry_loss": 0.37762583001102235,
+          "loss": 0.37762583001102235,
+          "slider_shape_loss": 0.11490297002574539,
+          "spacing_loss": 0.0023875752244952447,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06864364203884706
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 37,
+        "epoch_seconds": 539.7425482510589,
+        "epochs_without_improvement": 4,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.40997911940708337,
+          "geometry_loss": 0.42677898578220874,
+          "loss": 0.42677898578220874,
+          "slider_shape_loss": 0.130751179589144,
+          "spacing_loss": 0.002637304982837539,
+          "steps": 1200.0,
+          "token_loss": 0.43564415705700715,
+          "turn_loss": 0.0692203572698984
+        },
+        "train_seconds": 389.30509178107604,
+        "val": {
+          "denoising_loss": 0.3613446349832425,
+          "geometry_loss": 0.37659575002269047,
+          "loss": 0.37659575002269047,
+          "slider_shape_loss": 0.11537592612193885,
+          "spacing_loss": 0.002324732511735484,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.0696209836389131
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 38,
+        "epoch_seconds": 535.803113471251,
+        "epochs_without_improvement": 5,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.39707484998080567,
+          "geometry_loss": 0.4125761776786142,
+          "loss": 0.4125761776786142,
+          "slider_shape_loss": 0.11505518553517587,
+          "spacing_loss": 0.0026035230242773843,
+          "steps": 1200.0,
+          "token_loss": 0.41545429605369766,
+          "turn_loss": 0.07470914565101323
+        },
+        "train_seconds": 387.5049266158603,
+        "val": {
+          "denoising_loss": 0.3715660952496186,
+          "geometry_loss": 0.3873585136795512,
+          "loss": 0.3873585136795512,
+          "slider_shape_loss": 0.12018590634804827,
+          "spacing_loss": 0.0024263655467033733,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.07062382879560543
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 39,
+        "epoch_seconds": 534.5972802033648,
+        "epochs_without_improvement": 6,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4048940241530848,
+          "geometry_loss": 0.4218792756592545,
+          "loss": 0.4218792756592545,
+          "slider_shape_loss": 0.1322911967644361,
+          "spacing_loss": 0.002594703816192047,
+          "steps": 1200.0,
+          "token_loss": 0.3851356163186332,
+          "turn_loss": 0.06993323471654547
+        },
+        "train_seconds": 387.0199903282337,
+        "val": {
+          "denoising_loss": 0.36269168200888774,
+          "geometry_loss": 0.3769831981519852,
+          "loss": 0.3769831981519852,
+          "slider_shape_loss": 0.1063212078051751,
+          "spacing_loss": 0.0023967878986208154,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06839433704687288
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 40,
+        "epoch_seconds": 536.38536560582,
+        "epochs_without_improvement": 7,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.3931515194277745,
+          "geometry_loss": 0.4091748615715187,
+          "loss": 0.4091748615715187,
+          "slider_shape_loss": 0.12081371809612526,
+          "spacing_loss": 0.002607054135019243,
+          "steps": 1200.0,
+          "token_loss": 0.49036421130721763,
+          "turn_loss": 0.07362529540650357
+        },
+        "train_seconds": 389.3153539360501,
+        "val": {
+          "denoising_loss": 0.36241097713335935,
+          "geometry_loss": 0.376399428570816,
+          "loss": 0.376399428570816,
+          "slider_shape_loss": 0.1030573981885377,
+          "spacing_loss": 0.0023260124189848595,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06900220456082172
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 41,
+        "epoch_seconds": 539.1522927512415,
+        "epochs_without_improvement": 8,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.40650375991361215,
+          "geometry_loss": 0.42263251604124286,
+          "loss": 0.42263251604124286,
+          "slider_shape_loss": 0.12337239976640708,
+          "spacing_loss": 0.0026622600617208056,
+          "steps": 1200.0,
+          "token_loss": 0.5003002506121993,
+          "turn_loss": 0.07050579324922013
+        },
+        "train_seconds": 391.42617941787466,
+        "val": {
+          "denoising_loss": 0.3635241409707934,
+          "geometry_loss": 0.37609727592835807,
+          "loss": 0.37609727592835807,
+          "slider_shape_loss": 0.08876357244908271,
+          "spacing_loss": 0.0023351410806000633,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06926527887919506
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 42,
+        "epoch_seconds": 533.3419257928617,
+        "epochs_without_improvement": 9,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.387734730700419,
+          "geometry_loss": 0.40437558059328393,
+          "loss": 0.40437558059328393,
+          "slider_shape_loss": 0.12660890660276192,
+          "spacing_loss": 0.0027045276116820696,
+          "steps": 1200.0,
+          "token_loss": 0.5015515377217283,
+          "turn_loss": 0.07419011860063206
+        },
+        "train_seconds": 386.4374772477895,
+        "val": {
+          "denoising_loss": 0.3609972065587737,
+          "geometry_loss": 0.373807380579153,
+          "loss": 0.373807380579153,
+          "slider_shape_loss": 0.09194748740953386,
+          "spacing_loss": 0.0023685454201365337,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06757141387051813
+        }
+      },
+      {
+        "best_val_loss": 0.37420956655612186,
+        "checkpoint": "/common/users/asj102/osu_project/v2_runs/run_20261015_audio_alignment_precision/geometry/latest.pt",
+        "epoch": 43,
+        "epoch_seconds": 539.1321079740301,
+        "epochs_without_improvement": 10,
+        "is_best": false,
+        "train": {
+          "denoising_loss": 0.4110527531562063,
+          "geometry_loss": 0.42693496763667405,
+          "loss": 0.42693496763667405,
+          "slider_shape_loss": 0.11899044261596743,
+          "spacing_loss": 0.002610688187830202,
+          "steps": 1200.0,
+          "token_loss": 0.523238077169905,
+          "turn_loss": 0.07444200182863361
+        },
+        "train_seconds": 391.73570041172206,
+        "val": {
+          "denoising_loss": 0.36075437866590887,
+          "geometry_loss": 0.3749264730073111,
+          "loss": 0.3749264730073111,
+          "slider_shape_loss": 0.10544681518556627,
+          "spacing_loss": 0.0023401880787224014,
+          "steps": 4280.0,
+          "token_loss": 0.8263702458031824,
+          "turn_loss": 0.06786788346186012
+        }
+      }
+    ]
+  }
+}

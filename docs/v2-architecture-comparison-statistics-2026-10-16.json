@@ -1,0 +1,37 @@
+{
+  "protocol": "Paired bootstrap of source groups; 20,000 resamples, seed 1731; token-weighted differences",
+  "sources": 18,
+  "sources_accuracy_better": 15,
+  "sources_accuracy_worse": 3,
+  "token_accuracy_delta_pp": 1.1723168227242287,
+  "accuracy_delta_pp_95_percentile_interval": [
+    0.4926245169460158,
+    1.990280495643902
+  ],
+  "token_ce_delta": -0.04023146139129008,
+  "ce_delta_95_percentile_interval": [
+    -0.07267946648415897,
+    -0.01468386898808131
+  ],
+  "family_accuracy_delta_pp": {
+    "control": -0.2963243175083563,
+    "offset": 2.3008352071956284,
+    "snap": 2.867009315772573,
+    "residual": -0.6223899775136515,
+    "kind": 1.2447799550272975,
+    "combo": 0.9998393832316044,
+    "hit_sound": 2.212495984580787,
+    "duration": -0.08044333214157762,
+    "curve": 3.9315155358275233,
+    "repeats": 0.24458737204456904,
+    "anchors": 0.38952803695987415
+  },
+  "geometry_relative_delta_percent": {
+    "geometry_loss": 3.764025465867449,
+    "denoising_loss": 3.497477204137156,
+    "spacing_loss": 3.834514154928481,
+    "turn_loss": 5.6548892970861075,
+    "slider_shape_loss": 13.213922888845264
+  },
+  "geometry_caveat": "Same evaluation recipe, but model initialization consumes different RNG before denoising, so diffusion noise is not paired. Descriptive losses, not statistical proof or playability measurements."
+}
