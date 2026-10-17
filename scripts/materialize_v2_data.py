@@ -46,14 +46,16 @@ def osz_sources(directory: Path):
                 }
 
 
-def hf_sources(revision: str, limit: int):
+def hf_sources(revision: str, limit: int, start: int = 0):
     from datasets import Audio, load_dataset
     dataset = load_dataset('project-riz/osu-beatmaps', 'original', revision=revision,
                            split='train', streaming=True)
     dataset = dataset.cast_column('mp3', Audio(decode=False))
     for index, example in enumerate(dataset):
-        if index >= limit:
+        if index >= start + limit:
             break
+        if index < start:
+            continue
         metadata = example['json']
         if isinstance(metadata, str):
             metadata = json.loads(metadata)

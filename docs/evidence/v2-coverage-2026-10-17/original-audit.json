@@ -1,0 +1,57 @@
+{
+  "audio_duration_ms": 90149.625,
+  "audit": {
+    "candidate_id": "played",
+    "seed": 1601,
+    "valid": false,
+    "selected": false,
+    "score": null,
+    "errors": [
+      "event 19: rendered slider body leaves the playfield",
+      "event 21: rendered slider body leaves the playfield",
+      "event 26: rendered slider body leaves the playfield",
+      "event 29: rendered slider body leaves the playfield",
+      "event 34: rendered slider body leaves the playfield",
+      "event 47: rendered slider body leaves the playfield",
+      "event 50: rendered slider body leaves the playfield",
+      "event 52: rendered slider body leaves the playfield",
+      "event 54: rendered slider body leaves the playfield",
+      "event 64: rendered slider body leaves the playfield",
+      "event 72: rendered slider body leaves the playfield",
+      "event 76: rendered slider body leaves the playfield",
+      "event 80: rendered slider body leaves the playfield",
+      "event 81: rendered slider body leaves the playfield",
+      "event 87: rendered slider body leaves the playfield",
+      "event 88: rendered slider body leaves the playfield",
+      "audible-song coverage 59.3% is below 85.0%",
+      "unmapped audible intro is 5.4s",
+      "unmapped audible outro is 36.8s"
+    ],
+    "warnings": [],
+    "metrics": {
+      "object_count": 99.0,
+      "duration_ms": 46796.0,
+      "objects_per_minute": 126.93392597657919,
+      "circle_count": 69.0,
+      "slider_count": 30.0,
+      "spinner_count": 0.0,
+      "max_snap_error_beats": 0.00503970843271162,
+      "median_start_gap_ms": 434.0,
+      "max_jump_speed_px_per_second": 5944.143356000626,
+      "audio_duration_ms": 90149.625,
+      "first_object_ms": 5409.0,
+      "last_object_end_ms": 52205.0,
+      "active_audio_coverage": 0.5932134831460674,
+      "unmapped_intro_ms": 5409.0,
+      "unmapped_outro_ms": 36795.0
+    },
+    "difficulty": {
+      "available": false,
+      "stars": null,
+      "calculator_id": "not_evaluated",
+      "attributes": {},
+      "error": "candidate failed deterministic validation"
+    },
+    "provenance": {}
+  }
+}

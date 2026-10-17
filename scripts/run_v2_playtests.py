@@ -10,6 +10,7 @@ import zipfile
 import torch
 
 from src.v2.clock import TimingHypothesis
+from src.v2.coverage import policy_for_audio
 from src.v2.evaluation import Candidate, RosuDifficultyCalculator, StrictAuditPolicy, build_generation_result, rerank_candidates
 from src.v2.generation import GenerationRequest
 from src.v2.inference import GeneratedDraft, _sample_candidate_map, extract_audio_features, load_audio, load_v2_models
@@ -82,9 +83,9 @@ def main():
                     failures.append({'candidate':i,'error':str(exc),'seconds':time.monotonic()-started})
                     print(json.dumps({'song':song['id'],'mode':mode,'candidate':i,'error':str(exc)}), flush=True)
             strict = rerank_candidates(candidates, target_star=request.target_star, calculator=calculator,
-                                       policy=StrictAuditPolicy(max_star_error=0.5, minimum_start_gap_ms=10.0))
+                                       policy=policy_for_audio(StrictAuditPolicy(max_star_error=0.5, minimum_start_gap_ms=10.0), features))
             diagnostic = rerank_candidates(candidates, target_star=request.target_star, calculator=calculator,
-                                           policy=StrictAuditPolicy(max_star_error=None, minimum_start_gap_ms=10.0))
+                                           policy=policy_for_audio(StrictAuditPolicy(max_star_error=None, minimum_start_gap_ms=10.0), features))
             passing = [a for a in strict if a.valid]
             calibrated = bool(passing)
             audits = strict if calibrated else diagnostic

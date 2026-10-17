@@ -1,6 +1,8 @@
 # Project operations
 
-The active V2 branch is `architecture-v2-hierarchical-beatgrid`.
+The coverage repair and experimental rhythm-flow branch is
+`codex/v2-coverage-rhythm-flow`, based on the preserved
+`architecture-v2-hierarchical-beatgrid` baseline `d75f6a8`.
 
 Codex accesses Rutgers iLab directly from the Mac through the password-authenticated
 OpenSSH ControlMaster. Do not add SSH keys or use the Hermes container for access.
@@ -26,3 +28,10 @@ new within-bar audio path, with `--initialize-planner` for legacy weight transfe
 Keep legacy checkpoints unchanged. Do not use `--resume` to silently change
 `local_audio_tokens`. See `docs/v2-audio-alignment-2026-10-14.md` for evidence,
 commands, and the distinction between implementation validation and map quality.
+
+October 17 follow-up: production V2 generation now retries empty audible bars,
+audits full-song coverage, and evaluates rendered slider paths including native
+length extension. Keep these audits enabled when selecting playable outputs.
+The separate `src/rhythm_flow/` experiment predicts timing signals only; its
+64-step smoke checkpoint is not a usable beatmap model. See
+`docs/v2-coverage-and-diffusion-2026-10-17.md` for evidence and run locations.

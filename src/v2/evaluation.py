@@ -42,8 +42,23 @@ class StrictAuditPolicy:
     allowed_snap_divisors: tuple[int, ...] = (1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 96)
     max_star_error: float | None = None
     minimum_start_gap_ms: float = 0.0
+    check_slider_paths: bool = True
+    audio_duration_ms: float | None = None
+    active_audio_intervals_ms: tuple[tuple[float, float], ...] | None = None
+    minimum_audio_coverage: float = 0.85
+    maximum_unmapped_edge_ms: float = 5000.0
 
     def __post_init__(self) -> None:
+        if not 0 <= self.minimum_audio_coverage <= 1 or not math.isfinite(self.maximum_unmapped_edge_ms) or self.maximum_unmapped_edge_ms < 0:
+            raise ValueError("invalid audio coverage tolerances")
+        if self.audio_duration_ms is not None and (not math.isfinite(self.audio_duration_ms) or self.audio_duration_ms <= 0):
+            raise ValueError("audio duration must be finite and positive")
+        if self.active_audio_intervals_ms is not None:
+            previous = 0.0
+            for start, end in self.active_audio_intervals_ms:
+                if not (math.isfinite(start) and math.isfinite(end) and previous <= start < end and self.audio_duration_ms is not None and end <= self.audio_duration_ms):
+                    raise ValueError("active audio intervals must be sorted, disjoint and inside audio")
+                previous = end
         if self.same_tick_tolerance_ms < 0.0:
             raise ValueError("same_tick_tolerance_ms must be non-negative")
         if self.minimum_start_gap_ms < 0 or not math.isfinite(self.minimum_start_gap_ms):
@@ -431,6 +446,16 @@ def _generic_strict_audit(map_spec: Any, policy: StrictAuditPolicy) -> tuple[lis
                     continue
                 if not (math.isfinite(point_x) and math.isfinite(point_y)):
                     errors.append(f"event {index}: slider point {point_index} is non-finite")
+            if policy.check_slider_paths:
+                from .slider_path import slider_path, circle_radius
+                try:
+                    path = slider_path((x, y), control_points, curve_type, length)
+                    cs = _field(_field(map_spec, "difficulty", {}), "circle_size", 4.0)
+                    radius = circle_radius(cs)
+                    if (path.min(axis=0) < radius).any() or (path.max(axis=0) > (512-radius, 384-radius)).any():
+                        errors.append(f"event {index}: rendered slider body leaves the playfield")
+                except (ValueError, TypeError, IndexError) as exc:
+                    errors.append(f"event {index}: slider path evaluation failed: {exc}")
 
         canonical_events.append(
             (
@@ -460,6 +485,10 @@ def _generic_strict_audit(map_spec: Any, policy: StrictAuditPolicy) -> tuple[lis
         "median_start_gap_ms": float(median(gap_values)) if gap_values else 0.0,
         "max_jump_speed_px_per_second": max_jump_speed,
     }
+    from .coverage import audit_coverage
+    coverage_errors, coverage_metrics = audit_coverage(timed, policy)
+    errors.extend(coverage_errors)
+    metrics.update(coverage_metrics)
     fingerprint = hashlib.sha256(
         json.dumps(canonical_events, separators=(",", ":"), sort_keys=False).encode("utf-8")
     ).hexdigest()

@@ -1,0 +1,20 @@
+{
+  "history": [
+    {
+      "epoch": 1,
+      "step": 64,
+      "train_loss": 1.7822379935532808,
+      "validation": {
+        "aligned": 1.4725250005722046,
+        "zero_audio": 1.460580825805664,
+        "shift_1000ms": 1.4934347867965698
+      },
+      "validation_windows": 32,
+      "seconds": 21.31774425000185
+    }
+  ],
+  "parameters": 602021,
+  "world_size": 1,
+  "bounded_smoke": true,
+  "max_gpu_memory_bytes": 190252544
+}

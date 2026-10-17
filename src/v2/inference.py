@@ -638,12 +638,20 @@ def _sample_candidate_map(
     geometry_steps: int,
     metadata: MapMetadata | None = None,
     minimum_start_gap_ms: float = 0.0,
+    empty_bar_retries: int = 2,
+    diagnostics: dict | None = None,
 ) -> MapSpec:
     device = next(planner.parameters()).device
+    if empty_bar_retries < 0:
+        raise ValueError("empty_bar_retries must be non-negative")
+    if diagnostics is not None:
+        diagnostics.update(audio_duration_ms=features.duration_ms, bars=[])
     if next(geometry.parameters()).device != device:
         raise ValueError("planner and geometry models must be on the same device")
     end_beat = max(0.0, hypothesis.timing_map.time_to_beat(features.duration_ms))
     bars = build_bar_definitions(hypothesis, end_beat=end_beat)
+    if end_beat > bars[-1].start_beat:
+        bars = (*bars[:-1], replace(bars[-1], end_beat=end_beat))
     bar_mid, clock = clock_features_for_bars(hypothesis, bars)
     profile = _request_profile(request).to(device).unsqueeze(0)
     rhythm = features.rhythm_features.float().to(device).unsqueeze(0)
@@ -700,6 +708,8 @@ def _sample_candidate_map(
     )
     planned_bars: list[tuple[BarDefinition, list[int], list[PlannerEvent], list[int] | None]] = []
     previous_tokens: list[int] | None = None
+    from .coverage import active_intervals
+    audible = active_intervals(features)
     last_event_beat = None
     # Include 1 ms for the worst-case difference between two rounded native
     # timestamps. Use the fastest beat length to cover tempo changes too.
@@ -720,7 +730,31 @@ def _sample_candidate_map(
             generator=generator,
         )
         decoded = codec.decode(tokens, bar_start_beat=bar.start_beat, meter=bar.length_beats)
-        planned_bars.append((bar, tokens, decoded, previous_tokens))
+        used_previous = previous_tokens
+        start_ms = hypothesis.timing_map.beat_to_time(bar.start_beat)
+        end_ms = min(features.duration_ms, hypothesis.timing_map.beat_to_time(bar.end_beat))
+        is_audible = any(min(end_ms, b)-max(start_ms, a) >= 100 for a, b in audible)
+        original_count = len(decoded)
+        retries = 0
+        # An empty sampled bar can condition the next one to be empty as well.
+        # Retry with the learned boundary dropout path; never insert synthetic
+        # notes or force notes into silence. Coverage validation remains required.
+        for _ in range(empty_bar_retries if is_audible else 0):
+            if decoded:
+                break
+            used_previous = None
+            retries += 1
+            tokens = planner.generate_bar(
+                decode_memory, memory_mask=decode_mask, target_bar_index=bar.bar_index,
+                bar_length_beats=bar.length_beats, minimum_start_gap_beats=gap_beats,
+                previous_event_relative_beat=None if last_event_beat is None else last_event_beat-bar.start_beat,
+                previous_bar_tokens=None, max_tokens=planner.config.max_decoder_tokens-1,
+                temperature=temperature, generator=generator)
+            decoded = codec.decode(tokens, bar_start_beat=bar.start_beat, meter=bar.length_beats)
+        planned_bars.append((bar, tokens, decoded, used_previous))
+        if diagnostics is not None:
+            diagnostics['bars'].append(dict(start_ms=start_ms, end_ms=end_ms,
+                initial_events=original_count, final_events=len(decoded), retries=retries, audible=is_audible))
         if decoded:
             last_event_beat = decoded[-1].beat_position
         previous_tokens = tokens
@@ -778,6 +812,21 @@ def _sample_candidate_map(
     events = project_event_intervals(
         _geometry_to_events(plans, full_geometry, hypothesis, difficulty), hypothesis, difficulty
     )
+    # The final bar can be partial, and a sampled hold may extend beyond it.
+    # Clip only the physical audio boundary, preserving all in-song onsets.
+    bounded_events = []
+    for event in events:
+        if event.beat_position >= end_beat:
+            continue
+        if event.end_beat is not None and event.end_beat > end_beat:
+            if event.kind == EventKind.SLIDER:
+                event = replace(event, end_beat=end_beat, slider_length=_slider_length_for_end(
+                    hypothesis, start_beat=event.beat_position, target_end_beat=end_beat,
+                    repeats=event.slider_repeats, slider_multiplier=difficulty.slider_multiplier))
+            else:
+                event = replace(event, end_beat=end_beat)
+        bounded_events.append(event)
+    events = bounded_events
     star = float(request.target_star if request.target_star is not None else DEFAULT_TARGET_STAR)
     if metadata is not None:
         map_metadata = metadata
@@ -793,13 +842,22 @@ def _sample_candidate_map(
     compiled_events = reproject_events_for_compiled_timing(
         events, hypothesis, difficulty, timing_points
     )
+    from .slider_path import fit_event_to_playfield
+    fitted = []
+    for event in compiled_events:
+        try:
+            fitted.append(fit_event_to_playfield(event, difficulty.circle_size))
+        except ValueError:
+            # Preserve the sampled event for an explicit rejection in the audit;
+            # do not silently drop a difficult object to lower the star rating.
+            fitted.append(event)
     return MapSpec(
         format_version=14,
         general=GeneralSettings(audio_filename=request.audio_filename, sample_set="Soft", mode=0),
         metadata=map_metadata,
         difficulty=difficulty,
         timing_points=timing_points,
-        events=compiled_events,
+        events=tuple(fitted),
     )
 
 
@@ -874,11 +932,12 @@ def generate_draft(
                 },
             )
         )
+    from .coverage import policy_for_audio
     audits = rerank_candidates(
         candidates,
         target_star=request.target_star,
         calculator=calculator,
-        policy=audit_policy,
+        policy=policy_for_audio(audit_policy, features),
     )
     result = build_generation_result(
         request,

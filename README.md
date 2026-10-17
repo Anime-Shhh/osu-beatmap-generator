@@ -21,6 +21,12 @@ full design in [plans/tempo-posterior-hierarchical-event-diffusion.md](plans/tem
 
 ## V2 status and safety
 
+**October 17 coverage repair and diffusion research:** Kaguya generation now
+covers the song, and exported slider bodies are checked beyond their anchors.
+The separate `src/rhythm_flow/` prototype tests continuous audio-time generation;
+it is experimental and has not established better musical timing. See the
+[measured repair, osu!dreamer comparison, data expansion and experiment report](docs/v2-coverage-and-diffusion-2026-10-17.md).
+
 **Audio alignment follow-up (October 14):** the trained planner showed weak
 paired sensitivity to shifted/zeroed audio in a validation diagnostic. The new
 opt-in [local-audio preset and research report](docs/v2-audio-alignment-2026-10-14.md)

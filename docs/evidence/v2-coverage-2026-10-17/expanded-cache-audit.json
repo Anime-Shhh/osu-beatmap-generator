@@ -1,0 +1,23 @@
+{
+  "charts": 1376,
+  "audio_files": 330,
+  "new_charts": 603,
+  "new_feature_bytes": 528388048,
+  "source_groups": {
+    "train": 260,
+    "val": 36,
+    "test": 34
+  },
+  "frozen_chart_assignments_verified": 773,
+  "audio_files_sha256_verified": 330,
+  "split_loader_smoke_passed": true,
+  "manifest_sha256": "c90ed4044a6d4b053f5ffb4a73276fd023ac38e4f6ae2c305fd37de20b3bbb32",
+  "charts_by_split": {
+    "train": 1100,
+    "test": 123,
+    "val": 153
+  },
+  "rejection_count": 2,
+  "undecodable_audio_count": 1,
+  "audio_bytes": 1208195248
+}

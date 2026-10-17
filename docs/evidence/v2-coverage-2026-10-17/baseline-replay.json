@@ -1,0 +1,114 @@
+{
+  "audio_duration_ms": 90149.625,
+  "clock": "half-69.2bpm-210.0ms",
+  "objects": 99,
+  "first_ms": 5408.83753515625,
+  "last_ms": 52205.146140625,
+  "bars": [
+    {
+      "bar": 0,
+      "events": 0
+    },
+    {
+      "bar": 1,
+      "events": 6
+    },
+    {
+      "bar": 2,
+      "events": 13
+    },
+    {
+      "bar": 3,
+      "events": 7
+    },
+    {
+      "bar": 4,
+      "events": 6
+    },
+    {
+      "bar": 5,
+      "events": 6
+    },
+    {
+      "bar": 6,
+      "events": 10
+    },
+    {
+      "bar": 7,
+      "events": 5
+    },
+    {
+      "bar": 8,
+      "events": 6
+    },
+    {
+      "bar": 9,
+      "events": 8
+    },
+    {
+      "bar": 10,
+      "events": 6
+    },
+    {
+      "bar": 11,
+      "events": 6
+    },
+    {
+      "bar": 12,
+      "events": 8
+    },
+    {
+      "bar": 13,
+      "events": 6
+    },
+    {
+      "bar": 14,
+      "events": 6
+    },
+    {
+      "bar": 15,
+      "events": 0
+    },
+    {
+      "bar": 16,
+      "events": 0
+    },
+    {
+      "bar": 17,
+      "events": 0
+    },
+    {
+      "bar": 18,
+      "events": 0
+    },
+    {
+      "bar": 19,
+      "events": 0
+    },
+    {
+      "bar": 20,
+      "events": 0
+    },
+    {
+      "bar": 21,
+      "events": 0
+    },
+    {
+      "bar": 22,
+      "events": 0
+    },
+    {
+      "bar": 23,
+      "events": 0
+    },
+    {
+      "bar": 24,
+      "events": 0
+    },
+    {
+      "bar": 25,
+      "events": 0
+    }
+  ],
+  "device": "NVIDIA RTX A4000"
+}
