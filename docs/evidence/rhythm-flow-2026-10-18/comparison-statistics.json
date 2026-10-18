@@ -1,0 +1,13 @@
+{
+  "paired_source_bootstrap": {
+    "sources": 34,
+    "resamples": 20000,
+    "seed": 1731,
+    "f1_delta_50ms": 0.11081267149025731,
+    "percentile_95_interval": [
+      0.08540987085046188,
+      0.13436252854512645
+    ],
+    "caveat": "Fixed checkpoints and validation-selected thresholds; does not quantify training-seed variation."
+  }
+}

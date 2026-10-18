@@ -1,7 +1,7 @@
 # Project operations
 
-The coverage repair and experimental rhythm-flow branch is
-`codex/v2-coverage-rhythm-flow`, based on the preserved
+V2, coverage repair and the experimental rhythm-flow work are now merged into
+`main`. The preserved `codex/v2-coverage-rhythm-flow` branch was based on the
 `architecture-v2-hierarchical-beatgrid` baseline `d75f6a8`.
 
 Codex accesses Rutgers iLab directly from the Mac through the password-authenticated
@@ -35,3 +35,11 @@ length extension. Keep these audits enabled when selecting playable outputs.
 The separate `src/rhythm_flow/` experiment predicts timing signals only; its
 64-step smoke checkpoint is not a usable beatmap model. See
 `docs/v2-coverage-and-diffusion-2026-10-17.md` for evidence and run locations.
+
+October 18 rhythm-flow evaluation: job 541156 completed 30 epochs; the retained
+checkpoint is `v2_runs/run_20261017_rhythm_training/train/best.pt`. This is still
+rhythm-only, not a native-geometry or OSZ checkpoint. Matched test onset F1 at
+50 ms is 42.3%, with poor circle recall and hold durations. See
+`docs/rhythm-flow-results-2026-10-18.md` before claiming full-map quality or
+comparing its loss numerically with V2's unrelated objectives. Evaluation jobs
+549284 and 549331 completed; no continuing training or monitoring was scheduled.

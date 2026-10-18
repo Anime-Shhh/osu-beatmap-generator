@@ -21,6 +21,12 @@ full design in [plans/tempo-posterior-hierarchical-event-diffusion.md](plans/tem
 
 ## V2 status and safety
 
+**October 18 rhythm-flow results:** the separate rhythm-only model completed
+30 epochs. Matched held-out onset F1 at ±50 ms improved from 31.2% for the smoke
+checkpoint to 42.3%; zeroing audio reduces the trained model to 13.2%.
+Circle recall and hold durations remain weak, and geometry/`.osz` integration
+is incomplete. See [training, Kaguya inference and full metrics](docs/rhythm-flow-results-2026-10-18.md).
+
 **October 17 coverage repair and diffusion research:** Kaguya generation now
 covers the song, and exported slider bodies are checked beyond their anchors.
 The separate `src/rhythm_flow/` prototype tests continuous audio-time generation;
