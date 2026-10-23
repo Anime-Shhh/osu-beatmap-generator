@@ -27,6 +27,7 @@ from .tokenizer import (
     difficulty_to_bin,
     parse_osu_bpm,
     tokenize_beatmap,
+    object_head_distance_targets,
 )
 
 
@@ -319,6 +320,8 @@ def collate_fn(batch: list[dict[str, Any]]) -> dict[str, Any]:
     all_time_res = []
     all_x_res = []
     all_y_res = []
+    all_distances = []
+    all_distance_masks = []
     signals = []
     signal_lengths = []
 
@@ -338,6 +341,9 @@ def collate_fn(batch: list[dict[str, Any]]) -> dict[str, Any]:
         all_time_res.append([r.time_offset_ms for r in sample["residuals"]] + [0.0] * pad_len)
         all_x_res.append([r.x_offset_px for r in sample["residuals"]] + [0.0] * pad_len)
         all_y_res.append([r.y_offset_px for r in sample["residuals"]] + [0.0] * pad_len)
+        distances, distance_mask = object_head_distance_targets(sample["tokens"], sample["residuals"])
+        all_distances.append(distances + [0.0] * pad_len)
+        all_distance_masks.append(distance_mask + [False] * pad_len)
 
         if have_signal:
             signal = sample["signal"]
@@ -377,6 +383,8 @@ def collate_fn(batch: list[dict[str, Any]]) -> dict[str, Any]:
         "time_residuals": torch.tensor(all_time_res, dtype=torch.float32).clamp(-BEAT_QUANT / 2, BEAT_QUANT / 2),
         "x_residuals": torch.tensor(all_x_res, dtype=torch.float32).clamp(-8.0, 8.0),
         "y_residuals": torch.tensor(all_y_res, dtype=torch.float32).clamp(-6.0, 6.0),
+        "distance_targets": torch.tensor(all_distances, dtype=torch.float32),
+        "distance_mask": torch.tensor(all_distance_masks, dtype=torch.bool),
         "difficulty_id": torch.tensor([sample["difficulty_id"] for sample in batch], dtype=torch.long),
         "bpm": torch.tensor([[sample["bpm"]] for sample in batch], dtype=torch.float32),
         "star_rating": torch.tensor([[sample.get("star_rating", 4.0)] for sample in batch], dtype=torch.float32),
@@ -536,6 +544,7 @@ class OsuCachedDataset(IterableDataset):
         sample_type: str = WINDOW_SAMPLE,
         signal_required: bool = False,
         quality_filter: str = "all",
+        shuffle_seed: Optional[int] = None,
     ):
         self.shard_pattern = shard_pattern
         self.shuffle = shuffle
@@ -543,6 +552,7 @@ class OsuCachedDataset(IterableDataset):
         self.sample_type = sample_type
         self.signal_required = signal_required
         self.quality_filter = quality_filter
+        self.shuffle_seed = shuffle_seed
 
     def _passes_quality_filter(self, status: Optional[str]) -> bool:
         if self.quality_filter == "all":
@@ -571,12 +581,13 @@ class OsuCachedDataset(IterableDataset):
                 print(f"[dataset] Worker {worker_info.id} has 0 shards after split.", flush=True)
                 return
 
+        rng = random.Random(self.shuffle_seed + (worker_info.id if worker_info else 0)) if self.shuffle_seed is not None else None
         if self.shuffle:
-            random.shuffle(shards)
+            (rng or random).shuffle(shards)
 
         dataset = wds.WebDataset(shards, shardshuffle=False, empty_check=False)
         if self.shuffle:
-            dataset = dataset.shuffle(1000)
+            dataset = dataset.shuffle(1000, rng=rng) if rng is not None else dataset.shuffle(1000)
 
         for sample in dataset:
             try:

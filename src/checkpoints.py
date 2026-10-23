@@ -100,3 +100,29 @@ def load_model_state_dict(model, state_dict, strict: bool = True):
         "normalized_compiled_keys": normalized,
         "resized_ast_position_embeddings": resized_ast_pos,
     }
+
+
+def load_legacy_state_dict(model, state_dict, *, initialize_distance_head=False):
+    """Explicit, weights-only migration: only a *whole* missing new head is allowed.
+
+    All other missing/unexpected keys and all incompatible shapes remain errors.
+    Never restore an old optimizer into the expanded parameter list.
+    """
+    model = unwrap_model(model)
+    state, normalized = normalize_model_state_dict(state_dict)
+    expected = model.state_dict()
+    head = {k for k in expected if k.startswith('decoder.distance_head.')}
+    missing = set(expected) - set(state)
+    unexpected = set(state) - set(expected)
+    migrated = False
+    if missing or unexpected:
+        if initialize_distance_head and head and missing == head and not unexpected:
+            state.update({k: expected[k] for k in head})
+            migrated = True
+        else:
+            raise RuntimeError(f'Incompatible legacy checkpoint: missing={sorted(missing)}, '
+                               f'unexpected={sorted(unexpected)}. For a pre-distance checkpoint, '
+                               'explicitly initialize only the new distance head.')
+    result = load_model_state_dict(model, state, strict=True)
+    result.update(normalized_compiled_keys=normalized, initialized_distance_head=migrated)
+    return result

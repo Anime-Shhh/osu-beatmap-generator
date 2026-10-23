@@ -207,6 +207,12 @@ class BeatmapDecoder(nn.Module):
         self.y_res_head = nn.Linear(d_model, 1)
 
         self.norm = nn.LayerNorm(d_model)
+        # Isolate initialization so all pre-existing weights and RNG state match
+        # the baseline. This head is supervision only, never a sampling control.
+        with torch.random.fork_rng(devices=[]):
+            self.distance_head = nn.Sequential(
+                nn.Linear(d_model, 64), nn.GELU(), nn.Linear(64, 1), nn.Softplus()
+            )
 
     def _causal_mask(self, seq_len: int, device: torch.device) -> torch.Tensor:
         return nn.Transformer.generate_square_subsequent_mask(seq_len, device=device)
@@ -216,7 +222,9 @@ class BeatmapDecoder(nn.Module):
         encoder_out: torch.Tensor,
         tgt_tokens: torch.Tensor,
         tgt_padding_mask: Optional[torch.Tensor] = None,
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        *,
+        return_distance: bool = False,
+    ) -> tuple[torch.Tensor, ...]:
         """
         Args:
             encoder_out: [B, S, D] from audio encoder
@@ -228,6 +236,7 @@ class BeatmapDecoder(nn.Module):
             time_res: [B, T, 1]
             x_res: [B, T, 1]
             y_res: [B, T, 1]
+            distance: [B, T, 1] nonnegative /640 distance, only if return_distance
         """
         B, T = tgt_tokens.shape
         device = tgt_tokens.device
@@ -252,7 +261,10 @@ class BeatmapDecoder(nn.Module):
         x_res = self.x_res_head(out)
         y_res = self.y_res_head(out)
 
-        return logits, time_res, x_res, y_res
+        result = (logits, time_res, x_res, y_res)
+        if return_distance:
+            return (*result, self.distance_head(out))
+        return result
 
 
 # ---------------------------------------------------------------------------
@@ -304,6 +316,10 @@ class OsuMapper(nn.Module):
         max_seq_len: int = 2048,
     ):
         super().__init__()
+        self.model_config = dict(d_model=d_model, encoder_pretrained=encoder_pretrained,
+            encoder_unfreeze_last_n=encoder_unfreeze_last_n, decoder_layers=decoder_layers,
+            decoder_heads=decoder_heads, decoder_ff=decoder_ff, dropout=dropout,
+            max_seq_len=max_seq_len)
         self.encoder = AudioEncoder(
             pretrained=encoder_pretrained,
             d_model=d_model,
@@ -330,14 +346,15 @@ class OsuMapper(nn.Module):
         encoder_out = self.encoder(mel)
         cond = self.conditioning(difficulty_id, bpm)  # [B, 1, D]
         memory = torch.cat([cond, encoder_out], dim=1)  # [B, 1+T, D]
-        logits, time_res, x_res, y_res = self.decoder(
-            memory, tgt_tokens, tgt_padding_mask
+        logits, time_res, x_res, y_res, distance = self.decoder(
+            memory, tgt_tokens, tgt_padding_mask, return_distance=True
         )
         return {
             "logits": logits,
             "time_residuals": time_res,
             "x_residuals": x_res,
             "y_residuals": y_res,
+            "distance_predictions": distance,
         }
 
     @torch.no_grad()

@@ -5,12 +5,17 @@ Standalone evaluation for legacy, AE, and flow checkpoints.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
+import math
 import os
+from pathlib import Path
 from statistics import mean, pstdev
 
 import torch
 
-from .checkpoints import load_model_state_dict
+from .checkpoints import load_model_state_dict, load_legacy_state_dict
+from .legacy_distance import TeacherForcedMetrics
 from .dataset import FULL_SONG_SAMPLE, WINDOW_SAMPLE, OsuCachedDataset, build_dataloader
 from .flow_model import LatentFlowMatcher, integrate_flow, sample_flow_inputs
 from .latent_ae import SignalAutoencoder
@@ -26,6 +31,9 @@ def parse_args():
     p.add_argument("--split_file", type=str, required=True)
     p.add_argument("--split_name", type=str, choices=["val", "test"], default="test")
     p.add_argument("--checkpoint", type=str, required=True)
+    p.add_argument("--initialize_distance_head", action="store_true")
+    p.add_argument("--output_json", default="", help="Write a new machine-readable result file")
+    p.add_argument("--seed", type=int, default=42)
     p.add_argument("--ae_checkpoint", type=str, default="")
     p.add_argument("--stage", type=str, choices=["auto", "legacy", "ae", "flow"], default="auto")
     p.add_argument("--quality_filter", type=str, choices=["all", "ranked_only"], default="all")
@@ -77,6 +85,8 @@ def run_eval_legacy(model, dataloader, device: torch.device, max_batches: int = 
     hit_f1_values = []
     onset_influence_values = []
 
+    auxiliary_metrics = TeacherForcedMetrics()
+
     for step, batch in enumerate(dataloader):
         if max_batches > 0 and step >= max_batches:
             break
@@ -98,6 +108,7 @@ def run_eval_legacy(model, dataloader, device: torch.device, max_batches: int = 
             logits = outputs["logits"]
             loss = ce_loss_fn(logits.reshape(-1, TOTAL_VOCAB), tgt_output.reshape(-1))
         loss_values.append(float(loss.item()))
+        auxiliary_metrics.update(outputs, batch)
 
         mel_no_onset = mel.clone()
         mel_no_onset[:, :, -1:, :] = 0.0
@@ -153,6 +164,7 @@ def run_eval_legacy(model, dataloader, device: torch.device, max_batches: int = 
         "hit_f1": hit_f1_values,
         "cursor_smoothness": [],
         "onset_influence": onset_influence_values,
+        **{k: [v] if v is not None else [] for k, v in auxiliary_metrics.result().items()},
     }
 
 
@@ -292,6 +304,7 @@ def run_eval_flow(ae, flow_model, dataloader, device: torch.device, max_batches:
 
 def main():
     args = parse_args()
+    torch.manual_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
     print(f"Checkpoint: {args.checkpoint}")
@@ -335,14 +348,16 @@ def main():
     print(f"Shards in split '{args.split_name}': {len(shard_list)}")
 
     if stage == "legacy":
-        model = OsuMapper(
+        config = checkpoint.get('legacy_model_config') or dict(
             d_model=args.d_model,
             decoder_layers=args.decoder_layers,
             decoder_heads=args.decoder_heads,
             decoder_ff=args.decoder_ff,
             dropout=args.dropout,
-        ).to(device)
-        load_model_state_dict(model, checkpoint["model_state_dict"])
+        )
+        model = OsuMapper(**config).to(device)
+        load_legacy_state_dict(model, checkpoint["model_state_dict"],
+                              initialize_distance_head=args.initialize_distance_head)
         model.eval()
         values = run_eval_legacy(model, dataloader, device, max_batches=args.max_batches)
     elif stage == "ae":
@@ -379,13 +394,22 @@ def main():
 
     summary = {
         key: (mean(values[key]) if values[key] else float("nan"), _safe_std(values[key]))
-        for key in ("loss", "edit_distance", "timing_mae_ms", "hit_f1", "cursor_smoothness", "onset_influence")
+        for key in values
     }
 
     print("=== Evaluation Summary ===")
-    for key in ("loss", "edit_distance", "timing_mae_ms", "hit_f1", "cursor_smoothness", "onset_influence"):
+    for key in summary:
         metric_mean, metric_std = summary[key]
         print(f"{key}: mean={metric_mean:.6f} std={metric_std:.6f}")
+    if args.output_json:
+        payload = dict(stage=stage, seed=args.seed, split_name=args.split_name,
+            checkpoint_sha256=hashlib.sha256(Path(args.checkpoint).read_bytes()).hexdigest(),
+            split_manifest_sha256=hashlib.sha256(Path(args.split_file).read_bytes()).hexdigest(),
+            distance_config=checkpoint.get('distance_config'),
+            metrics={k: {'mean': m if math.isfinite(m) else None, 'std': s if math.isfinite(s) else None}
+                     for k, (m, s) in summary.items()}, args=vars(args))
+        with open(args.output_json, 'x') as handle:
+            json.dump(payload, handle, indent=2, allow_nan=False)
 
 
 if __name__ == "__main__":

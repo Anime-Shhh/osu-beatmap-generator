@@ -10,7 +10,7 @@ import os
 import torch
 import torchaudio
 
-from .checkpoints import load_model_state_dict
+from .checkpoints import load_model_state_dict, load_legacy_state_dict
 from .dataset import (
     N_MELS,
     PREDICT_START_SEC,
@@ -40,6 +40,9 @@ def parse_args():
         help="Audio filename written into the .osu file (defaults to --input basename)",
     )
     p.add_argument("--checkpoint", type=str, default="/common/users/asj102/osu_project/models/best.pt")
+    p.add_argument("--initialize_distance_head", action="store_true",
+                   help="Explicitly initialize the unused auxiliary head when loading a pre-distance legacy checkpoint")
+    p.add_argument("--seed", type=int, default=42)
     p.add_argument("--ae_checkpoint", type=str, default="")
     p.add_argument("--generation_mode", type=str, choices=["auto", "legacy", "flow"], default="auto")
     p.add_argument("--difficulty", type=float, default=4.0, help="Target star rating for conditioning")
@@ -172,14 +175,16 @@ def _build_normalized_mel(waveform: torch.Tensor, mel_transform, device: torch.d
 
 
 def _load_legacy_model(args, checkpoint: dict, device: torch.device) -> OsuMapper:
-    model = OsuMapper(
+    config = checkpoint.get('legacy_model_config') or dict(
         d_model=args.d_model,
         decoder_layers=args.decoder_layers,
         decoder_heads=args.decoder_heads,
         decoder_ff=args.decoder_ff,
         dropout=args.dropout,
-    ).to(device)
-    load_model_state_dict(model, checkpoint["model_state_dict"])
+    )
+    model = OsuMapper(**config).to(device)
+    load_legacy_state_dict(model, checkpoint["model_state_dict"],
+                          initialize_distance_head=getattr(args, 'initialize_distance_head', False))
     model.eval()
     return model
 
@@ -205,8 +210,10 @@ def _load_ae_and_flow(args, checkpoint: dict, device: torch.device):
 
 
 @torch.no_grad()
-def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm: float, device: torch.device) -> list[dict]:
-    model = _load_legacy_model(args, checkpoint, device)
+def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm: float, device: torch.device, *, model=None, diagnostics=None) -> list[dict]:
+    model = model if model is not None else _load_legacy_model(args, checkpoint, device)
+    if hasattr(args, 'seed'):
+        torch.manual_seed(args.seed)
     mel_transform = build_mel_transform("cpu")
     diff_id = difficulty_to_bin(args.difficulty)
     diff_tensor = torch.tensor([diff_id], device=device)
@@ -230,6 +237,9 @@ def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm:
             temperature=args.temperature,
         )
         residuals = [Residuals(time_offset_ms=t, x_offset_px=x, y_offset_px=y) for t, x, y in residuals_raw]
+        if diagnostics is not None:
+            from .legacy_spacing_eval import audit_raw_head_tokens
+            diagnostics.append(audit_raw_head_tokens(tokens, residuals))
         objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat)
         # Training only supervises the center prediction interval.  Retaining
         # arbitrary out-of-window autoregressive tokens creates duplicate and
@@ -254,6 +264,9 @@ def generate_legacy_objects(args, checkpoint: dict, waveform: torch.Tensor, bpm:
             temperature=args.temperature,
         )
         residuals = [Residuals(time_offset_ms=t, x_offset_px=x, y_offset_px=y) for t, x, y in residuals_raw]
+        if diagnostics is not None:
+            from .legacy_spacing_eval import audit_raw_head_tokens
+            diagnostics.append(audit_raw_head_tokens(tokens, residuals))
         objects = detokenize_to_hitobjects(tokens, residuals, base_time_ms=predict_start_ms, ms_per_beat=ms_per_beat)
         end_ms = (waveform.shape[-1] / TARGET_SR) * 1000.0
         all_objects.extend(

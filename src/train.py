@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import glob
+import hashlib
 import os
 import random
 import shutil
@@ -20,7 +21,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.cuda.amp import GradScaler, autocast
 
-from .checkpoints import export_model_state_dict, load_model_state_dict, normalize_model_state_dict
+from .checkpoints import export_model_state_dict, load_model_state_dict, normalize_model_state_dict, load_legacy_state_dict, unwrap_model
+from .legacy_distance import distance_config, shifted_distance_loss, TeacherForcedMetrics, corpus_fingerprint
 from .dataset import (
     FULL_SONG_SAMPLE,
     WINDOW_SAMPLE,
@@ -40,7 +42,7 @@ from .latent_ae import (
 )
 from .metrics import compute_all_metrics, compute_signal_metrics
 from .model import OsuMapper, get_adaptive_batch_size
-from .splits import build_split_lists, parse_split_ratios, write_split_manifest
+from .splits import build_split_lists, parse_split_ratios, write_split_manifest, load_split_manifest, resolve_split_shards
 from .tokenizer import PAD, TOTAL_VOCAB
 
 
@@ -79,6 +81,12 @@ def parse_args():
     p.add_argument("--split_file", type=str, default="")
     p.add_argument("--split_shuffle", action="store_true")
     p.add_argument("--resume", type=str, default="")
+    p.add_argument("--initialize_from", type=str, default="",
+                   help="Legacy weights-only initialization; explicitly initializes a missing distance head, with a fresh optimizer")
+    p.add_argument("--max_updates", type=int, default=0, help="Legacy optimizer update budget; 0 = epoch budget")
+    p.add_argument("--checkpoint_top_k", type=int, default=3)
+    p.add_argument("--compact_checkpoints", action="store_true",
+                   help="Legacy only: atomic saves with hardlinked best/last aliases to reduce storage")
     p.add_argument("--stream", action="store_true")
     p.add_argument("--tf32", action="store_true")
     p.add_argument("--compile", action="store_true")
@@ -117,6 +125,8 @@ def parse_args():
     # Loss weights
     p.add_argument("--w_discrete", type=float, default=0.8)
     p.add_argument("--w_residual", type=float, default=0.2)
+    p.add_argument("--distance_loss_weight", type=float, default=0.0,
+                   help="Legacy auxiliary Smooth L1 weight; 0 preserves the original objective; try 0.1 as an unproven hypothesis")
     p.add_argument("--w_token_aux", type=float, default=0.0)
     p.add_argument("--w_reconstruction_aux", type=float, default=0.1)
     p.add_argument("--w_flow", type=float, default=1.0)
@@ -142,26 +152,43 @@ def resolve_runtime_args(args):
 class CheckpointManager:
     """Keep only top-k checkpoints by validation loss."""
 
-    def __init__(self, model_dir: str, top_k: int = 3):
+    def __init__(self, model_dir: str, top_k: int = 3, compact: bool = False):
+        if top_k < 1:
+            raise ValueError('checkpoint_top_k must be positive')
         self.model_dir = Path(model_dir)
         self.model_dir.mkdir(parents=True, exist_ok=True)
         self.top_k = top_k
+        self.compact = compact
         self.checkpoints: list[tuple[float, Path]] = []
 
-    def save(self, state: dict, val_loss: float) -> Path:
+    def save(self, state: dict, val_loss: float, *, save_last: bool = False) -> Path:
         epoch = int(state.get("epoch", 0))
         path = self.model_dir / f"checkpoint_epoch{epoch:03d}_loss{val_loss:.4f}.pt"
-        torch.save(state, path)
+        temporary = path.with_suffix('.tmp') if self.compact else path
+        torch.save(state, temporary)
+        if self.compact:
+            temporary.replace(path)
+
+        def link_alias(name):
+            alias = self.model_dir / name
+            pending = alias.with_suffix('.link.tmp')
+            os.link(path, pending)
+            pending.replace(alias)
+
+        if self.compact and save_last:
+            link_alias('last.pt')
 
         self.checkpoints.append((val_loss, path))
         self.checkpoints.sort(key=lambda item: item[0])
+        if self.compact and self.checkpoints[0][1] == path:
+            link_alias('best.pt')
         while len(self.checkpoints) > self.top_k:
             _, old_path = self.checkpoints.pop()
             if old_path.exists():
                 old_path.unlink()
 
         best = self.model_dir / "best.pt"
-        if self.checkpoints and self.checkpoints[0][1] == path:
+        if not self.compact and self.checkpoints and self.checkpoints[0][1] == path:
             torch.save(state, best)
         return path
 
@@ -198,7 +225,8 @@ def build_logger(args):
 
             def _tb_log(values):
                 for key, value in values.items():
-                    tb_writer.add_scalar(key, value, step[0])
+                    if value is not None:
+                        tb_writer.add_scalar(key, value, step[0])
                 step[0] += 1
 
             logger_fn = _tb_log
@@ -226,6 +254,7 @@ def build_dataset(args, epoch: int, split_name: str, split_shards: dict[str, lis
             sample_type=sample_type,
             signal_required=signal_required,
             quality_filter=args.quality_filter,
+            shuffle_seed=args.seed + epoch if args.stage == 'legacy' else None,
         )
 
     curriculum = None
@@ -276,6 +305,14 @@ def compute_param_counts(model: nn.Module) -> tuple[int, int]:
 
 
 def prepare_cached_splits(args) -> tuple[dict[str, list[str]] | None, str | None]:
+    if args.split_file and os.path.exists(args.split_file) and not args.stream:
+        split_lists = resolve_split_shards(args.data_dir, load_split_manifest(args.split_file))
+        paths = [p for values in split_lists.values() for p in values]
+        if len(set(paths)) != len(paths) or any(not os.path.isfile(p) or os.path.getsize(p) == 0 for p in paths):
+            raise ValueError('existing split manifest contains duplicate, missing or empty shards')
+        if any(not values for values in split_lists.values()):
+            raise ValueError('existing split manifest must contain train/val/test shards')
+        return split_lists, args.split_file
     shard_pattern = os.path.join(args.data_dir, "shard-*.tar")
     shards = sorted(glob.glob(shard_pattern))
     original_count = len(shards)
@@ -318,10 +355,14 @@ def train_one_epoch_legacy(model, dataloader, optimizer, scaler, epoch, args, de
     total_discrete = 0.0
     total_residual = 0.0
     num_batches = 0
+    total_distance = total_distance_mae = 0.0
+    distance_count = 0
     optimizer.zero_grad()
     ce_loss_fn = nn.CrossEntropyLoss(ignore_index=PAD)
     smooth_l1 = nn.SmoothL1Loss()
     tf_ratio = get_teacher_forcing_ratio(epoch, args)
+    progress_started = time.monotonic()
+    examples_seen = 0
 
     for step, batch in enumerate(dataloader):
         mel = batch["mel"].to(device)
@@ -356,35 +397,62 @@ def train_one_epoch_legacy(model, dataloader, optimizer, scaler, epoch, args, de
                 y_res_gt[:, 1:tgt_output.shape[1] + 1].unsqueeze(-1) * mask,
             )
             residual_loss = (time_loss + x_loss + y_loss) / 3.0
-            loss = (args.w_discrete * discrete_loss + args.w_residual * residual_loss) / max(args.accum_steps, 1)
+            spacing_loss, spacing_mae, spacing_count = shifted_distance_loss(outputs, batch)
+            loss = (args.w_discrete * discrete_loss + args.w_residual * residual_loss
+                    + (args.distance_loss_weight * spacing_loss if args.distance_loss_weight else 0)) / max(args.accum_steps, 1)
 
         scaler.scale(loss).backward()
         if (step + 1) % max(args.accum_steps, 1) == 0:
             scaler.unscale_(optimizer)
             nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
+            previous_scale = scaler.get_scale()
             scaler.step(optimizer)
             scaler.update()
             optimizer.zero_grad()
+            # GradScaler lowers its scale when it skips an overflowing update.
+            # Count completed optimizer steps, not just attempted steps.
+            if scaler.get_scale() >= previous_scale:
+                args.optimizer_updates = getattr(args, 'optimizer_updates', 0) + 1
 
         total_loss += loss.item() * max(args.accum_steps, 1)
         total_discrete += discrete_loss.item()
         total_residual += residual_loss.item()
+        total_distance += spacing_loss.detach().item() * spacing_count.item()
+        total_distance_mae += spacing_mae.detach().item() * spacing_count.item()
+        distance_count += spacing_count.item()
         num_batches += 1
+        examples_seen += len(tokens)
+
+        if step % max(args.log_every, 1) == 0:
+            print(f'legacy_progress epoch={epoch+1} batches={step+1} '
+                  f'updates={getattr(args, "optimizer_updates", 0)} examples={examples_seen} '
+                  f'loss={loss.item()*max(args.accum_steps,1):.6f} '
+                  f'distance_mae_px={spacing_mae.item():.3f} '
+                  f'elapsed_s={time.monotonic()-progress_started:.3f}', flush=True)
 
         if logger and step % max(args.log_every, 1) == 0:
             logger({
                 "train/loss": loss.item() * max(args.accum_steps, 1),
                 "train/discrete_loss": discrete_loss.item(),
                 "train/residual_loss": residual_loss.item(),
+                "train/distance_loss": spacing_loss.detach().item(),
+                "train/distance_mae_px": spacing_mae.detach().item(),
+                "train/distance_target_count": spacing_count.item(),
                 "train/tf_ratio": tf_ratio,
             })
         if args.dry_run and step >= 2:
+            break
+        if args.max_updates and getattr(args, 'optimizer_updates', 0) >= args.max_updates:
             break
 
     return {
         "train/loss": total_loss / max(num_batches, 1),
         "train/discrete_loss": total_discrete / max(num_batches, 1),
         "train/residual_loss": total_residual / max(num_batches, 1),
+        "train/distance_loss": total_distance / max(distance_count, 1),
+        "train/distance_mae_px": total_distance_mae / max(distance_count, 1),
+        "train/distance_target_count": distance_count,
+        "train/optimizer_updates": getattr(args, 'optimizer_updates', 0),
     }
 
 
@@ -399,6 +467,7 @@ def validate_legacy(model, dataloader, args, device, max_batches: int = 50):
     total_onset_influence = 0.0
     num_batches = 0
     num_metrics = 0
+    auxiliary_metrics = TeacherForcedMetrics()
 
     for step, batch in enumerate(dataloader):
         if step >= max_batches:
@@ -420,6 +489,8 @@ def validate_legacy(model, dataloader, args, device, max_batches: int = 50):
             logits = outputs["logits"]
             loss = ce_loss_fn(logits.reshape(-1, TOTAL_VOCAB), tgt_output.reshape(-1))
         total_loss += loss.item()
+
+        auxiliary_metrics.update(outputs, batch)
 
         mel_no_onset = mel.clone()
         mel_no_onset[:, :, N_MELS:, :] = 0.0
@@ -450,6 +521,7 @@ def validate_legacy(model, dataloader, args, device, max_batches: int = 50):
         "val/hit_f1": total_hit_f1 / max(num_metrics, 1),
         "val/cursor_smoothness": 0.0,
         "val/onset_influence": total_onset_influence / max(num_batches, 1),
+        **{'val/'+k: v for k, v in auxiliary_metrics.result().items()},
     }
 
 
@@ -788,7 +860,10 @@ def validate_flow(ae, flow_model, dataloader, args, device, max_batches: int = 1
     }
 
 
-def build_legacy_model(args, device):
+def build_legacy_model(args, device, checkpoint=None):
+    config = (checkpoint or {}).get("legacy_model_config")
+    if config:
+        return OsuMapper(**config).to(device)
     model = OsuMapper(
         d_model=args.d_model,
         decoder_layers=args.decoder_layers,
@@ -824,6 +899,16 @@ def load_checkpoint_weights(module: nn.Module, state_dict: dict, strict: bool = 
 def main():
     args = parse_args()
     resolve_runtime_args(args)
+    distance_config(args.distance_loss_weight)
+    if args.checkpoint_top_k < 1 or (args.compact_checkpoints and args.stage != 'legacy'):
+        raise ValueError('invalid checkpoint retention configuration')
+    if args.max_updates < 0 or (args.resume and args.initialize_from):
+        raise ValueError('invalid update budget or conflicting resume/initialization')
+    if args.stage != 'legacy' and (args.initialize_from or args.max_updates or args.distance_loss_weight):
+        raise ValueError('distance experiment options apply only to --stage legacy')
+    if args.stage == 'legacy' and Path(args.model_dir).exists() and any(Path(args.model_dir).iterdir()):
+        raise FileExistsError('use a fresh model_dir; historical checkpoints must not be overwritten')
+    args.optimizer_updates = 0
     set_seed(args.seed)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -876,9 +961,11 @@ def main():
         pass
 
     split_shards, split_file = prepare_cached_splits(args)
+    data_fingerprint = corpus_fingerprint(split_shards) if args.stage == 'legacy' and split_shards else None
     logger_fn = build_logger(args)
     scaler = GradScaler(enabled=torch.cuda.is_available())
-    ckpt_mgr = CheckpointManager(args.model_dir, top_k=3)
+    ckpt_mgr = CheckpointManager(args.model_dir, top_k=args.checkpoint_top_k,
+                                 compact=args.compact_checkpoints)
 
     start_epoch = 0
     best_val_loss = float("inf")
@@ -892,16 +979,28 @@ def main():
     critic_opt = None
 
     if args.stage == "legacy":
-        legacy_model = build_legacy_model(args, device)
+        source_path = args.resume or args.initialize_from
+        ckpt = torch.load(source_path, map_location=device, weights_only=False) if source_path else None
+        legacy_model = build_legacy_model(args, device, ckpt)
+        if ckpt is not None:
+            if args.resume and ckpt.get('distance_config') != distance_config(args.distance_loss_weight):
+                raise ValueError('resume requires matching distance config; use --initialize_from for a fresh experiment')
+            if args.resume and ckpt.get('data_fingerprint') != data_fingerprint:
+                raise ValueError('resume dataset differs from checkpoint')
+            report = load_legacy_state_dict(legacy_model, ckpt['model_state_dict'],
+                                           initialize_distance_head=bool(args.initialize_from))
+            print(f'Legacy checkpoint load: {report}')
+        # Load first: AST positional-embedding migration may replace a parameter.
         total, trainable = compute_param_counts(legacy_model)
         print(f"Parameters: {total:,} total, {trainable:,} trainable")
         optimizer = torch.optim.AdamW(legacy_model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
             optimizer, T_0=max(args.epochs // 5, 1), T_mult=2
         )
-        if args.resume and os.path.exists(args.resume):
-            ckpt = torch.load(args.resume, map_location=device, weights_only=False)
-            load_model_state_dict(legacy_model, ckpt["model_state_dict"])
+        if args.resume:
+            args.optimizer_updates = ckpt.get('optimizer_updates', 0)
+            if args.max_updates and args.optimizer_updates >= args.max_updates:
+                raise ValueError('checkpoint has already reached max_updates')
             optimizer.load_state_dict(ckpt["optimizer_state_dict"])
             if ckpt.get("scheduler_state_dict"):
                 scheduler.load_state_dict(ckpt["scheduler_state_dict"])
@@ -1014,6 +1113,13 @@ def main():
                 "stage": args.stage,
                 "epoch": epoch,
                 "model_state_dict": export_model_state_dict(legacy_model),
+                "legacy_model_config": unwrap_model(legacy_model).model_config,
+                "distance_config": distance_config(args.distance_loss_weight),
+                "training_args": vars(args).copy(),
+                "optimizer_updates": args.optimizer_updates,
+                "data_fingerprint": data_fingerprint,
+                "split_manifest_sha256": hashlib.sha256(Path(split_file).read_bytes()).hexdigest() if split_file else None,
+                "initial_checkpoint_sha256": hashlib.sha256(Path(args.initialize_from).read_bytes()).hexdigest() if args.initialize_from else (ckpt or {}).get('initial_checkpoint_sha256'),
                 "optimizer_state_dict": optimizer.state_dict(),
                 "scheduler_state_dict": scheduler.state_dict(),
                 "val_loss": val_metrics["val/loss"],
@@ -1068,7 +1174,19 @@ def main():
         logger_fn(logger_payload)
 
         if not args.dry_run:
-            ckpt_mgr.save(checkpoint_state, val_metrics["val/loss"])
+            ckpt_mgr.save(checkpoint_state, val_metrics["val/loss"],
+                          save_last=args.stage == 'legacy')
+            if args.stage == 'legacy' and not args.compact_checkpoints:
+                # Controlled comparisons use the same completed update budget,
+                # not potentially different best-validation epochs.
+                last = Path(args.model_dir) / 'last.pt'
+                torch.save(checkpoint_state, last.with_suffix('.tmp'))
+                last.with_suffix('.tmp').replace(last)
+
+        if args.stage == 'legacy' and args.max_updates and args.optimizer_updates >= args.max_updates:
+            best_val_loss = min(best_val_loss, val_metrics['val/loss'])
+            print(f'Reached optimizer update budget: {args.optimizer_updates}')
+            break
 
         improved = val_metrics["val/loss"] < (best_val_loss - args.early_stop_min_delta)
         if improved:

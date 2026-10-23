@@ -1,0 +1,9 @@
+[
+  {
+    "id": "heldout-song-01",
+    "split": "test",
+    "audio": "/absolute/path/to/heldout-full-song.mp3",
+    "bpm": 120.0,
+    "difficulties": [2.5, 4.5, 6.0]
+  }
+]

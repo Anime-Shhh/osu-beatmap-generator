@@ -66,6 +66,7 @@ NUM_DIFF_BINS = 5
 TOTAL_VOCAB = VOCAB_SIZE  # 1166
 
 MAX_SLIDER_CONTROL_POINTS = 8
+PLAYFIELD_DIAGONAL = math.hypot(PLAYFIELD_W, PLAYFIELD_H)  # 640 pixels
 
 
 # ---------------------------------------------------------------------------
@@ -116,6 +117,38 @@ def bin_to_xy(token: int, res: Optional[Residuals] = None) -> tuple[float, float
     x = max(0, min(PLAYFIELD_W, x))
     y = max(0, min(PLAYFIELD_H, y))
     return x, y
+
+
+def object_head_distance_targets(tokens: list[int], residuals: list[Residuals]):
+    """Auxiliary labels aligned with the *unshifted* existing token sequence.
+
+    Only circle and slider heads participate. Controls/tails never become the
+    preceding head; spinners and sequence boundaries invalidate that context.
+    Reconstruct reference coordinates before any collator/inference clipping.
+    This measures head-to-head spacing, not slider-tail or cursor travel.
+    """
+    if len(tokens) != len(residuals):
+        raise ValueError("tokens and reference residuals must have equal length")
+    distances = [0.0] * len(tokens)
+    mask = [False] * len(tokens)
+    previous = None
+    for i, token in enumerate(tokens):
+        if token in (BOS, EOS, PAD, SEP, TYPE_SPINNER_START, TYPE_SPINNER_END):
+            previous = None
+        if not (POS_OFFSET <= token < TIME_OFFSET and i > 0
+                and tokens[i - 1] in (TYPE_CIRCLE, TYPE_SLIDER_START)):
+            continue
+        idx = token - POS_OFFSET
+        x = (idx % GRID_W + 0.5) * BIN_W + residuals[i].x_offset_px
+        y = (idx // GRID_W + 0.5) * BIN_H + residuals[i].y_offset_px
+        if not (math.isfinite(x) and math.isfinite(y)):
+            previous = None
+            continue
+        if previous is not None:
+            distances[i] = math.hypot(x - previous[0], y - previous[1]) / PLAYFIELD_DIAGONAL
+            mask[i] = True
+        previous = (x, y)
+    return distances, mask
 
 
 def beat_to_bin(delta_beats: float) -> tuple[int, float]:
