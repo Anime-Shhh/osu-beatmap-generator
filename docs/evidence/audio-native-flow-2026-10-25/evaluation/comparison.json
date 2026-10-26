@@ -1,0 +1,14 @@
+{
+  "sources": 34,
+  "sampling_seeds": [
+    91731,
+    91732,
+    91733
+  ],
+  "gain_f1": 0.1681584085835735,
+  "source_bootstrap_ci95": [
+    0.1438482939385139,
+    0.1915090093914913
+  ],
+  "caveat": "Fixed training checkpoints; three generation seeds pooled within each resampled source. Not training-seed uncertainty or isolated architectural ablation."
+}

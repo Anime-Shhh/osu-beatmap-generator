@@ -1,8 +1,11 @@
-# Architecture explained — `main`
+# Architecture explained — `codex/audio-native-flow`
 
 Prepared **October 24, 2026**. Source snapshot before this documentation commit: `cc9130acd48ecc08630c1a38ce42454d9d290935`.
 
-**Branch focus:** V2 with coverage/path repairs, plus the independent rhythm-flow experiment and its evaluation tools.
+**Branch focus:** Audio-conditioned onset flow plus native event-geometry flow,
+trained separately and connected to an audited MP3 + stars -> `.osz` pipeline.
+Section 12 describes the new implementation. Sections 2–11 preserve the inherited
+model descriptions and their historical limitations.
 
 Local `main` includes `cc9130a` (evaluation/report additions); GitHub `origin/main` was at `3866dea` when this document was prepared. This local difference changes evaluation tooling, not the neural model architecture.
 
@@ -15,6 +18,7 @@ as a recorded run or preset. Checkpoint configuration can override them.
 
 | Family | Present here? | Role and generation output |
 | --- | --- | --- |
+| Audio/native conditional flow | Yes: branch focus | One onset flow + type/duration marks → native topology/geometry flow → measured, audited `.osz` |
 | Legacy AST + autoregressive tokens | Yes | Absolute grid positions plus residuals; legacy `.osu` generation |
 | Legacy auxiliary distance head | No | Exists only on the two distance branches |
 | Sparse V2 planner + geometry diffusion | Yes | Grammar event plan → native coordinates/slider paths → audited `.osz` |
@@ -760,3 +764,137 @@ download weights, modify datasets/checkpoints, or change training/inference code
 - [Measured V2 comparison](docs/v2-architecture-comparison-2026-10-16.md)
 - [Coverage repair and rhythm-flow research](docs/v2-coverage-and-diffusion-2026-10-17.md)
 - [Completed rhythm-flow evaluation](docs/rhythm-flow-results-2026-10-18.md)
+
+## 12. Audio/native conditional flow
+
+Implemented October 25, 2026 in `src/beatmap_flow/`. This is a new experimental
+pipeline, not a silent checkpoint migration of any inherited model. Training
+finished for both stages; generated quality is evaluated separately.
+
+### 12.1 Onset flow and event marks
+
+Input audio is the existing versioned 101-channel log-mel/attack/RMS feature
+stream at 10ms. The six-component profile retains a continuous star value.
+One noisy scalar per audio frame represents onset existence; circle, slider,
+and spinner peaks no longer compete in three separate flow channels.
+
+The 2,085,126-parameter model has width 128, eight audio temporal blocks, twelve
+flow temporal blocks, and four mark blocks. Blocks use channel-only LayerNorm,
+dilated kernel-5 depthwise convolution, gated pointwise mixing, and profile/time
+modulation. Every convolutional block masks padding; no temporal normalization
+statistics mix valid samples with padding. The audio encoder has no pretrained
+MERT/AST component and should not be described as instrument separation.
+
+For target onset signal `s`, Gaussian `z`, and uniform `t`:
+
+```
+y = 2*s - 1
+x_t = (1-t)*z + t*y
+L_flow = mean_valid((v(x_t,audio,profile,t) - (y-z))^2)
+L_total = L_flow + .25*audio_onset_BCE + .5*type_CE + .25*log_duration_Huber
+```
+
+The flow term is unweighted. Auxiliary onset BCE uses positive weight 5. Type
+and duration losses apply only within 20ms of a reference onset; duration applies
+only to holds, using `log(1+duration_ms/100)`. Marks read audio plus onset context,
+with up to 20ms context shifts during training. This remains an approximation to
+the distribution of generated onsets, not proof that exposure mismatch is gone.
+
+Training windows are 20.48 seconds. Full-song generation caches audio features
+for overlapping windows, maintains one global noise tensor, and averages vector
+fields at each Euler step. Thresholds are selected using generated validation
+onset F1. Type comes from a separate classifier; duration is explicit, capped
+before the next object and at the audio end. No oracle beat grid, reference chart,
+chart-prefix teacher forcing, or EOS token enters this stage.
+
+### 12.2 Native topology and geometry
+
+The 3,360,240-parameter geometry model receives timestamp-aligned onset-local and
+400ms-averaged audio features, profile, object kind, and logarithmic previous/next
+gaps and duration. A three-layer width-192 context Transformer predicts curve
+family, 1–32 anchors, 1–8 repeat spans, log pixel length, and new-combo probability.
+Perfect curves are constrained to exactly two controls at inference.
+
+A four-layer width-192 active-point Transformer learns a linear noise-to-geometry
+flow. Heads use absolute normalized-coordinate logits; controls are offsets from
+their own head. Native L/B/P/C curve families, controls, length and repeats remain
+explicit. Circle heads and slider controls have separately normalized flow losses,
+preventing control-heavy sliders from dominating head placement. The loss adds
+0.15 times topology/length/combo losses and existing spacing (.1), unsigned turn
+(.05), and control-shape (.1) auxiliary losses with reliability `t^2`.
+
+Windows contain 64 consecutive events and cross bar boundaries. Sampling fixes
+the preceding 16-event overlap by re-noising it at each flow step. Context depends
+on explicit events and audio, never hidden states from the older V2 planner.
+Training uses native plans with small continuous-condition perturbations; complete
+generated-plan training remains future work. Bezier segment-separator duplication
+is not separately classified, and new-combo prediction does not provide learned
+hitsound, kiai, or motif planning.
+
+### 12.3 Native export and difficulty
+
+The generator takes audio, requested stars, two checkpoints and a decoder
+calibration bound to the rhythm-checkpoint hash. An optional training-only profile
+guide selects typical settings near the requested stars. Audio autocorrelation
+provides timing hypotheses; the learned event times remain in milliseconds.
+Predicted slider length/repeats/duration determine an inherited SV point using
+native duration math. Length is constrained where needed for legal SV, recorded
+in the audit, and used as the geometry condition before sampling.
+
+Each full candidate is compiled and independently parsed. Native interval rules,
+rendered slider paths, audible coverage, and pinned rosu-pp-py 4.0.2 stars are
+checked. Default target tolerance is ±0.5 stars. Whole-curve translations fit
+objects into the playfield; oversized curves cause candidate rejection. Only a
+passing candidate is packaged with the original audio bytes. Failure to find one
+produces a report and exit 2. Passing these gates is not a human mapping-quality
+judgment or official Ranked eligibility.
+
+### 12.4 Data, training and evidence
+
+The frozen corpus has 1,376 native charts / 330 audio source groups, split by
+source into 260 train, 36 validation and 34 test groups. It contains 1,367 Ranked
+and 9 Approved charts. All native chart/audio hashes were verified; older codec
+timing labels were replaced from authentic `.osu` files. Geometry excludes 61
+charts exceeding representation bounds, retaining 1,315 charts. Exclusions and
+all split identities are recorded rather than silently clipping source geometry.
+
+Both models trained from random initialization for 60 epochs on iLab through
+Slurm. Onset training completed 15,600 updates; geometry completed 15,360.
+Validation composite loss selected onset epoch 15 and geometry epoch 24, showing
+that the final epoch was not the best checkpoint. Training saves EMA best and
+resumable last states, optimizer/RNG, architecture and dataset hash contracts.
+
+See [the work log and critique](docs/audio-native-flow-worklog-2026-10-25.md) and
+[training evidence](docs/evidence/audio-native-flow-2026-10-25/training-summary.json).
+The new matched generated-event evaluator uses fixed 10.24-second windows,
+validation-only thresholds, three seeds and aligned/zero/shifted audio. Its scores
+must not be conflated with full-song musicality or geometry quality.
+
+### 12.5 Phrase-context follow-up (implemented; full training pending)
+
+The user's Kaguya playtest and exact-audio native comparison expose missing
+rhythmic detail: 242 generated objects versus 324 native, only 6/36 short circle
+pairs reproduced, and a median slider duration of 261ms versus 109ms. Full-song
+validation across twelve other sources also recovers only 18.72% of short circle
+pairs as circles. More total notes alone is insufficient; aggregate generated
+density on that validation set already exceeds reference density.
+
+Optional `RhythmConfig(context_layers=2, density_auxiliary=True)` adds masked
+80ms pooled audio attention across the 20.48s window. The 10ms path remains intact;
+a zero-initialized context output permits explicit transfer from the old best
+checkpoint. A separate audio-only head predicts log(1+events/s) in 1.28s regions,
+supervised by exact native start counts, with weight .1. No target-derived clock
+or density is passed as an inference input, and velocity MSE stays unweighted.
+The revised model has 2,432,519 parameters. It is not an instrument-separation
+model or a whole-song structure planner.
+
+Two 20-epoch runs compare the existing and revised architectures on the same
+expanded source-separated corpus. Both initialize from the existing best with
+new optimizers at 1e-4; `--initialize` and exact `--resume` remain distinct.
+Each evaluates identical frozen full-song sources and generated validation windows.
+The architecture change combines attention and density supervision; no isolated
+effect or improved map quality is claimed before evaluating completed runs.
+
+[The rhythm follow-up](docs/rhythm-followup-2026-10-25.md) records comparison data,
+jobs and remaining faults. Beat This! was tested diagnostically, with pinned
+weights and a conservative constant-tempo fitter; it is not enabled in generation.

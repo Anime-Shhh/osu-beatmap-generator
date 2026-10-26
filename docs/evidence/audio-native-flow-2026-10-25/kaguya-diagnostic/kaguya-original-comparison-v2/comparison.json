@@ -1,0 +1,1045 @@
+{
+  "role": "user-selected development comparison",
+  "target_stars": 4.5,
+  "generated_osu_sha256": "23fb4686e7127db297168a2c0a94d538c6bf9e9d3befd645b8f4fc09f86960f0",
+  "original_osz_sha256": "a32180b9b76fd7b45ec261b713d7034fbe5be67f7b3bbda28f2ce45effa20796",
+  "generated_difficulty": {
+    "available": true,
+    "stars": 5.014477486353817,
+    "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+    "attributes": {
+      "aim": 2.8277388758354083,
+      "speed": 1.8211562406235715
+    },
+    "error": null
+  },
+  "maps": [
+    {
+      "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Confession].osu",
+      "version": "Confession?",
+      "chart_sha256": "701ca6f026dee598d5c5e999e636ff0dd4018aab53e5b1da4e2a7bb668b70680",
+      "difficulty": {
+        "available": true,
+        "stars": 4.48741353211963,
+        "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+        "attributes": {
+          "aim": 2.513965337378981,
+          "speed": 1.673698776861868
+        },
+        "error": null
+      },
+      "timing_segments": [
+        {
+          "start_ms": -734.0,
+          "beat_length_ms": 434.782608695652,
+          "start_beat": 0.0,
+          "meter": 4
+        }
+      ],
+      "generated": {
+        "objects": 242,
+        "kinds": {
+          "1": 120,
+          "0": 122
+        },
+        "gaps_ms": {
+          "median": 230.00000000000182,
+          "under_80": 0,
+          "under_150": 25,
+          "under_250": 122
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 135,
+          "precision": 0.5578512396694215,
+          "recall": 0.4166666666666667,
+          "f1": 0.47703180212014135,
+          "matched_mean_abs_error_ms": 4.970370370370288,
+          "matched_signed_error_ms": 2.437037037036793
+        },
+        "25": {
+          "matches": 191,
+          "precision": 0.7892561983471075,
+          "recall": 0.5895061728395061,
+          "f1": 0.6749116607773852,
+          "matched_mean_abs_error_ms": 7.958115183245994,
+          "matched_signed_error_ms": 5.3403141361254605
+        },
+        "50": {
+          "matches": 195,
+          "precision": 0.8057851239669421,
+          "recall": 0.6018518518518519,
+          "f1": 0.6890459363957597,
+          "matched_mean_abs_error_ms": 8.630769230769152,
+          "matched_signed_error_ms": 6.066666666666476
+        },
+        "100": {
+          "matches": 198,
+          "precision": 0.8181818181818182,
+          "recall": 0.6111111111111112,
+          "f1": 0.6996466431095406,
+          "matched_mean_abs_error_ms": 11.95959595959578,
+          "matched_signed_error_ms": 5.0808080808079215
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.043478260887129,
+        "mean": 8.621631333101273,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 10,
+        "both_as_circles_50ms": 6,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 22,
+          "reference": 25,
+          "matched_50ms": 15,
+          "missing_50ms": 10,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 30,
+          "matched_50ms": 20,
+          "missing_50ms": 10,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 21,
+          "reference": 34,
+          "matched_50ms": 16,
+          "missing_50ms": 18,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 25,
+          "reference": 31,
+          "matched_50ms": 21,
+          "missing_50ms": 10,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 31,
+          "matched_50ms": 12,
+          "missing_50ms": 19,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 17,
+          "missing_50ms": 10,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 22,
+          "reference": 29,
+          "matched_50ms": 19,
+          "missing_50ms": 10,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 14,
+          "reference": 30,
+          "matched_50ms": 13,
+          "missing_50ms": 17,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 33,
+          "matched_50ms": 23,
+          "missing_50ms": 10,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 3,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 3
+        }
+      ]
+    },
+    {
+      "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Easy].osu",
+      "version": "Easy?",
+      "chart_sha256": "1f8aa4eda34dd079041f4c7c51fe7773fb49f1923049a946e22273fc4174428a",
+      "difficulty": {
+        "available": true,
+        "stars": 1.7398745995771305,
+        "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+        "attributes": {
+          "aim": 0.9546961855148083,
+          "speed": 0.692823693759862
+        },
+        "error": null
+      },
+      "timing_segments": [
+        {
+          "start_ms": -734.0,
+          "beat_length_ms": 434.782608695652,
+          "start_beat": 0.0,
+          "meter": 4
+        }
+      ],
+      "generated": {
+        "objects": 242,
+        "kinds": {
+          "1": 120,
+          "0": 122
+        },
+        "gaps_ms": {
+          "median": 230.00000000000182,
+          "under_80": 0,
+          "under_150": 25,
+          "under_250": 122
+        }
+      },
+      "reference": {
+        "objects": 106,
+        "kinds": {
+          "0": 56,
+          "1": 50
+        },
+        "gaps_ms": {
+          "median": 653.0,
+          "under_80": 0,
+          "under_150": 0,
+          "under_250": 0
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 53,
+          "precision": 0.2190082644628099,
+          "recall": 0.5,
+          "f1": 0.3045977011494253,
+          "matched_mean_abs_error_ms": 5.07547169811286,
+          "matched_signed_error_ms": 2.3207547169809217
+        },
+        "25": {
+          "matches": 75,
+          "precision": 0.30991735537190085,
+          "recall": 0.7075471698113207,
+          "f1": 0.43103448275862066,
+          "matched_mean_abs_error_ms": 8.106666666666325,
+          "matched_signed_error_ms": 5.386666666666421
+        },
+        "50": {
+          "matches": 77,
+          "precision": 0.3181818181818182,
+          "recall": 0.7264150943396226,
+          "f1": 0.4425287356321839,
+          "matched_mean_abs_error_ms": 9.038961038960705,
+          "matched_signed_error_ms": 6.389610389610151
+        },
+        "100": {
+          "matches": 78,
+          "precision": 0.32231404958677684,
+          "recall": 0.7358490566037735,
+          "f1": 0.4482758620689655,
+          "matched_mean_abs_error_ms": 11.153846153845638,
+          "matched_signed_error_ms": 3.6923076923074563
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.043478260887129,
+        "mean": 8.621631333101273,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 0,
+        "both_onsets_recovered_50ms": 0,
+        "both_as_circles_50ms": 0,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 9,
+          "matched_50ms": 9,
+          "missing_50ms": 0,
+          "extra_50ms": 12
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 22,
+          "reference": 11,
+          "matched_50ms": 8,
+          "missing_50ms": 3,
+          "extra_50ms": 14
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 9,
+          "matched_50ms": 5,
+          "missing_50ms": 4,
+          "extra_50ms": 20
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 21,
+          "reference": 9,
+          "matched_50ms": 4,
+          "missing_50ms": 5,
+          "extra_50ms": 17
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 25,
+          "reference": 9,
+          "matched_50ms": 8,
+          "missing_50ms": 1,
+          "extra_50ms": 17
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 9,
+          "matched_50ms": 6,
+          "missing_50ms": 3,
+          "extra_50ms": 11
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 10,
+          "matched_50ms": 7,
+          "missing_50ms": 3,
+          "extra_50ms": 17
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 22,
+          "reference": 9,
+          "matched_50ms": 7,
+          "missing_50ms": 2,
+          "extra_50ms": 15
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 14,
+          "reference": 10,
+          "matched_50ms": 6,
+          "missing_50ms": 4,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 9,
+          "matched_50ms": 6,
+          "missing_50ms": 3,
+          "extra_50ms": 19
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 23,
+          "reference": 12,
+          "matched_50ms": 11,
+          "missing_50ms": 1,
+          "extra_50ms": 12
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 3,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 3
+        }
+      ]
+    },
+    {
+      "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Fixxis' Hard].osu",
+      "version": "Fixxis' Hard?",
+      "chart_sha256": "4c514a6c1f401fad5ec6c6d36278f33c135be768adce4a8c59710d808575f4a8",
+      "difficulty": {
+        "available": true,
+        "stars": 3.162390266016046,
+        "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+        "attributes": {
+          "aim": 1.6943273506500713,
+          "speed": 1.342231840566146
+        },
+        "error": null
+      },
+      "timing_segments": [
+        {
+          "start_ms": -734.0,
+          "beat_length_ms": 434.782608695652,
+          "start_beat": 0.0,
+          "meter": 4
+        }
+      ],
+      "generated": {
+        "objects": 242,
+        "kinds": {
+          "1": 120,
+          "0": 122
+        },
+        "gaps_ms": {
+          "median": 230.00000000000182,
+          "under_80": 0,
+          "under_150": 25,
+          "under_250": 122
+        }
+      },
+      "reference": {
+        "objects": 225,
+        "kinds": {
+          "0": 125,
+          "1": 100
+        },
+        "gaps_ms": {
+          "median": 434.0,
+          "under_80": 0,
+          "under_150": 4,
+          "under_250": 99
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 96,
+          "precision": 0.39669421487603307,
+          "recall": 0.4266666666666667,
+          "f1": 0.41113490364025695,
+          "matched_mean_abs_error_ms": 4.781249999999808,
+          "matched_signed_error_ms": 2.697916666666399
+        },
+        "25": {
+          "matches": 141,
+          "precision": 0.5826446280991735,
+          "recall": 0.6266666666666667,
+          "f1": 0.6038543897216274,
+          "matched_mean_abs_error_ms": 8.092198581560124,
+          "matched_signed_error_ms": 6.092198581560073
+        },
+        "50": {
+          "matches": 145,
+          "precision": 0.5991735537190083,
+          "recall": 0.6444444444444445,
+          "f1": 0.6209850107066381,
+          "matched_mean_abs_error_ms": 8.993103448275706,
+          "matched_signed_error_ms": 7.04827586206876
+        },
+        "100": {
+          "matches": 149,
+          "precision": 0.6157024793388429,
+          "recall": 0.6622222222222223,
+          "f1": 0.6381156316916489,
+          "matched_mean_abs_error_ms": 12.35570469798628,
+          "matched_signed_error_ms": 4.140939597315286
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.043478260887129,
+        "mean": 8.621631333101273,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 58,
+        "both_onsets_recovered_50ms": 16,
+        "both_as_circles_50ms": 4,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 20,
+          "matched_50ms": 14,
+          "missing_50ms": 6,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 22,
+          "reference": 21,
+          "matched_50ms": 15,
+          "missing_50ms": 6,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 24,
+          "matched_50ms": 16,
+          "missing_50ms": 8,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 21,
+          "reference": 17,
+          "matched_50ms": 6,
+          "missing_50ms": 11,
+          "extra_50ms": 15
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 25,
+          "reference": 19,
+          "matched_50ms": 14,
+          "missing_50ms": 5,
+          "extra_50ms": 11
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 17,
+          "matched_50ms": 8,
+          "missing_50ms": 9,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 19,
+          "matched_50ms": 13,
+          "missing_50ms": 6,
+          "extra_50ms": 11
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 22,
+          "reference": 22,
+          "matched_50ms": 16,
+          "missing_50ms": 6,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 14,
+          "reference": 23,
+          "matched_50ms": 11,
+          "missing_50ms": 12,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 23,
+          "matched_50ms": 16,
+          "missing_50ms": 7,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 23,
+          "reference": 20,
+          "matched_50ms": 16,
+          "missing_50ms": 4,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 3,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 3
+        }
+      ]
+    },
+    {
+      "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Insane].osu",
+      "version": "Insane?",
+      "chart_sha256": "af75b3f057e9ec8af28925be6bec58d0860eb7621b273dfdb767ac4639e8efd5",
+      "difficulty": {
+        "available": true,
+        "stars": 4.0000075820629934,
+        "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+        "attributes": {
+          "aim": 2.229544401677742,
+          "speed": 1.5199731397302532
+        },
+        "error": null
+      },
+      "timing_segments": [
+        {
+          "start_ms": -734.0,
+          "beat_length_ms": 434.782608695652,
+          "start_beat": 0.0,
+          "meter": 4
+        }
+      ],
+      "generated": {
+        "objects": 242,
+        "kinds": {
+          "1": 120,
+          "0": 122
+        },
+        "gaps_ms": {
+          "median": 230.00000000000182,
+          "under_80": 0,
+          "under_150": 25,
+          "under_250": 122
+        }
+      },
+      "reference": {
+        "objects": 264,
+        "kinds": {
+          "1": 121,
+          "0": 143
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 34,
+          "under_250": 166
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 111,
+          "precision": 0.45867768595041325,
+          "recall": 0.42045454545454547,
+          "f1": 0.43873517786561267,
+          "matched_mean_abs_error_ms": 5.036036036035903,
+          "matched_signed_error_ms": 2.531531531531267
+        },
+        "25": {
+          "matches": 159,
+          "precision": 0.6570247933884298,
+          "recall": 0.6022727272727273,
+          "f1": 0.6284584980237155,
+          "matched_mean_abs_error_ms": 8.062893081760933,
+          "matched_signed_error_ms": 5.622641509433798
+        },
+        "50": {
+          "matches": 163,
+          "precision": 0.6735537190082644,
+          "recall": 0.6174242424242424,
+          "f1": 0.6442687747035574,
+          "matched_mean_abs_error_ms": 8.865030674846555,
+          "matched_signed_error_ms": 6.484662576686956
+        },
+        "100": {
+          "matches": 166,
+          "precision": 0.6859504132231405,
+          "recall": 0.6287878787878788,
+          "f1": 0.6561264822134387,
+          "matched_mean_abs_error_ms": 12.81325301204799,
+          "matched_signed_error_ms": 5.319277108433622
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.043478260887129,
+        "mean": 8.621631333101273,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 90,
+        "both_onsets_recovered_50ms": 26,
+        "both_as_circles_50ms": 11,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 24,
+          "matched_50ms": 16,
+          "missing_50ms": 8,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 22,
+          "reference": 19,
+          "matched_50ms": 14,
+          "missing_50ms": 5,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 22,
+          "matched_50ms": 16,
+          "missing_50ms": 6,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 21,
+          "reference": 28,
+          "matched_50ms": 11,
+          "missing_50ms": 17,
+          "extra_50ms": 10
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 25,
+          "reference": 26,
+          "matched_50ms": 16,
+          "missing_50ms": 10,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 25,
+          "matched_50ms": 10,
+          "missing_50ms": 15,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 22,
+          "matched_50ms": 14,
+          "missing_50ms": 8,
+          "extra_50ms": 10
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 22,
+          "reference": 25,
+          "matched_50ms": 18,
+          "missing_50ms": 7,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 14,
+          "reference": 23,
+          "matched_50ms": 11,
+          "missing_50ms": 12,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 27,
+          "matched_50ms": 19,
+          "missing_50ms": 8,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 23,
+          "reference": 23,
+          "matched_50ms": 18,
+          "missing_50ms": 5,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 3,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 3
+        }
+      ]
+    },
+    {
+      "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Yahuri-sama's Normal].osu",
+      "version": "Yahuri-sama's Normal?",
+      "chart_sha256": "dd8670297f8efbb0b488e08517126ea8b250458ff9a146cfee3ed946c92386b7",
+      "difficulty": {
+        "available": true,
+        "stars": 2.105329391390658,
+        "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+        "attributes": {
+          "aim": 1.1288112180392729,
+          "speed": 0.8912952554364837
+        },
+        "error": null
+      },
+      "timing_segments": [
+        {
+          "start_ms": -734.0,
+          "beat_length_ms": 434.782608695652,
+          "start_beat": 0.0,
+          "meter": 4
+        }
+      ],
+      "generated": {
+        "objects": 242,
+        "kinds": {
+          "1": 120,
+          "0": 122
+        },
+        "gaps_ms": {
+          "median": 230.00000000000182,
+          "under_80": 0,
+          "under_150": 25,
+          "under_250": 122
+        }
+      },
+      "reference": {
+        "objects": 174,
+        "kinds": {
+          "0": 79,
+          "1": 95
+        },
+        "gaps_ms": {
+          "median": 435.0,
+          "under_80": 0,
+          "under_150": 0,
+          "under_250": 34
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 82,
+          "precision": 0.33884297520661155,
+          "recall": 0.47126436781609193,
+          "f1": 0.3942307692307692,
+          "matched_mean_abs_error_ms": 4.9878048780486886,
+          "matched_signed_error_ms": 2.7926829268291766
+        },
+        "25": {
+          "matches": 112,
+          "precision": 0.4628099173553719,
+          "recall": 0.6436781609195402,
+          "f1": 0.5384615384615384,
+          "matched_mean_abs_error_ms": 7.6874999999998845,
+          "matched_signed_error_ms": 5.5624999999998845
+        },
+        "50": {
+          "matches": 115,
+          "precision": 0.47520661157024796,
+          "recall": 0.6609195402298851,
+          "f1": 0.5528846153846154,
+          "matched_mean_abs_error_ms": 8.504347826086844,
+          "matched_signed_error_ms": 6.4347826086955395
+        },
+        "100": {
+          "matches": 118,
+          "precision": 0.48760330578512395,
+          "recall": 0.6781609195402298,
+          "f1": 0.5673076923076923,
+          "matched_mean_abs_error_ms": 12.889830508474466,
+          "matched_signed_error_ms": 2.7372881355931105
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.043478260887129,
+        "mean": 8.621631333101273,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 3,
+        "both_onsets_recovered_50ms": 2,
+        "both_as_circles_50ms": 0,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 16,
+          "matched_50ms": 12,
+          "missing_50ms": 4,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 22,
+          "reference": 14,
+          "matched_50ms": 9,
+          "missing_50ms": 5,
+          "extra_50ms": 13
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 19,
+          "matched_50ms": 14,
+          "missing_50ms": 5,
+          "extra_50ms": 11
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 21,
+          "reference": 16,
+          "matched_50ms": 8,
+          "missing_50ms": 8,
+          "extra_50ms": 13
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 25,
+          "reference": 17,
+          "matched_50ms": 11,
+          "missing_50ms": 6,
+          "extra_50ms": 14
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 16,
+          "matched_50ms": 8,
+          "missing_50ms": 8,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 13,
+          "matched_50ms": 9,
+          "missing_50ms": 4,
+          "extra_50ms": 15
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 22,
+          "reference": 16,
+          "matched_50ms": 12,
+          "missing_50ms": 4,
+          "extra_50ms": 10
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 14,
+          "reference": 18,
+          "matched_50ms": 8,
+          "missing_50ms": 10,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 18,
+          "matched_50ms": 13,
+          "missing_50ms": 5,
+          "extra_50ms": 12
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 23,
+          "reference": 11,
+          "matched_50ms": 11,
+          "missing_50ms": 0,
+          "extra_50ms": 12
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 3,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 3
+        }
+      ]
+    }
+  ],
+  "matching_encoded_audio_in_cache": [],
+  "closest_original": "Confession?"
+}

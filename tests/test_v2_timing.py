@@ -52,6 +52,17 @@ OSU_CONTENT = """osu file format v14
 
 
 class TimingAndEventTests(unittest.TestCase):
+    def test_velocity_boundary_survives_beat_round_trip(self):
+        timing = timing_map_from_points([
+            TimingPoint(120., 393.44262295081967),
+            TimingPoint(930., -50., uninherited=False),
+        ])
+        round_trip = timing.beat_to_time(timing.time_to_beat(930.))
+        self.assertLess(round_trip, 930.)  # Reproduces the floating-point boundary.
+        self.assertEqual(timing.slider_velocity_at_time(round_trip), 2.)
+        self.assertEqual(timing.slider_velocity_at_time(930.-1e-6), 1.)
+        self.assertEqual(timing.timing_point_at_time(round_trip).offset_ms, 930.)
+
     def test_piecewise_timing_map_round_trips(self):
         timing = parse_timing_map(OSU_CONTENT)
         self.assertEqual(len(timing.segments), 2)

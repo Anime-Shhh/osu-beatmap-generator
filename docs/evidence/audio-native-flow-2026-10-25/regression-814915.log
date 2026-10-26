@@ -1,0 +1,14 @@
+........................................................................ [ 97%]
+..                                                                       [100%]
+=============================== warnings summary ===============================
+tests/test_onset_flow.py::OnsetFlowTests::test_phrase_attention_padding_and_empty_rows
+  /common/users/asj102/osu_project/codex_audio_flow_20261025_expanded_train/tests/test_onset_flow.py:73: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+  Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+    self.assertGreater(float(result['phrase_density_huber']), 0.)
+
+tests/test_v2_quality.py::test_geometry_epoch_freezes_planner_and_partial_accumulation_is_normalized
+  /common/users/asj102/osu_project/env/lib/python3.12/site-packages/torch/nn/modules/activation.py:1336: UserWarning: Support for mismatched key_padding_mask and attn_mask is deprecated. Use same type for both instead.
+    key_padding_mask = F._canonical_mask(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+74 passed, 2 warnings in 9.19s

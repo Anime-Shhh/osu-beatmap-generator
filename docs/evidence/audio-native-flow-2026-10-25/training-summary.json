@@ -1,0 +1,448 @@
+{
+  "onset": {
+    "parameters": 2085126,
+    "epochs": 60,
+    "best_epoch": 15,
+    "best_step": 3900,
+    "best_validation": {
+      "aligned": {
+        "loss": 0.39260440071423847,
+        "flow": 0.10762596958213383,
+        "audio_onset_bce": 0.39893049663967556,
+        "type_ce": 0.3445291734404034,
+        "duration_huber": 0.05192483340700468
+      },
+      "zero_audio": {
+        "loss": 0.9394610391722785,
+        "flow": 0.23973415460851458,
+        "audio_onset_bce": 1.1953385472297668,
+        "type_ce": 0.648186723391215,
+        "duration_huber": 0.3071955343087514
+      },
+      "shift_1000ms": {
+        "loss": 0.9002598259184096,
+        "flow": 0.2929823597272237,
+        "audio_onset_bce": 1.2134927776124742,
+        "type_ce": 0.5631881753603617,
+        "duration_huber": 0.08924072111646335
+      }
+    },
+    "final": {
+      "epoch": 60,
+      "step": 15600,
+      "train": {
+        "loss": 0.19672790221296824,
+        "flow": 0.06553487780575569,
+        "audio_onset_bce": 0.33843063288010083,
+        "type_ce": 0.07806042520186075,
+        "duration_huber": 0.03022061288714982
+      },
+      "validation": {
+        "aligned": {
+          "loss": 0.5545288026332855,
+          "flow": 0.09643050614330503,
+          "audio_onset_bce": 0.4161660538779365,
+          "type_ce": 0.6807648340861002,
+          "duration_huber": 0.054697520203060575
+        },
+        "zero_audio": {
+          "loss": 1.7508697244856093,
+          "flow": 0.2189088612794876,
+          "audio_onset_bce": 1.5886704458130732,
+          "type_ce": 1.9569745063781738,
+          "duration_huber": 0.6252239942550659
+        },
+        "shift_1000ms": {
+          "loss": 1.2350242998864915,
+          "flow": 0.2884794788228141,
+          "audio_onset_bce": 1.3994540638393826,
+          "type_ce": 1.1402344670560625,
+          "duration_huber": 0.10625623953011301
+        }
+      },
+      "seconds": 1925.6617411915213
+    },
+    "first": {
+      "epoch": 1,
+      "step": 260,
+      "train": {
+        "loss": 1.2654811159922525,
+        "flow": 0.7481790057741678,
+        "audio_onset_bce": 0.6270643062316454,
+        "type_ce": 0.6480970553480662,
+        "duration_huber": 0.1459500170384462
+      },
+      "validation": {
+        "aligned": {
+          "loss": 0.5546629461977217,
+          "flow": 0.20728682892190087,
+          "audio_onset_bce": 0.44936257269647384,
+          "type_ce": 0.43088820907804704,
+          "duration_huber": 0.07836547576718861
+        },
+        "zero_audio": {
+          "loss": 0.7501020365291171,
+          "flow": 0.28825000259611344,
+          "audio_onset_bce": 0.9012275735537211,
+          "type_ce": 0.42656709088219535,
+          "duration_huber": 0.09304646650950114
+        },
+        "shift_1000ms": {
+          "loss": 0.854362236128913,
+          "flow": 0.34398942192395526,
+          "audio_onset_bce": 0.9500685864024692,
+          "type_ce": 0.5041754610008664,
+          "duration_huber": 0.083071768283844
+        }
+      },
+      "seconds": 29.546020484529436
+    },
+    "max_gpu_memory_bytes": 2398979584,
+    "checkpoint_sha256": "ca048058618ae62c662e0dd7f391c1ebc0d856a75f2a41f4fe9d63aa70fac2a5"
+  },
+  "geometry": {
+    "parameters": 3360240,
+    "epochs": 60,
+    "best_epoch": 24,
+    "best_step": 6144,
+    "best_validation": {
+      "loss": 3.3924158232552664,
+      "head_flow": 2.473888451712472,
+      "anchor_flow": 0.38439360857009885,
+      "curve_ce": 1.374728979383196,
+      "count_ce": 1.1687257732663836,
+      "repeat_ce": 0.4031908690929413,
+      "length_huber": 0.01753905990294048,
+      "combo_bce": 0.5123765672956194,
+      "spacing_loss": 0.0015037939617676395,
+      "turn_loss": 0.04488015196153096,
+      "slider_shape_loss": 0.10255197286605836
+    },
+    "final": {
+      "epoch": 60,
+      "step": 15360,
+      "train": {
+        "loss": 3.1700456393882632,
+        "head_flow": 2.3974357154220343,
+        "anchor_flow": 0.41845218901289627,
+        "curve_ce": 0.6119046146050096,
+        "count_ce": 0.8791299830190837,
+        "repeat_ce": 0.31729936867486686,
+        "length_huber": 0.012036104744765908,
+        "combo_bce": 0.45930643542669713,
+        "spacing_loss": 0.001508147571939844,
+        "turn_loss": 0.045463198293873575,
+        "slider_shape_loss": 0.09782266250113025
+      },
+      "validation": {
+        "loss": 3.413318518229893,
+        "head_flow": 2.474427284513201,
+        "anchor_flow": 0.36464025207928247,
+        "curve_ce": 1.5495242425373623,
+        "count_ce": 1.234083822795323,
+        "repeat_ce": 0.4415738505976541,
+        "length_huber": 0.017003514085497176,
+        "combo_bce": 0.5119665375777653,
+        "spacing_loss": 0.0015008396369272045,
+        "turn_loss": 0.04481821592364992,
+        "slider_shape_loss": 0.0873725888984544
+      },
+      "seconds": 1021.8869206914678
+    },
+    "first": {
+      "epoch": 1,
+      "step": 256,
+      "train": {
+        "loss": 4.555153460241854,
+        "head_flow": 3.2729554139077663,
+        "anchor_flow": 0.6885943475645036,
+        "curve_ce": 1.119100090349093,
+        "count_ce": 1.485610521864146,
+        "repeat_ce": 0.6144292383687571,
+        "length_huber": 0.06764607377408538,
+        "combo_bce": 0.5574010708369315,
+        "spacing_loss": 0.001563239485676604,
+        "turn_loss": 0.044612692450755276,
+        "slider_shape_loss": 0.14588659333821852
+      },
+      "validation": {
+        "loss": 3.851604550225394,
+        "head_flow": 2.874266617638724,
+        "anchor_flow": 0.4732132724353245,
+        "curve_ce": 1.002299155507769,
+        "count_ce": 1.2024398054395402,
+        "repeat_ce": 0.4521531547818865,
+        "length_huber": 0.034289466802562986,
+        "combo_bce": 0.5597412245614188,
+        "spacing_loss": 0.0015052819591281669,
+        "turn_loss": 0.04515160130602973,
+        "slider_shape_loss": 0.1407811462879181
+      },
+      "seconds": 16.681219193153083
+    },
+    "max_gpu_memory_bytes": 404356096,
+    "checkpoint_sha256": "8604fc2c7eabaf541befe0db7c18915e145f7afdd3623bc5785dbe2de60bd580"
+  },
+  "cache_audit": {
+    "native_charts": 1376,
+    "geometry_charts": 1315,
+    "audio_hashes_verified": 330,
+    "splits": {
+      "train": 1064,
+      "test": 104,
+      "val": 147
+    },
+    "excluded_geometry": [
+      {
+        "chart_sha256": "e35e67067c6541c07426819977210b7e3395cacb86fe7e44a3eafa706d06e0fa",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c035c135a49e9588dfd89e475ca2430cbf4ebc2f176d3117c9bb6ac5961074e0",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "83ded92aafeee7a0aaafd0bcff3107a81a770bf803607b62374c9272b9d93f98",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "9e62e63cc32f35b7b9ab7d39b3c74e9b1471a744300bce075ef7f1987bbf7984",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "b793aab0c25eb84669d2b48408e8d18f4c4870ba33d1088dd9187839f0c3f3d2",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "900327f5510184784a66d40739a0bfb0ea5c5f2fa476e5deafd212f8c40e469f",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "0675c8f70c291abf4af56eb9e446828582eab4d43819d27d54394303b048fef4",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "cfc11a0855956fb83262091e53d4ff6261fc2781e4f6f382a8e139102e2d9bdc",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "5218e6f8b2c43ce9390f50e74d91287d6ffb7cb264634f10f2b45e30ba204e60",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "e06270256b300586f046b524bf96473ef027fe235ec6972ce1ac8d7f6eb64b1a",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "9cec36712bf0557a6ee8f107506f2eed36d0b3c9ea78d3b002812bc6dd18add6",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "26c4c6594abb310b955e2470eed12af7b6836b7835a3a8d4f25978151b603eb4",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "aeba7534f8faa6c386e344fa590e2e5da8a3b67b7c225c11a77ec4dd5fa54237",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "2f6362abbe53fa619477657aade472b730d3de15197c195e713c6b4fcdf52418",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "24df6e264c75eac131f108a61b96ad6f0463fb838b33684c0f43987d38aaa34a",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "34c249cdfb3229ea8db1cb830a3dda8810490a9c84d690ba3e7ee8afeb59fa13",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "95509efca85a5c9f3fa0c0c52108f385edc193122667ed86f93566d9a8f46190",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "7d849f87e23ccb6499177ad3bfd5aaa350e6649c2c977e5ec6fdd621583fc85b",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "e9977dab33303f8a4a0c272776b33363d59c4eb1b3d76bdaf263910c1041b103",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "8d4c5cb9e3af55e94d0d1374d0987bb15225a24592c1cb41d25c1d16000bb6d9",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c464aeaeb0ea6b7fe3212cd2c3f2f9d162de4dc37335626457fef9ca82744a0a",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "b441b3f769247b87bb08e98cb8a2b3dd519e0d4c7b99cf8123adc776e1dab9fb",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "e7e495bd2c1e88b7c1b42f6d0c99b0bc5729826f7025d627cbc7fe85e43b9351",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "b822d078634a49f8580030c26d6f44d9462f6ec22acfa80ffb7a16264f69291b",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "2cf07b07ac8afe1810554b39d0b780e69b0c9cbc669433c85115966b94cc66d1",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "0dff41c1e9ee88e79f4de31de999e78e64ee4736309abf65f0c17f18e1c85054",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c6c469f1a27c44d60ec8c45d9dbc8e20bf8618ceab36aa786b7d4c7ef39a57c5",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "0dfbeadc6c03492e7d21cfeaac3a0f6b2078b9ef477e126218fcdbead34c414b",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "6924824f278163b465d5498cc90ff24b9e8408f8bb632de7928d1654c67a9acd",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "8bfcb35e5e10d405a5e1f66e7db3c2329667452e71c0f5b704d6d37881ad5f85",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "ce19466b5f8180d68f8d177ef6325e2e44b1297e7ba0fd10981f42234b6f32f5",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "97a2298ec986b7d10ee687753f193378130900880af8d98d924a5ba265057ef7",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "a443de43162e331c6fdb17e95ca6f9ce2b75b3574fdd72b82b03439b15bd4d9d",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "8b27b5d6be2da3b2414ac56901c3eab9092ded7bc11743379a2dd7461eb386f6",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "112b72cc5d3ca305594d3814da86e10ade3309d16aba04c48673a1c4c8c3a984",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "a00cd36c86aeb1f3a971a4debbffd20c042e9ef8596fcf34c289d151dc512d41",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "237810abcb96dad5d29170618443dd7730402dc34c1df8057da56873d747dc3c",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "94ba27d23bd5c08b2ebc44fa82642457e8e67c85e59bf7f67317fa7b73f532ce",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "d4538048c252c8ac3631352bbb10fd24d7a6187a4d803f2561235da1bcceac08",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c3519a7f792db91cd2e2857ea1b86e1b3cc36aaddd3e1eecd4baba7fbb59ae90",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "66974ec34c293cd74d319fe0076eca3e54bc057c4d6706d903ca6de9bd085ae2",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "2aebd08e1e940be6b6de72e202603aac29a59db86e05d3930f04586d541ba74a",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "9c44383a876ba1f30748a71c317ce898b3a217f5ba49284eddcbd4dbe47391f7",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "3dce9903ca1e813560247209eab30475efec34e934e1f66c43bded5a075c9059",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c901bf37f6b277c1274d7efc496aa406b35f072ba68e60968b2f50a6c702af58",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "d2218fcead05345670a937e2e2387e852ce35567c02272911ec05496b8cf8613",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "1a40c79cb56e0ee2678632d281c86e3ef6dde3f23081b3b04a636d1dfb9941bf",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "6f6c143fc02d3ff2b71261d6fd1d26999a82be6cf4b438bb268bdab5f024a686",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "cf6295536435a9bc10bc746de7c6530331911e60d1fa9bf8a8de405bbdee7bbf",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "80590c3f8d27a8bb0913f4ce24d3d929d17a315877bedd2ea8f90565af005026",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "703feb173dcc9fb70fdd990968223b24348b4ae01d7ee7131f74bf497113d86e",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "cd7992ea52881be8099f2fc05458322751ccc4e8b1647c0225502cff75939c37",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "f514babe74e0a7126eff56577a1092bdde0c430aa30656929f64fe983492c013",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "652b758fe6eac1f2817f645fd3c7727f11cbdacba5527230e37980c5f080307a",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c81640d7a58d5c80bb930a232f02e561f85dc2d3ae0b34b9d9d4948eb349b8ad",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "b0308f33683b36dd6c8b51d7ad66e08c6305e952bc381fc564b19f23ff4ae355",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "bf808f6d63d2aea1ce6641afb2818a830903d0dcb0c3ca48149f32c1066ace33",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "ac22ae6c8ae4173fab443ca87724f5a21a1fcf90c41e1c506354d440fe959842",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "c9ffce2615c8636d0ebb9d2c286c75bbfc461c4e888f3bf37a55a9fe32e849ce",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "20f61a6c16c9e341ebcff759f5a118d8b5bf1054e118328aa8145166d083b48a",
+        "error": "source exceeds declared geometry representation"
+      },
+      {
+        "chart_sha256": "ddded537356f294f3d17a56fa89e74b3f9c3be5283db298735a7ef805ba7fd21",
+        "error": "source exceeds declared geometry representation"
+      }
+    ],
+    "source_status": {
+      "ranked": 1367,
+      "approved": 9
+    },
+    "rhythm_manifest_sha256": "fbda8a8f8fa14f17710457490a46f3f99e93e6b5de71290e3a292dbdea127f39",
+    "geometry_manifest_sha256": "88579b88838a338955c2a7f03aa1181d2fe434525d60062496fb54bf39b65446"
+  }
+}

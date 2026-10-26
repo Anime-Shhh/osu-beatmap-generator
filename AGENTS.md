@@ -43,3 +43,20 @@ rhythm-only, not a native-geometry or OSZ checkpoint. Matched test onset F1 at
 `docs/rhythm-flow-results-2026-10-18.md` before claiming full-map quality or
 comparing its loss numerically with V2's unrelated objectives. Evaluation jobs
 549284 and 549331 completed; no continuing training or monitoring was scheduled.
+
+October 25 audio/native flow work is isolated on `codex/audio-native-flow` in
+`osu-diffusion-lab`. The user explicitly authorized iLab access, edits and Slurm
+training toward MP3 + difficulty -> human-quality OSZ. Read
+`docs/audio-native-flow-worklog-2026-10-25.md` for current paths, source snapshots,
+jobs and remaining evaluation work before continuing. Both new 60-epoch training
+runs finished; this alone does not establish professional output quality. The new
+native-label cache preserves all prior source splits. Do not reuse a saved test
+comparison as an untouched test after tuning on its results.
+
+Latest user steering: prioritize missing rhythmic objects, incorrect timing/sound
+selection and short two-note patterns. Exact-original-audio Kaguya comparison and
+12-source full-song validation are completed; read `docs/rhythm-followup-2026-10-25.md`.
+Expansion job 814768 is followed by dependent control/phrase training jobs 814837
+and 814838. Check their current states; documentation records status at writing.
+The user-provided original Kaguya MP3 is shifted relative to the older inference
+MP3: never compare those files' raw timestamps without audio alignment.

@@ -26,6 +26,24 @@ TIMING_EFFECT_KIAI = 1
 TIMING_EFFECT_OMIT_FIRST_BAR_LINE = 8
 
 
+def _active_boundary_index(boundaries: tuple[float, ...], coordinate: float) -> int:
+    """Right-continuous lookup tolerant only to beat/time floating round-off.
+
+    A native event exactly at a timing point can round-trip through beat space
+    a few ULPs below that point. Selecting the previous SV then changes its
+    duration discontinuously. Do not round milliseconds broadly: genuinely
+    earlier fractional timestamps must still select the previous segment.
+    """
+    value = float(coordinate)
+    index = bisect_right(boundaries, value)
+    if index < len(boundaries):
+        following = boundaries[index]
+        tolerance = 8*math.ulp(max(1., abs(value), abs(following)))
+        if 0 <= following-value <= tolerance:
+            index = bisect_right(boundaries, following)
+    return index-1
+
+
 @dataclass(frozen=True)
 class TimingPoint:
     """One native ``[TimingPoints]`` record.
@@ -200,11 +218,11 @@ class TimingMap:
         self._timing_point_times = tuple(point.offset_ms for point in source_points)
 
     def segment_at_time(self, time_ms: float) -> TimingSegment:
-        index = max(0, bisect_right(self._start_times, float(time_ms)) - 1)
+        index = max(0, _active_boundary_index(self._start_times, time_ms))
         return self.segments[index]
 
     def segment_at_beat(self, beat: float) -> TimingSegment:
-        index = max(0, bisect_right(self._start_beats, float(beat)) - 1)
+        index = max(0, _active_boundary_index(self._start_beats, beat))
         return self.segments[index]
 
     def timing_point_at_time(self, time_ms: float) -> Optional[TimingPoint]:
@@ -212,7 +230,7 @@ class TimingMap:
 
         if not self.timing_points:
             return None
-        index = bisect_right(self._timing_point_times, float(time_ms)) - 1
+        index = _active_boundary_index(self._timing_point_times, time_ms)
         return self.timing_points[index] if index >= 0 else None
 
     def time_to_beat(self, time_ms: float) -> float:
@@ -232,7 +250,7 @@ class TimingMap:
         return self.segment_at_time(time_ms).meter
 
     def slider_velocity_at_time(self, time_ms: float) -> float:
-        index = max(0, bisect_right(self._slider_velocity_times, float(time_ms)) - 1)
+        index = max(0, _active_boundary_index(self._slider_velocity_times, time_ms))
         return self.slider_velocity_segments[index].multiplier
 
     def kiai_at_time(self, time_ms: float) -> bool:

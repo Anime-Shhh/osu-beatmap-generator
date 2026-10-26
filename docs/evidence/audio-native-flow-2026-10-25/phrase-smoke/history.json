@@ -1,0 +1,67 @@
+{
+  "contract": {
+    "config": {
+      "audio_dim": 101,
+      "profile_dim": 6,
+      "width": 128,
+      "audio_layers": 8,
+      "flow_layers": 12,
+      "window_frames": 2048,
+      "overlap_frames": 512,
+      "frame_ms": 10.0,
+      "context_layers": 2,
+      "context_stride": 8,
+      "density_auxiliary": true
+    },
+    "manifest_sha256": "fbda8a8f8fa14f17710457490a46f3f99e93e6b5de71290e3a292dbdea127f39",
+    "seed": 1731,
+    "batch_size": 16,
+    "epochs_budget": 20,
+    "learning_rate": 0.0001
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "step": 64,
+      "train": {
+        "loss": 0.3546564392745495,
+        "flow": 0.0977480806177482,
+        "audio_onset_bce": 0.39184253942221403,
+        "type_ce": 0.21374320739414543,
+        "duration_huber": 0.03815771234803833,
+        "phrase_density_huber": 0.4253668960882351
+      },
+      "validation": {
+        "aligned": {
+          "loss": 0.3843981623649597,
+          "flow": 0.09282783418893814,
+          "audio_onset_bce": 0.3474291115999222,
+          "type_ce": 0.34495939314365387,
+          "duration_huber": 0.06205623596906662,
+          "phrase_density_huber": 0.16719285398721695
+        },
+        "zero_audio": {
+          "loss": 0.9033300280570984,
+          "flow": 0.19489924609661102,
+          "audio_onset_bce": 1.0166636109352112,
+          "type_ce": 0.6687050759792328,
+          "duration_huber": 0.4086596518754959,
+          "phrase_density_huber": 0.17747418582439423
+        },
+        "shift_1000ms": {
+          "loss": 0.767295628786087,
+          "flow": 0.22999044507741928,
+          "audio_onset_bce": 0.9696653187274933,
+          "type_ce": 0.5114079415798187,
+          "duration_huber": 0.08891133964061737,
+          "phrase_density_huber": 0.1695706769824028
+        }
+      },
+      "seconds": 17.86734886839986
+    }
+  ],
+  "parameters": 2432519,
+  "train_sources": 260,
+  "validation_sources": 36,
+  "max_gpu_memory_bytes": 2478755328
+}
