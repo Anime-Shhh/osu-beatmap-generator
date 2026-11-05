@@ -56,7 +56,13 @@ comparison as an untouched test after tuning on its results.
 Latest user steering: prioritize missing rhythmic objects, incorrect timing/sound
 selection and short two-note patterns. Exact-original-audio Kaguya comparison and
 12-source full-song validation are completed; read `docs/rhythm-followup-2026-10-25.md`.
-Expansion job 814768 is followed by dependent control/phrase training jobs 814837
-and 814838. Check their current states; documentation records status at writing.
+November 5 update: expansion 814768 failed and dependent 814837/814838 never
+trained. Recovery and replacement 20-epoch control/phrase runs now completed,
+along with all Kaguya comparisons. Read `docs/inference-check-2026-11-04.md` and
+its evidence before further work. Timing improved, but coverage, stacked doubles
+and difficulty control remain poor; added phrase context has no conclusive gain.
+The project allocation exceeded quota; new outputs use
+`/common/home/asj102/osu_flow_runs/run_20261104`. Preserve existing artifacts.
+No evaluation jobs remain pending from this check.
 The user-provided original Kaguya MP3 is shifted relative to the older inference
 MP3: never compare those files' raw timestamps without audio alignment.

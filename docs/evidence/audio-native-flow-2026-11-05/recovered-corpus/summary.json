@@ -1,0 +1,23 @@
+{
+  "charts": 3436,
+  "added_charts": 2060,
+  "audio_files": 805,
+  "groups": {
+    "train": 637,
+    "val": 84,
+    "test": 84
+  },
+  "splits": {
+    "train": 2765,
+    "test": 325,
+    "val": 346
+  },
+  "manifest_sha256": "104c8d54338cc075baabba20809d39841a07a1729db14b5a67d7000ba343b5e4",
+  "recovery": {
+    "journal_sha256": "0a2a726973b9005a781017d51d8c643baf01b538135abcdc2e6f850de1d1ee93",
+    "scanned_records": 1222,
+    "complete_requested_scan": false,
+    "reason": "acquisition job failed; recover only journaled, verified files"
+  },
+  "validation_audio_files": 12
+}

@@ -1,0 +1,10 @@
+{
+  "selected_model": "phrase",
+  "measured_stars": 5.165830843540151,
+  "requested_stars": 4.5,
+  "selection_basis": "highest full-song validation onset F1 at fixed threshold .5; Kaguya excluded from selection",
+  "quality": "experimental draft; human playtest pending",
+  "parent_osu_sha256": "b7027a30f2ca89687f463d1653ee740f708b3e054f7b50398f2609712a0bb2c5",
+  "osu_sha256": "5fcbfd70e2cdd7e349ed113ffddf6036387b4fa4b6d44e21e84e58ed93227403",
+  "osz_sha256": "1fe1c72f2af87b1a7e597b0d5ea4343231fa3b1b04203225e8695b2f8823a0e6"
+}

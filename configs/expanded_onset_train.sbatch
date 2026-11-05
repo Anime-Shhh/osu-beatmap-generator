@@ -5,12 +5,13 @@
 #SBATCH --mem=24G
 #SBATCH --time=03:00:00
 set -euo pipefail
+exec 2>&1
 : "${SOURCE_DIR:?}" "${OUTPUT_DIR:?}" "${CONTEXT_LAYERS:?}"
 cd "$SOURCE_DIR"
 export PYTHONPATH="$PWD" OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
 OSU_BASE=/common/users/asj102/osu_project
 OSU_RUN="$OSU_BASE/flow_runs/run_20261025"
-OSU_CACHE="$OSU_RUN/expanded-corpus/audio-cache"
+OSU_CACHE="${CACHE_DIR:-$OSU_RUN/expanded-corpus/audio-cache}"
 test -s "$OSU_CACHE/manifest.json"
 extra=()
 if [ "$CONTEXT_LAYERS" -gt 0 ]; then extra+=(--density-auxiliary); fi
@@ -29,5 +30,5 @@ if [ "$CONTEXT_LAYERS" -gt 0 ]; then extra+=(--density-auxiliary); fi
 if [ "$CONTEXT_LAYERS" -eq 0 ]; then
   "$OSU_BASE/env/bin/python" -u -m scripts.evaluate_onset_flow \
     --cache-dir "$OSU_CACHE" --checkpoint "$OSU_RUN/onset/best.pt" \
-    --output-dir "$OSU_RUN/expanded-original-checkpoint-validation" --validation-only --allow-parent-checkpoint
+    --output-dir "$OUTPUT_DIR/original-checkpoint-validation" --validation-only --allow-parent-checkpoint
 fi

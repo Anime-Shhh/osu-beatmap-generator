@@ -49,6 +49,12 @@ def profile_for_request(stars, guide=None):
         slider_tick_rate=settings.slider_tick_rate)
 
 
+def compatible_training_sources(rhythm, geometry):
+    """Independent stages may share a corpus or its verified split-preserving parent."""
+    return geometry['rhythm_manifest_sha256'] in (
+        rhythm['manifest_sha256'], rhythm.get('parent_manifest_sha256'))
+
+
 @torch.inference_mode()
 def predict_topology(model, condition, starts):
     n = len(starts)
@@ -165,7 +171,7 @@ def main():
     torch.set_num_threads(1)
     rhythm, rc = load_rhythm(a.rhythm_checkpoint, device)
     geometry, gc = load_geometry(a.geometry_checkpoint, device)
-    if rc['manifest_sha256'] != gc['rhythm_manifest_sha256']:
+    if not compatible_training_sources(rc, gc):
         raise ValueError('rhythm and geometry training sources do not match')
     hashes = {k: hashlib.sha256(path.read_bytes()).hexdigest() for k, path in
               [('rhythm', a.rhythm_checkpoint), ('geometry', a.geometry_checkpoint), ('audio', a.audio)]}
@@ -178,7 +184,7 @@ def main():
         threshold = calibration['threshold']
     if threshold is None: raise ValueError('provide validation calibration or an explicit diagnostic threshold')
     guide = json.loads(a.profile_guide.read_text()) if a.profile_guide else None
-    if guide is not None and guide['manifest_sha256'] != rc['manifest_sha256']:
+    if guide is not None and guide['manifest_sha256'] not in (rc['manifest_sha256'], rc.get('parent_manifest_sha256')):
         raise ValueError('profile guide and model sources differ')
     settings, profile = profile_for_request(a.stars, guide)
     waveform, sample_rate = load_audio(a.audio)
@@ -191,6 +197,8 @@ def main():
     policy = policy_for_audio(StrictAuditPolicy(max_star_error=a.star_tolerance, minimum_start_gap_ms=10.), bundle)
     calculator = RosuDifficultyCalculator()
     report = {'schema': 'osu-native-flow-generation/1', 'target_stars': a.stars, 'threshold': threshold,
+        'training_sources': {'rhythm': rc['manifest_sha256'], 'geometry': gc['rhythm_manifest_sha256'],
+                             'rhythm_parent': rc.get('parent_manifest_sha256')},
         'calibrated_threshold': bool(a.calibration), 'hashes': hashes, 'settings': asdict(settings),
         'audio_duration_ms': bundle.duration_ms, 'steps': a.steps, 'candidates': [],
         'human_playtest': 'not performed', 'selected': None,

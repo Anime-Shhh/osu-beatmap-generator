@@ -1,0 +1,1100 @@
+{
+  "corpus": {
+    "charts": 3436,
+    "added_charts": 2060,
+    "audio_files": 805,
+    "groups": {
+      "train": 637,
+      "val": 84,
+      "test": 84
+    },
+    "splits": {
+      "train": 2765,
+      "test": 325,
+      "val": 346
+    },
+    "manifest_sha256": "104c8d54338cc075baabba20809d39841a07a1729db14b5a67d7000ba343b5e4",
+    "recovery": {
+      "journal_sha256": "0a2a726973b9005a781017d51d8c643baf01b538135abcdc2e6f850de1d1ee93",
+      "scanned_records": 1222,
+      "complete_requested_scan": false,
+      "reason": "acquisition job failed; recover only journaled, verified files"
+    },
+    "validation_audio_files": 12
+  },
+  "models": {
+    "original": {
+      "kaguya_across_seeds": {
+        "onset_f1_50ms": {
+          "mean": 0.7059812437195458,
+          "stdev": 0.014841229816664891,
+          "min": 0.6855123674911661,
+          "max": 0.7263513513513513
+        },
+        "onset_recall_50ms": {
+          "mean": 0.6253858024691358,
+          "stdev": 0.026547396549901205,
+          "min": 0.5895061728395061,
+          "max": 0.6728395061728395
+        },
+        "onset_precision_50ms": {
+          "mean": 0.8116925099230639,
+          "stdev": 0.015743091459553684,
+          "min": 0.7841726618705036,
+          "max": 0.8412017167381974
+        },
+        "onset_f1_10ms": {
+          "mean": 0.47217925445608866,
+          "stdev": 0.026416827916370286,
+          "min": 0.42010771992818674,
+          "max": 0.5101351351351351
+        },
+        "objects": {
+          "mean": 249.8125,
+          "stdev": 13.629471743248159,
+          "min": 230,
+          "max": 278
+        },
+        "short_circle_pairs_recovered": {
+          "mean": 5.875,
+          "stdev": 1.408308678285174,
+          "min": 4,
+          "max": 8
+        }
+      },
+      "selected_candidate": 6,
+      "threshold": 0.5,
+      "checkpoint_sha256": "ca048058618ae62c662e0dd7f391c1ebc0d856a75f2a41f4fe9d63aa70fac2a5",
+      "default_star_tolerance_passes": 0,
+      "selected_kaguya": {
+        "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Confession].osu",
+        "version": "Confession?",
+        "chart_sha256": "701ca6f026dee598d5c5e999e636ff0dd4018aab53e5b1da4e2a7bb668b70680",
+        "difficulty": {
+          "available": true,
+          "stars": 4.48741353211963,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.513965337378981,
+            "speed": 1.673698776861868
+          },
+          "error": null
+        },
+        "timing_segments": [
+          {
+            "start_ms": -734.0,
+            "beat_length_ms": 434.782608695652,
+            "start_beat": 0.0,
+            "meter": 4
+          }
+        ],
+        "generated": {
+          "objects": 242,
+          "kinds": {
+            "1": 120,
+            "0": 122
+          },
+          "gaps_ms": {
+            "median": 230.00000000000182,
+            "under_80": 0,
+            "under_150": 25,
+            "under_250": 122
+          }
+        },
+        "reference": {
+          "objects": 324,
+          "kinds": {
+            "1": 239,
+            "0": 85
+          },
+          "gaps_ms": {
+            "median": 218.0,
+            "under_80": 0,
+            "under_150": 40,
+            "under_250": 230
+          }
+        },
+        "onsets": {
+          "10": {
+            "matches": 135,
+            "precision": 0.5578512396694215,
+            "recall": 0.4166666666666667,
+            "f1": 0.47703180212014135,
+            "matched_mean_abs_error_ms": 4.970370370370288,
+            "matched_signed_error_ms": 2.437037037036793
+          },
+          "25": {
+            "matches": 191,
+            "precision": 0.7892561983471075,
+            "recall": 0.5895061728395061,
+            "f1": 0.6749116607773852,
+            "matched_mean_abs_error_ms": 7.958115183245994,
+            "matched_signed_error_ms": 5.3403141361254605
+          },
+          "50": {
+            "matches": 195,
+            "precision": 0.8057851239669421,
+            "recall": 0.6018518518518519,
+            "f1": 0.6890459363957597,
+            "matched_mean_abs_error_ms": 8.630769230769152,
+            "matched_signed_error_ms": 6.066666666666476
+          },
+          "100": {
+            "matches": 198,
+            "precision": 0.8181818181818182,
+            "recall": 0.6111111111111112,
+            "f1": 0.6996466431095406,
+            "matched_mean_abs_error_ms": 11.95959595959578,
+            "matched_signed_error_ms": 5.0808080808079215
+          }
+        },
+        "generated_distance_to_reference_quarter_beat_ms": {
+          "median": 7.043478260887129,
+          "mean": 8.621631333101273,
+          "over_20ms": 16,
+          "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+        },
+        "short_circle_pairs": {
+          "reference": 36,
+          "both_onsets_recovered_50ms": 10,
+          "both_as_circles_50ms": 6,
+          "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+        },
+        "segments": [
+          {
+            "start_ms": 0,
+            "end_ms": 8000,
+            "generated": 21,
+            "reference": 27,
+            "matched_50ms": 18,
+            "missing_50ms": 9,
+            "extra_50ms": 3
+          },
+          {
+            "start_ms": 8000,
+            "end_ms": 16000,
+            "generated": 22,
+            "reference": 25,
+            "matched_50ms": 15,
+            "missing_50ms": 10,
+            "extra_50ms": 7
+          },
+          {
+            "start_ms": 16000,
+            "end_ms": 24000,
+            "generated": 25,
+            "reference": 30,
+            "matched_50ms": 20,
+            "missing_50ms": 10,
+            "extra_50ms": 5
+          },
+          {
+            "start_ms": 24000,
+            "end_ms": 32000,
+            "generated": 21,
+            "reference": 34,
+            "matched_50ms": 16,
+            "missing_50ms": 18,
+            "extra_50ms": 5
+          },
+          {
+            "start_ms": 32000,
+            "end_ms": 40000,
+            "generated": 25,
+            "reference": 31,
+            "matched_50ms": 21,
+            "missing_50ms": 10,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 40000,
+            "end_ms": 48000,
+            "generated": 17,
+            "reference": 31,
+            "matched_50ms": 12,
+            "missing_50ms": 19,
+            "extra_50ms": 5
+          },
+          {
+            "start_ms": 48000,
+            "end_ms": 56000,
+            "generated": 24,
+            "reference": 27,
+            "matched_50ms": 17,
+            "missing_50ms": 10,
+            "extra_50ms": 7
+          },
+          {
+            "start_ms": 56000,
+            "end_ms": 64000,
+            "generated": 22,
+            "reference": 29,
+            "matched_50ms": 19,
+            "missing_50ms": 10,
+            "extra_50ms": 3
+          },
+          {
+            "start_ms": 64000,
+            "end_ms": 72000,
+            "generated": 14,
+            "reference": 30,
+            "matched_50ms": 13,
+            "missing_50ms": 17,
+            "extra_50ms": 1
+          },
+          {
+            "start_ms": 72000,
+            "end_ms": 80000,
+            "generated": 25,
+            "reference": 33,
+            "matched_50ms": 23,
+            "missing_50ms": 10,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 80000,
+            "end_ms": 88000,
+            "generated": 23,
+            "reference": 27,
+            "matched_50ms": 21,
+            "missing_50ms": 6,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 88000,
+            "end_ms": 96000,
+            "generated": 3,
+            "reference": 0,
+            "matched_50ms": 0,
+            "missing_50ms": 0,
+            "extra_50ms": 3
+          }
+        ],
+        "spatial_pairs": {
+          "generated": {
+            "short_circle_pairs": 53,
+            "overlapping_pairs_within_8px": 0,
+            "median_short_pair_head_distance_px": 199.7248106770914,
+            "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+          },
+          "reference": {
+            "short_circle_pairs": 36,
+            "overlapping_pairs_within_8px": 13,
+            "median_short_pair_head_distance_px": 48.71653387885805,
+            "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+          }
+        },
+        "generated_median_slider_duration_ms": 260.68065690428466,
+        "matched_hold_duration_mae_ms": 100.91227183525076
+      },
+      "selected_stars": 5.014477486353817,
+      "full_song_validation": {
+        "onsets": {
+          "25": {
+            "tp": 6053,
+            "predicted": 10798,
+            "reference": 10082,
+            "precision": 0.5605667716243748,
+            "recall": 0.6003769093433843,
+            "f1": 0.5797892720306513
+          },
+          "50": {
+            "tp": 6213,
+            "predicted": 10798,
+            "reference": 10082,
+            "precision": 0.5753843304315615,
+            "recall": 0.6162467764332473,
+            "f1": 0.5951149425287356
+          },
+          "100": {
+            "tp": 6447,
+            "predicted": 10798,
+            "reference": 10082,
+            "precision": 0.5970550101870716,
+            "recall": 0.6394564570521721,
+            "f1": 0.6175287356321838
+          }
+        },
+        "kind_aware_50ms": {
+          "0": {
+            "tp": 1810,
+            "predicted": 5766,
+            "reference": 5648,
+            "precision": 0.3139091224419008,
+            "recall": 0.3204674220963173,
+            "f1": 0.31715437182407563
+          },
+          "1": {
+            "tp": 1915,
+            "predicted": 5021,
+            "reference": 4388,
+            "precision": 0.3813981278629755,
+            "recall": 0.43641750227894255,
+            "f1": 0.4070570730151982
+          },
+          "2": {
+            "tp": 0,
+            "predicted": 11,
+            "reference": 46,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "macro_source_f1_50ms": 0.5791684741648491,
+        "kind_accuracy_among_50ms_matches": 0.5976178979558989,
+        "matched_duration_error_ms": {
+          "count": 1903,
+          "mean": 120.00029815339961,
+          "median": 71.64360809326172
+        },
+        "matched_onset_error_ms": {
+          "count": 6213,
+          "mean": 6.6906486399484955,
+          "median": 5.0
+        },
+        "predicted_events_per_second": 2.6427728801280512,
+        "reference_events_per_second": 2.4675343746481766,
+        "empty_windows": 0,
+        "sampled_seconds": 4085.86,
+        "windows": 24
+      },
+      "full_song_short_pairs": {
+        "reference": 3318,
+        "both_onsets_recovered_50ms": 908,
+        "both_as_circles_50ms": 621
+      }
+    },
+    "control": {
+      "kaguya_across_seeds": {
+        "onset_f1_50ms": {
+          "mean": 0.7147053902996635,
+          "stdev": 0.0245705955843899,
+          "min": 0.6703096539162113,
+          "max": 0.7598684210526315
+        },
+        "onset_recall_50ms": {
+          "mean": 0.6417824074074074,
+          "stdev": 0.041492453201907614,
+          "min": 0.5679012345679012,
+          "max": 0.7129629629629629
+        },
+        "onset_precision_50ms": {
+          "mean": 0.8088455852063073,
+          "stdev": 0.020821500403107072,
+          "min": 0.759581881533101,
+          "max": 0.8377192982456141
+        },
+        "onset_f1_10ms": {
+          "mean": 0.5834961378046638,
+          "stdev": 0.03138871706120652,
+          "min": 0.5217391304347826,
+          "max": 0.6414473684210527
+        },
+        "objects": {
+          "mean": 257.375,
+          "stdev": 19.791833332631583,
+          "min": 225,
+          "max": 287
+        },
+        "short_circle_pairs_recovered": {
+          "mean": 6.1875,
+          "stdev": 2.166987155784116,
+          "min": 4,
+          "max": 11
+        }
+      },
+      "selected_candidate": 15,
+      "threshold": 0.55,
+      "checkpoint_sha256": "7aa37c6fc3e4703630905af9388a6f088f373e0f559befef897ba6a41eea22d4",
+      "default_star_tolerance_passes": 0,
+      "selected_kaguya": {
+        "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Confession].osu",
+        "version": "Confession?",
+        "chart_sha256": "701ca6f026dee598d5c5e999e636ff0dd4018aab53e5b1da4e2a7bb668b70680",
+        "difficulty": {
+          "available": true,
+          "stars": 4.48741353211963,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.513965337378981,
+            "speed": 1.673698776861868
+          },
+          "error": null
+        },
+        "timing_segments": [
+          {
+            "start_ms": -734.0,
+            "beat_length_ms": 434.782608695652,
+            "start_beat": 0.0,
+            "meter": 4
+          }
+        ],
+        "generated": {
+          "objects": 228,
+          "kinds": {
+            "1": 118,
+            "0": 110
+          },
+          "gaps_ms": {
+            "median": 320.0,
+            "under_80": 1,
+            "under_150": 22,
+            "under_250": 108
+          }
+        },
+        "reference": {
+          "objects": 324,
+          "kinds": {
+            "1": 239,
+            "0": 85
+          },
+          "gaps_ms": {
+            "median": 218.0,
+            "under_80": 0,
+            "under_150": 40,
+            "under_250": 230
+          }
+        },
+        "onsets": {
+          "10": {
+            "matches": 144,
+            "precision": 0.631578947368421,
+            "recall": 0.4444444444444444,
+            "f1": 0.5217391304347826,
+            "matched_mean_abs_error_ms": 5.388888888888975,
+            "matched_signed_error_ms": 1.3472222222221955
+          },
+          "25": {
+            "matches": 189,
+            "precision": 0.8289473684210527,
+            "recall": 0.5833333333333334,
+            "f1": 0.6847826086956522,
+            "matched_mean_abs_error_ms": 7.370370370370369,
+            "matched_signed_error_ms": 3.4126984126982864
+          },
+          "50": {
+            "matches": 191,
+            "precision": 0.8377192982456141,
+            "recall": 0.5895061728395061,
+            "f1": 0.6920289855072463,
+            "matched_mean_abs_error_ms": 7.617801047120456,
+            "matched_signed_error_ms": 3.3769633507852532
+          },
+          "100": {
+            "matches": 193,
+            "precision": 0.8464912280701754,
+            "recall": 0.595679012345679,
+            "f1": 0.6992753623188406,
+            "matched_mean_abs_error_ms": 10.010362694300479,
+            "matched_signed_error_ms": 4.435233160621675
+          }
+        },
+        "generated_distance_to_reference_quarter_beat_ms": {
+          "median": 7.043478260899487,
+          "mean": 7.811594202903347,
+          "over_20ms": 6,
+          "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+        },
+        "short_circle_pairs": {
+          "reference": 36,
+          "both_onsets_recovered_50ms": 9,
+          "both_as_circles_50ms": 5,
+          "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+        },
+        "segments": [
+          {
+            "start_ms": 0,
+            "end_ms": 8000,
+            "generated": 17,
+            "reference": 27,
+            "matched_50ms": 15,
+            "missing_50ms": 12,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 8000,
+            "end_ms": 16000,
+            "generated": 22,
+            "reference": 25,
+            "matched_50ms": 20,
+            "missing_50ms": 5,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 16000,
+            "end_ms": 24000,
+            "generated": 16,
+            "reference": 30,
+            "matched_50ms": 14,
+            "missing_50ms": 16,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 24000,
+            "end_ms": 32000,
+            "generated": 27,
+            "reference": 34,
+            "matched_50ms": 23,
+            "missing_50ms": 11,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 32000,
+            "end_ms": 40000,
+            "generated": 22,
+            "reference": 31,
+            "matched_50ms": 17,
+            "missing_50ms": 14,
+            "extra_50ms": 5
+          },
+          {
+            "start_ms": 40000,
+            "end_ms": 48000,
+            "generated": 21,
+            "reference": 31,
+            "matched_50ms": 17,
+            "missing_50ms": 14,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 48000,
+            "end_ms": 56000,
+            "generated": 22,
+            "reference": 27,
+            "matched_50ms": 13,
+            "missing_50ms": 14,
+            "extra_50ms": 9
+          },
+          {
+            "start_ms": 56000,
+            "end_ms": 64000,
+            "generated": 18,
+            "reference": 29,
+            "matched_50ms": 16,
+            "missing_50ms": 13,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 64000,
+            "end_ms": 72000,
+            "generated": 23,
+            "reference": 30,
+            "matched_50ms": 19,
+            "missing_50ms": 11,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 72000,
+            "end_ms": 80000,
+            "generated": 25,
+            "reference": 33,
+            "matched_50ms": 23,
+            "missing_50ms": 10,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 80000,
+            "end_ms": 88000,
+            "generated": 15,
+            "reference": 27,
+            "matched_50ms": 14,
+            "missing_50ms": 13,
+            "extra_50ms": 1
+          },
+          {
+            "start_ms": 88000,
+            "end_ms": 96000,
+            "generated": 0,
+            "reference": 0,
+            "matched_50ms": 0,
+            "missing_50ms": 0,
+            "extra_50ms": 0
+          }
+        ],
+        "spatial_pairs": {
+          "generated": {
+            "short_circle_pairs": 45,
+            "overlapping_pairs_within_8px": 0,
+            "median_short_pair_head_distance_px": 215.61539833694624,
+            "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+          },
+          "reference": {
+            "short_circle_pairs": 36,
+            "overlapping_pairs_within_8px": 13,
+            "median_short_pair_head_distance_px": 48.71653387885805,
+            "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+          }
+        },
+        "generated_median_slider_duration_ms": 269.1439630890018,
+        "matched_hold_duration_mae_ms": 84.54973963141182
+      },
+      "selected_stars": 5.0059269228677215,
+      "full_song_validation": {
+        "onsets": {
+          "25": {
+            "tp": 6071,
+            "predicted": 10574,
+            "reference": 10082,
+            "precision": 0.5741441271042179,
+            "recall": 0.6021622693909938,
+            "f1": 0.5878195197521302
+          },
+          "50": {
+            "tp": 6189,
+            "predicted": 10574,
+            "reference": 10082,
+            "precision": 0.5853035748061283,
+            "recall": 0.6138662963697679,
+            "f1": 0.5992447714949651
+          },
+          "100": {
+            "tp": 6383,
+            "predicted": 10574,
+            "reference": 10082,
+            "precision": 0.6036504634007944,
+            "recall": 0.6331085102162269,
+            "f1": 0.6180286599535245
+          }
+        },
+        "kind_aware_50ms": {
+          "0": {
+            "tp": 1825,
+            "predicted": 5726,
+            "reference": 5648,
+            "precision": 0.3187216206776109,
+            "recall": 0.32312322946175637,
+            "f1": 0.3209073325127484
+          },
+          "1": {
+            "tp": 1908,
+            "predicted": 4839,
+            "reference": 4388,
+            "precision": 0.39429634221946686,
+            "recall": 0.43482224247948953,
+            "f1": 0.41356887395686576
+          },
+          "2": {
+            "tp": 0,
+            "predicted": 9,
+            "reference": 46,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "macro_source_f1_50ms": 0.5814757932648668,
+        "kind_accuracy_among_50ms_matches": 0.6020358700920989,
+        "matched_duration_error_ms": {
+          "count": 1901,
+          "mean": 114.93725806528188,
+          "median": 71.25505828857422
+        },
+        "matched_onset_error_ms": {
+          "count": 6189,
+          "mean": 6.086766844401358,
+          "median": 5.0
+        },
+        "predicted_events_per_second": 2.5879496605365824,
+        "reference_events_per_second": 2.4675343746481766,
+        "empty_windows": 0,
+        "sampled_seconds": 4085.86,
+        "windows": 24
+      },
+      "full_song_short_pairs": {
+        "reference": 3318,
+        "both_onsets_recovered_50ms": 908,
+        "both_as_circles_50ms": 630
+      },
+      "training": {
+        "epochs": 20,
+        "best_epoch": 6,
+        "steps": 12740,
+        "seconds": 1193.0309435855597,
+        "parameters": 2085126
+      },
+      "expanded_validation_window_f1_50ms": 0.6187921358229501
+    },
+    "phrase": {
+      "kaguya_across_seeds": {
+        "onset_f1_50ms": {
+          "mean": 0.7073426828643266,
+          "stdev": 0.023347674536471852,
+          "min": 0.6666666666666666,
+          "max": 0.7528641571194763
+        },
+        "onset_recall_50ms": {
+          "mean": 0.6315586419753086,
+          "stdev": 0.04061701814865436,
+          "min": 0.5648148148148148,
+          "max": 0.7098765432098766
+        },
+        "onset_precision_50ms": {
+          "mean": 0.8063812189493608,
+          "stdev": 0.019429057056369423,
+          "min": 0.759581881533101,
+          "max": 0.8362831858407079
+        },
+        "onset_f1_10ms": {
+          "mean": 0.5854486347686689,
+          "stdev": 0.03085238858051069,
+          "min": 0.5155393053016454,
+          "max": 0.6481178396072013
+        },
+        "objects": {
+          "mean": 254.0625,
+          "stdev": 19.82748513217616,
+          "min": 223,
+          "max": 287
+        },
+        "short_circle_pairs_recovered": {
+          "mean": 6.1875,
+          "stdev": 1.9397164741270823,
+          "min": 3,
+          "max": 11
+        }
+      },
+      "selected_candidate": 15,
+      "threshold": 0.7,
+      "checkpoint_sha256": "8218a59a3860077310706131ba8a6750e5accf5578eed8ca28f8dace9d5b5a95",
+      "default_star_tolerance_passes": 0,
+      "selected_kaguya": {
+        "filename": "Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) (hypercyte) [Confession].osu",
+        "version": "Confession?",
+        "chart_sha256": "701ca6f026dee598d5c5e999e636ff0dd4018aab53e5b1da4e2a7bb668b70680",
+        "difficulty": {
+          "available": true,
+          "stars": 4.48741353211963,
+          "calculator_id": "rosu-pp-py/4.0.2/stable/no-mods",
+          "attributes": {
+            "aim": 2.513965337378981,
+            "speed": 1.673698776861868
+          },
+          "error": null
+        },
+        "timing_segments": [
+          {
+            "start_ms": -734.0,
+            "beat_length_ms": 434.782608695652,
+            "start_beat": 0.0,
+            "meter": 4
+          }
+        ],
+        "generated": {
+          "objects": 223,
+          "kinds": {
+            "1": 119,
+            "0": 104
+          },
+          "gaps_ms": {
+            "median": 330.0000000000018,
+            "under_80": 1,
+            "under_150": 23,
+            "under_250": 101
+          }
+        },
+        "reference": {
+          "objects": 324,
+          "kinds": {
+            "1": 239,
+            "0": 85
+          },
+          "gaps_ms": {
+            "median": 218.0,
+            "under_80": 0,
+            "under_150": 40,
+            "under_250": 230
+          }
+        },
+        "onsets": {
+          "10": {
+            "matches": 141,
+            "precision": 0.6322869955156951,
+            "recall": 0.4351851851851852,
+            "f1": 0.5155393053016454,
+            "matched_mean_abs_error_ms": 5.30496453900713,
+            "matched_signed_error_ms": 1.177304964538928
+          },
+          "25": {
+            "matches": 183,
+            "precision": 0.820627802690583,
+            "recall": 0.5648148148148148,
+            "f1": 0.6691042047531993,
+            "matched_mean_abs_error_ms": 7.245901639344221,
+            "matched_signed_error_ms": 2.9945355191255127
+          },
+          "50": {
+            "matches": 185,
+            "precision": 0.8295964125560538,
+            "recall": 0.5709876543209876,
+            "f1": 0.676416819012797,
+            "matched_mean_abs_error_ms": 7.502702702702702,
+            "matched_signed_error_ms": 2.9621621621620333
+          },
+          "100": {
+            "matches": 187,
+            "precision": 0.8385650224215246,
+            "recall": 0.5771604938271605,
+            "f1": 0.6837294332723949,
+            "matched_mean_abs_error_ms": 9.973262032085483,
+            "matched_signed_error_ms": 4.058823529411637
+          }
+        },
+        "generated_distance_to_reference_quarter_beat_ms": {
+          "median": 7.043478260871683,
+          "mean": 7.755117956720566,
+          "over_20ms": 6,
+          "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+        },
+        "short_circle_pairs": {
+          "reference": 36,
+          "both_onsets_recovered_50ms": 9,
+          "both_as_circles_50ms": 6,
+          "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+        },
+        "segments": [
+          {
+            "start_ms": 0,
+            "end_ms": 8000,
+            "generated": 17,
+            "reference": 27,
+            "matched_50ms": 15,
+            "missing_50ms": 12,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 8000,
+            "end_ms": 16000,
+            "generated": 22,
+            "reference": 25,
+            "matched_50ms": 20,
+            "missing_50ms": 5,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 16000,
+            "end_ms": 24000,
+            "generated": 16,
+            "reference": 30,
+            "matched_50ms": 14,
+            "missing_50ms": 16,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 24000,
+            "end_ms": 32000,
+            "generated": 27,
+            "reference": 34,
+            "matched_50ms": 23,
+            "missing_50ms": 11,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 32000,
+            "end_ms": 40000,
+            "generated": 22,
+            "reference": 31,
+            "matched_50ms": 17,
+            "missing_50ms": 14,
+            "extra_50ms": 5
+          },
+          {
+            "start_ms": 40000,
+            "end_ms": 48000,
+            "generated": 21,
+            "reference": 31,
+            "matched_50ms": 17,
+            "missing_50ms": 14,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 48000,
+            "end_ms": 56000,
+            "generated": 21,
+            "reference": 27,
+            "matched_50ms": 12,
+            "missing_50ms": 15,
+            "extra_50ms": 9
+          },
+          {
+            "start_ms": 56000,
+            "end_ms": 64000,
+            "generated": 17,
+            "reference": 29,
+            "matched_50ms": 15,
+            "missing_50ms": 14,
+            "extra_50ms": 2
+          },
+          {
+            "start_ms": 64000,
+            "end_ms": 72000,
+            "generated": 21,
+            "reference": 30,
+            "matched_50ms": 17,
+            "missing_50ms": 13,
+            "extra_50ms": 4
+          },
+          {
+            "start_ms": 72000,
+            "end_ms": 80000,
+            "generated": 25,
+            "reference": 33,
+            "matched_50ms": 22,
+            "missing_50ms": 11,
+            "extra_50ms": 3
+          },
+          {
+            "start_ms": 80000,
+            "end_ms": 88000,
+            "generated": 14,
+            "reference": 27,
+            "matched_50ms": 13,
+            "missing_50ms": 14,
+            "extra_50ms": 1
+          },
+          {
+            "start_ms": 88000,
+            "end_ms": 96000,
+            "generated": 0,
+            "reference": 0,
+            "matched_50ms": 0,
+            "missing_50ms": 0,
+            "extra_50ms": 0
+          }
+        ],
+        "spatial_pairs": {
+          "generated": {
+            "short_circle_pairs": 41,
+            "overlapping_pairs_within_8px": 0,
+            "median_short_pair_head_distance_px": 206.4097865896867,
+            "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+          },
+          "reference": {
+            "short_circle_pairs": 36,
+            "overlapping_pairs_within_8px": 13,
+            "median_short_pair_head_distance_px": 48.71653387885805,
+            "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+          }
+        },
+        "generated_median_slider_duration_ms": 268.05417500391195,
+        "matched_hold_duration_mae_ms": 85.2839546055316
+      },
+      "selected_stars": 5.165830843540151,
+      "full_song_validation": {
+        "onsets": {
+          "25": {
+            "tp": 6122,
+            "predicted": 10689,
+            "reference": 10082,
+            "precision": 0.5727383291233978,
+            "recall": 0.6072207895258878,
+            "f1": 0.5894757113282941
+          },
+          "50": {
+            "tp": 6241,
+            "predicted": 10689,
+            "reference": 10082,
+            "precision": 0.5838712695294228,
+            "recall": 0.6190240031739734,
+            "f1": 0.6009339945115788
+          },
+          "100": {
+            "tp": 6434,
+            "predicted": 10689,
+            "reference": 10082,
+            "precision": 0.6019272148938161,
+            "recall": 0.6381670303511208,
+            "f1": 0.6195175966491744
+          }
+        },
+        "kind_aware_50ms": {
+          "0": {
+            "tp": 1842,
+            "predicted": 5785,
+            "reference": 5648,
+            "precision": 0.31840968020743304,
+            "recall": 0.3261331444759207,
+            "f1": 0.3222251377591183
+          },
+          "1": {
+            "tp": 1922,
+            "predicted": 4894,
+            "reference": 4388,
+            "precision": 0.39272578667756436,
+            "recall": 0.4380127620783956,
+            "f1": 0.41413488472312
+          },
+          "2": {
+            "tp": 0,
+            "predicted": 10,
+            "reference": 46,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0
+          }
+        },
+        "macro_source_f1_50ms": 0.5834653957416903,
+        "kind_accuracy_among_50ms_matches": 0.6019868610799551,
+        "matched_duration_error_ms": {
+          "count": 1915,
+          "mean": 116.70953923336197,
+          "median": 71.32780456542969
+        },
+        "matched_onset_error_ms": {
+          "count": 6241,
+          "mean": 6.121294664316616,
+          "median": 5.0
+        },
+        "predicted_events_per_second": 2.6160955098804166,
+        "reference_events_per_second": 2.4675343746481766,
+        "empty_windows": 0,
+        "sampled_seconds": 4085.86,
+        "windows": 24
+      },
+      "full_song_short_pairs": {
+        "reference": 3318,
+        "both_onsets_recovered_50ms": 924,
+        "both_as_circles_50ms": 647
+      },
+      "training": {
+        "epochs": 20,
+        "best_epoch": 6,
+        "steps": 12740,
+        "seconds": 1275.194427922368,
+        "parameters": 2432519
+      },
+      "expanded_validation_window_f1_50ms": 0.6197934139666285
+    }
+  },
+  "validation_gains": {
+    "control": {
+      "source_count": 12,
+      "gain": 0.004129828966229487,
+      "source_bootstrap_ci95": [
+        -0.00835084242507389,
+        0.015005834843944799
+      ],
+      "caveat": "two generation seeds pooled within source; fixed trained checkpoints, not training-seed uncertainty"
+    },
+    "phrase": {
+      "source_count": 12,
+      "gain": 0.005819051982843049,
+      "source_bootstrap_ci95": [
+        -0.00531292743213152,
+        0.015666171634501236
+      ],
+      "caveat": "two generation seeds pooled within source; fixed trained checkpoints, not training-seed uncertainty"
+    }
+  },
+  "context_vs_control": {
+    "source_count": 12,
+    "gain": 0.0016892230166135613,
+    "source_bootstrap_ci95": [
+      -0.0007053315671982086,
+      0.004473975621919202
+    ],
+    "caveat": "two generation seeds pooled within source; fixed trained checkpoints, not training-seed uncertainty"
+  },
+  "selection_basis": "highest full-song validation onset F1 at fixed threshold .5; Kaguya excluded from selection",
+  "recommended_model": "phrase"
+}

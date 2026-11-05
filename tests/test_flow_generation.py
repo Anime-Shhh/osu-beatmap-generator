@@ -1,11 +1,17 @@
 import unittest
 import torch
-from src.beatmap_flow.generate import native_plan, compile_plan, profile_for_request
+from src.beatmap_flow.generate import native_plan, compile_plan, profile_for_request, compatible_training_sources
 from src.v2.timing import TimingPoint
 from src.v2.mapspec import DifficultySettings, compile_osu, mapspec_from_osu, validate_map_spec
 
 
 class FlowGenerationTests(unittest.TestCase):
+    def test_stage_transfer_requires_explicit_parent(self):
+        rhythm = {'manifest_sha256': 'expanded', 'parent_manifest_sha256': 'frozen'}
+        self.assertTrue(compatible_training_sources(rhythm, {'rhythm_manifest_sha256': 'frozen'}))
+        self.assertFalse(compatible_training_sources(rhythm, {'rhythm_manifest_sha256': 'unrelated'}))
+        self.assertFalse(compatible_training_sources({'manifest_sha256': 'expanded'}, {'rhythm_manifest_sha256': 'frozen'}))
+
     def test_native_duration_and_round_trip(self):
         events = [{'start_ms': 500., 'end_ms': 500., 'kind': 0},
                   {'start_ms': 1000., 'end_ms': 1500., 'kind': 1},
