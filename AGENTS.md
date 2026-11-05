@@ -66,3 +66,15 @@ The project allocation exceeded quota; new outputs use
 No evaluation jobs remain pending from this check.
 The user-provided original Kaguya MP3 is shifted relative to the older inference
 MP3: never compare those files' raw timestamps without audio alignment.
+
+
+November 5 upstream baseline: the user explicitly requested osu-dreamer.
+`docs/osu-dreamer-review-2026-11-05.md` records source review and completed job
+1045509: 16 Kaguya inferences using published v8 weights and unchanged v8.0 code.
+Run/source/dependencies/weights live under
+`/common/home/asj102/osu_flow_runs/dreamer_v8_20261105` (home allocation).
+It improves Kaguya ±50ms onset coverage but not all timing/type/double metrics;
+training overlap is unknown and upstream export lacks musical timing recovery.
+Do not claim this was trained locally, is a held-out score or is ranked-ready.
+The upstream baseline is a promising direction for joint chart/cursor modeling;
+retain it unchanged when testing adaptations. No jobs remain from this check.

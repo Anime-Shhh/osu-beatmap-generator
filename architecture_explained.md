@@ -870,7 +870,7 @@ The new matched generated-event evaluator uses fixed 10.24-second windows,
 validation-only thresholds, three seeds and aligned/zero/shifted audio. Its scores
 must not be conflated with full-song musicality or geometry quality.
 
-### 12.5 Phrase-context follow-up (implemented; full training pending)
+### 12.5 Phrase-context follow-up (training completed November 5)
 
 The user's Kaguya playtest and exact-audio native comparison expose missing
 rhythmic detail: 242 generated objects versus 324 native, only 6/36 short circle
@@ -898,3 +898,26 @@ effect or improved map quality is claimed before evaluating completed runs.
 [The rhythm follow-up](docs/rhythm-followup-2026-10-25.md) records comparison data,
 jobs and remaining faults. Beat This! was tested diagnostically, with pinned
 weights and a conservative constant-tempo fitter; it is not enabled in generation.
+
+
+The recovered 3,436-chart corpus and both 20-epoch follow-ups completed on
+November 5. Added phrase context did not show a conclusive full-song validation
+gain; missing notes, stacks and difficulty control remain unresolved. See
+[completed measurements](docs/inference-check-2026-11-04.md).
+
+## 13. Published osu-dreamer v8 baseline (tested November 5)
+
+A separate, pinned upstream v8.0 deployment now supplies a pretrained joint
+chart/cursor latent generator. It encodes nine chart signals into six-dimensional
+temporal latents at 27x compression and a 32-dimensional song style. Multiscale
+audio skip connections feed the chart decoder. A 65.23M-parameter combined model
+includes an eight-block latent Transformer and a difficulty-conditioned style
+sampler. This is unchanged upstream inference, not our separately trained rhythm
+and geometry model or a newly trained local reproduction.
+
+Sixteen exact-audio Kaguya generations achieved mean onset F1 at ±50ms of 80.54%,
+versus 70.73% for our phrase model, but tighter timing and short-pair recovery did
+not improve consistently. Training overlap of published weights is unknown.
+Its exporter does not recover a musical timing grid, so it is not ranked-ready.
+The audit, architectural comparison, version hashes, reproducible Slurm command
+and remaining faults are in [the v8 report](docs/osu-dreamer-review-2026-11-05.md).

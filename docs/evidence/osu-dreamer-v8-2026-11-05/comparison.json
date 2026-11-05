@@ -1,0 +1,3322 @@
+{
+  "upstream_commit": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+  "checkpoint_url": "https://huggingface.co/jaswon/osu-dreamer/resolve/main/v8.pt",
+  "checkpoint_sha256": "010b3d80cdce13550dccd5f3f6677cd5dab7df5fd98fdd5c9d3e8e5ba6c149b6",
+  "audio_sha256": "6ee5686d629635b982d5ccd97e4bcac5a7fa01969ab13c37587ef180b90bbe17",
+  "torch": "2.10.0+cu128",
+  "parameters": 65233044,
+  "requested_labels": [
+    4.5,
+    8.800000190734863,
+    6.5,
+    4.0,
+    6.5
+  ],
+  "steps": 8,
+  "reference_version": "Confession?",
+  "reference_spatial_pairs": {
+    "short_circle_pairs": 36,
+    "overlapping_pairs_within_8px": 13,
+    "median_short_pair_head_distance_px": 48.71653387885805,
+    "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+  },
+  "training_overlap": "unknown for published weights; not a held-out benchmark",
+  "selection": "prefer in-bounds heads, then closest measured stars; no reference matching",
+  "star_tolerance_passes": 1,
+  "selected": 2,
+  "summary": {
+    "f1_50ms": {
+      "mean": 0.8054402148155909,
+      "min": 0.7201492537313433,
+      "max": 0.8611544461778471
+    },
+    "f1_10ms": {
+      "mean": 0.5534522543788705,
+      "min": 0.46177847113884557,
+      "max": 0.7003367003367004
+    },
+    "objects": {
+      "mean": 267.5,
+      "min": 212,
+      "max": 350
+    },
+    "stars": {
+      "mean": 3.4635991742093513,
+      "min": 3.0460010225737584,
+      "max": 4.03232170656495
+    },
+    "short_circle_pairs_recovered": {
+      "mean": 4.625,
+      "min": 0,
+      "max": 14
+    }
+  },
+  "candidates": [
+    {
+      "candidate": 0,
+      "seed": 1731,
+      "stars": 3.3399316994154775,
+      "predicted_labels": [
+        4.378535270690918,
+        8.42148208618164,
+        7.393555641174316,
+        4.040738105773926,
+        5.719974040985107
+      ],
+      "seconds": 1.0407997388392687,
+      "objects": 253,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "85d7bdac8971fee5538294737c8e28b7910370bfa752b44b1dbf860d7760576e",
+      "generated": {
+        "objects": 253,
+        "kinds": {
+          "0": 133,
+          "1": 120
+        },
+        "gaps_ms": {
+          "median": 425.0,
+          "under_80": 0,
+          "under_150": 0,
+          "under_250": 120
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 153,
+          "precision": 0.6047430830039525,
+          "recall": 0.4722222222222222,
+          "f1": 0.5303292894280762,
+          "matched_mean_abs_error_ms": 4.6601307189541945,
+          "matched_signed_error_ms": 1.8235294117647831
+        },
+        "25": {
+          "matches": 228,
+          "precision": 0.9011857707509882,
+          "recall": 0.7037037037037037,
+          "f1": 0.7902946273830156,
+          "matched_mean_abs_error_ms": 8.219298245614114,
+          "matched_signed_error_ms": 5.692982456140517
+        },
+        "50": {
+          "matches": 234,
+          "precision": 0.924901185770751,
+          "recall": 0.7222222222222222,
+          "f1": 0.8110918544194108,
+          "matched_mean_abs_error_ms": 8.773504273504289,
+          "matched_signed_error_ms": 6.311965811965912
+        },
+        "100": {
+          "matches": 236,
+          "precision": 0.932806324110672,
+          "recall": 0.7283950617283951,
+          "f1": 0.8180242634315424,
+          "matched_mean_abs_error_ms": 10.169491525423728,
+          "matched_signed_error_ms": 6.398305084745878
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.39130434779959,
+        "mean": 8.442515896208214,
+        "over_20ms": 13,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 5,
+        "both_as_circles_50ms": 4,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 22,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 21,
+          "reference": 25,
+          "matched_50ms": 20,
+          "missing_50ms": 5,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 23,
+          "reference": 30,
+          "matched_50ms": 22,
+          "missing_50ms": 8,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 26,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 24,
+          "reference": 31,
+          "matched_50ms": 20,
+          "missing_50ms": 11,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 22,
+          "reference": 31,
+          "matched_50ms": 20,
+          "missing_50ms": 11,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 23,
+          "reference": 29,
+          "matched_50ms": 23,
+          "missing_50ms": 6,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 22,
+          "reference": 30,
+          "matched_50ms": 21,
+          "missing_50ms": 9,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 24,
+          "reference": 33,
+          "matched_50ms": 24,
+          "missing_50ms": 9,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 22,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 49,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 101.1236866416568,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 1,
+      "seed": 1732,
+      "stars": 3.9626212294375027,
+      "predicted_labels": [
+        4.899905681610107,
+        8.89600944519043,
+        7.952467441558838,
+        4.177469253540039,
+        5.200911521911621
+      ],
+      "seconds": 0.8160568373277783,
+      "objects": 350,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "6e1fec34c5e2384b0e48627d5a092cfedaffebe336fd0409ea39e19ff52f250b",
+      "generated": {
+        "objects": 350,
+        "kinds": {
+          "0": 165,
+          "1": 184,
+          "2": 1
+        },
+        "gaps_ms": {
+          "median": 216.0,
+          "under_80": 0,
+          "under_150": 45,
+          "under_250": 271
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 199,
+          "precision": 0.5685714285714286,
+          "recall": 0.6141975308641975,
+          "f1": 0.5905044510385756,
+          "matched_mean_abs_error_ms": 4.577889447236112,
+          "matched_signed_error_ms": 1.1105527638189263
+        },
+        "25": {
+          "matches": 281,
+          "precision": 0.8028571428571428,
+          "recall": 0.8672839506172839,
+          "f1": 0.8338278931750742,
+          "matched_mean_abs_error_ms": 7.661921708185069,
+          "matched_signed_error_ms": 4.238434163700961
+        },
+        "50": {
+          "matches": 290,
+          "precision": 0.8285714285714286,
+          "recall": 0.8950617283950617,
+          "f1": 0.8605341246290801,
+          "matched_mean_abs_error_ms": 8.40344827586211,
+          "matched_signed_error_ms": 4.89999999999992
+        },
+        "100": {
+          "matches": 291,
+          "precision": 0.8314285714285714,
+          "recall": 0.8981481481481481,
+          "f1": 0.8635014836795252,
+          "matched_mean_abs_error_ms": 12.089347079037735,
+          "matched_signed_error_ms": 0.8522336769758349
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.782608695633275,
+        "mean": 8.152546583855846,
+        "over_20ms": 21,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 21,
+        "both_as_circles_50ms": 14,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 25,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 30,
+          "reference": 25,
+          "matched_50ms": 23,
+          "missing_50ms": 2,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 37,
+          "reference": 30,
+          "matched_50ms": 29,
+          "missing_50ms": 1,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 33,
+          "reference": 34,
+          "matched_50ms": 31,
+          "missing_50ms": 3,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 36,
+          "reference": 31,
+          "matched_50ms": 26,
+          "missing_50ms": 5,
+          "extra_50ms": 10
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 35,
+          "reference": 31,
+          "matched_50ms": 28,
+          "missing_50ms": 3,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 31,
+          "reference": 27,
+          "matched_50ms": 23,
+          "missing_50ms": 4,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 30,
+          "reference": 29,
+          "matched_50ms": 28,
+          "missing_50ms": 1,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 35,
+          "reference": 30,
+          "matched_50ms": 27,
+          "missing_50ms": 3,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 32,
+          "reference": 33,
+          "matched_50ms": 31,
+          "missing_50ms": 2,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 26,
+          "reference": 27,
+          "matched_50ms": 23,
+          "missing_50ms": 4,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 73,
+        "overlapping_pairs_within_8px": 8,
+        "median_short_pair_head_distance_px": 54.45181356024793,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 2,
+      "seed": 1733,
+      "stars": 4.03232170656495,
+      "predicted_labels": [
+        4.61918306350708,
+        8.516615867614746,
+        7.730948448181152,
+        4.169436931610107,
+        6.131441593170166
+      ],
+      "seconds": 0.32692508585751057,
+      "objects": 317,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "7a10eccb66abec67090ddcb5259a6f9ad9f2dbb040a728473402553392aeb05c",
+      "generated": {
+        "objects": 317,
+        "kinds": {
+          "0": 245,
+          "1": 72
+        },
+        "gaps_ms": {
+          "median": 221.0,
+          "under_80": 0,
+          "under_150": 4,
+          "under_250": 231
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 148,
+          "precision": 0.4668769716088328,
+          "recall": 0.4567901234567901,
+          "f1": 0.46177847113884557,
+          "matched_mean_abs_error_ms": 5.331081081080951,
+          "matched_signed_error_ms": 4.722972972973039
+        },
+        "25": {
+          "matches": 261,
+          "precision": 0.8233438485804416,
+          "recall": 0.8055555555555556,
+          "f1": 0.8143525741029641,
+          "matched_mean_abs_error_ms": 10.494252873563157,
+          "matched_signed_error_ms": 10.03448275862074
+        },
+        "50": {
+          "matches": 276,
+          "precision": 0.8706624605678234,
+          "recall": 0.8518518518518519,
+          "f1": 0.8611544461778471,
+          "matched_mean_abs_error_ms": 11.507246376811596,
+          "matched_signed_error_ms": 11.072463768116048
+        },
+        "100": {
+          "matches": 278,
+          "precision": 0.8769716088328076,
+          "recall": 0.8580246913580247,
+          "f1": 0.8673946957878315,
+          "matched_mean_abs_error_ms": 12.035971223021578,
+          "matched_signed_error_ms": 10.38129496402889
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 8.956521739155898,
+        "mean": 10.90906597175871,
+        "over_20ms": 46,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 11,
+        "both_as_circles_50ms": 10,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 29,
+          "reference": 27,
+          "matched_50ms": 25,
+          "missing_50ms": 2,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 29,
+          "reference": 25,
+          "matched_50ms": 23,
+          "missing_50ms": 2,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 32,
+          "reference": 30,
+          "matched_50ms": 28,
+          "missing_50ms": 2,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 25,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 28,
+          "reference": 31,
+          "matched_50ms": 24,
+          "missing_50ms": 7,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 32,
+          "reference": 31,
+          "matched_50ms": 26,
+          "missing_50ms": 5,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 28,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 30,
+          "reference": 29,
+          "matched_50ms": 28,
+          "missing_50ms": 1,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 28,
+          "reference": 30,
+          "matched_50ms": 25,
+          "missing_50ms": 5,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 30,
+          "reference": 33,
+          "matched_50ms": 30,
+          "missing_50ms": 3,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 26,
+          "reference": 27,
+          "matched_50ms": 23,
+          "missing_50ms": 4,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 155,
+        "overlapping_pairs_within_8px": 1,
+        "median_short_pair_head_distance_px": 145.71547618561317,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 3,
+      "seed": 1734,
+      "stars": 3.3349831588905596,
+      "predicted_labels": [
+        4.929251670837402,
+        8.803071975708008,
+        7.719051837921143,
+        4.090209484100342,
+        5.950958251953125
+      ],
+      "seconds": 0.7159802876412868,
+      "objects": 234,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "06f952a9f67cc9c765fb496bd1899d1ae2a801841aa61686d95f14acc1ede488",
+      "generated": {
+        "objects": 234,
+        "kinds": {
+          "0": 34,
+          "1": 200
+        },
+        "gaps_ms": {
+          "median": 227.0,
+          "under_80": 0,
+          "under_150": 0,
+          "under_250": 126
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 142,
+          "precision": 0.6068376068376068,
+          "recall": 0.4382716049382716,
+          "f1": 0.5089605734767025,
+          "matched_mean_abs_error_ms": 4.718309859154974,
+          "matched_signed_error_ms": 1.9014084507041293
+        },
+        "25": {
+          "matches": 204,
+          "precision": 0.8717948717948718,
+          "recall": 0.6296296296296297,
+          "f1": 0.7311827956989247,
+          "matched_mean_abs_error_ms": 8.19607843137264,
+          "matched_signed_error_ms": 4.568627450980351
+        },
+        "50": {
+          "matches": 212,
+          "precision": 0.905982905982906,
+          "recall": 0.654320987654321,
+          "f1": 0.7598566308243727,
+          "matched_mean_abs_error_ms": 9.028301886792567,
+          "matched_signed_error_ms": 5.53773584905659
+        },
+        "100": {
+          "matches": 213,
+          "precision": 0.9102564102564102,
+          "recall": 0.6574074074074074,
+          "f1": 0.7634408602150538,
+          "matched_mean_abs_error_ms": 11.511737089201992,
+          "matched_signed_error_ms": 7.605633802816888
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.869565217375292,
+        "mean": 8.695652173920292,
+        "over_20ms": 18,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 11,
+        "both_as_circles_50ms": 0,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 22,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 18,
+          "reference": 25,
+          "matched_50ms": 16,
+          "missing_50ms": 9,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 18,
+          "reference": 30,
+          "matched_50ms": 17,
+          "missing_50ms": 13,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 30,
+          "reference": 34,
+          "matched_50ms": 27,
+          "missing_50ms": 7,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 21,
+          "reference": 31,
+          "matched_50ms": 17,
+          "missing_50ms": 14,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 20,
+          "reference": 31,
+          "matched_50ms": 19,
+          "missing_50ms": 12,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 25,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 23,
+          "reference": 29,
+          "matched_50ms": 22,
+          "missing_50ms": 7,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 22,
+          "reference": 30,
+          "matched_50ms": 20,
+          "missing_50ms": 10,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 22,
+          "reference": 33,
+          "matched_50ms": 22,
+          "missing_50ms": 11,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 13,
+          "reference": 27,
+          "matched_50ms": 13,
+          "missing_50ms": 14,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 10,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 108.05135709830154,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 4,
+      "seed": 1735,
+      "stars": 3.6295664122971454,
+      "predicted_labels": [
+        4.823442459106445,
+        8.825722694396973,
+        7.920856475830078,
+        4.075589179992676,
+        5.207311153411865
+      ],
+      "seconds": 0.38885878026485443,
+      "objects": 303,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "f7da3f31d3393bdcd57da1c924f097e327652315060623ac88e4c6f08765587f",
+      "generated": {
+        "objects": 303,
+        "kinds": {
+          "0": 213,
+          "1": 90
+        },
+        "gaps_ms": {
+          "median": 221.0,
+          "under_80": 0,
+          "under_150": 1,
+          "under_250": 222
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 159,
+          "precision": 0.5247524752475248,
+          "recall": 0.49074074074074076,
+          "f1": 0.507177033492823,
+          "matched_mean_abs_error_ms": 4.761006289307833,
+          "matched_signed_error_ms": 2.2955974842763407
+        },
+        "25": {
+          "matches": 252,
+          "precision": 0.8316831683168316,
+          "recall": 0.7777777777777778,
+          "f1": 0.8038277511961722,
+          "matched_mean_abs_error_ms": 8.781746031745923,
+          "matched_signed_error_ms": 6.57539682539663
+        },
+        "50": {
+          "matches": 265,
+          "precision": 0.8745874587458746,
+          "recall": 0.8179012345679012,
+          "f1": 0.8452950558213717,
+          "matched_mean_abs_error_ms": 9.815094339622654,
+          "matched_signed_error_ms": 7.716981132075401
+        },
+        "100": {
+          "matches": 266,
+          "precision": 0.8778877887788779,
+          "recall": 0.8209876543209876,
+          "f1": 0.8484848484848485,
+          "matched_mean_abs_error_ms": 11.101503759398481,
+          "matched_signed_error_ms": 8.545112781954817
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 8.04347826090179,
+        "mean": 9.775290572544547,
+        "over_20ms": 35,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 10,
+        "both_as_circles_50ms": 10,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 25,
+          "reference": 27,
+          "matched_50ms": 24,
+          "missing_50ms": 3,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 26,
+          "reference": 25,
+          "matched_50ms": 21,
+          "missing_50ms": 4,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 27,
+          "reference": 30,
+          "matched_50ms": 23,
+          "missing_50ms": 7,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 31,
+          "reference": 34,
+          "matched_50ms": 27,
+          "missing_50ms": 7,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 30,
+          "reference": 31,
+          "matched_50ms": 25,
+          "missing_50ms": 6,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 26,
+          "reference": 31,
+          "matched_50ms": 22,
+          "missing_50ms": 9,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 30,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 9
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 28,
+          "reference": 29,
+          "matched_50ms": 26,
+          "missing_50ms": 3,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 27,
+          "reference": 30,
+          "matched_50ms": 24,
+          "missing_50ms": 6,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 28,
+          "reference": 33,
+          "matched_50ms": 28,
+          "missing_50ms": 5,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 25,
+          "reference": 27,
+          "matched_50ms": 24,
+          "missing_50ms": 3,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 116,
+        "overlapping_pairs_within_8px": 2,
+        "median_short_pair_head_distance_px": 82.94272718888121,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 5,
+      "seed": 1736,
+      "stars": 3.1900503824833795,
+      "predicted_labels": [
+        4.65066385269165,
+        8.697137832641602,
+        7.681296348571777,
+        4.141530513763428,
+        5.81740140914917
+      ],
+      "seconds": 0.4786113668233156,
+      "objects": 254,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "e5cc288467110adc854fadf0ceb49e36508e922b16be6ecad603e314c82645a3",
+      "generated": {
+        "objects": 254,
+        "kinds": {
+          "0": 117,
+          "1": 137
+        },
+        "gaps_ms": {
+          "median": 424.0000000000073,
+          "under_80": 0,
+          "under_150": 0,
+          "under_250": 114
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 149,
+          "precision": 0.5866141732283464,
+          "recall": 0.45987654320987653,
+          "f1": 0.5155709342560554,
+          "matched_mean_abs_error_ms": 4.885906040268126,
+          "matched_signed_error_ms": 2.8053691275164603
+        },
+        "25": {
+          "matches": 222,
+          "precision": 0.8740157480314961,
+          "recall": 0.6851851851851852,
+          "f1": 0.7681660899653979,
+          "matched_mean_abs_error_ms": 8.364864864864611,
+          "matched_signed_error_ms": 6.193693693693415
+        },
+        "50": {
+          "matches": 232,
+          "precision": 0.9133858267716536,
+          "recall": 0.7160493827160493,
+          "f1": 0.8027681660899654,
+          "matched_mean_abs_error_ms": 9.353448275861858,
+          "matched_signed_error_ms": 7.275862068965282
+        },
+        "100": {
+          "matches": 232,
+          "precision": 0.9133858267716536,
+          "recall": 0.7160493827160493,
+          "f1": 0.8027681660899654,
+          "matched_mean_abs_error_ms": 10.482758620689427,
+          "matched_signed_error_ms": 8.681034482758403
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.543478260885192,
+        "mean": 8.962341663822384,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 3,
+        "both_as_circles_50ms": 0,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 20,
+          "reference": 25,
+          "matched_50ms": 19,
+          "missing_50ms": 6,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 22,
+          "reference": 30,
+          "matched_50ms": 21,
+          "missing_50ms": 9,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 25,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 25,
+          "reference": 31,
+          "matched_50ms": 20,
+          "missing_50ms": 11,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 24,
+          "reference": 31,
+          "matched_50ms": 22,
+          "missing_50ms": 9,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 22,
+          "reference": 27,
+          "matched_50ms": 16,
+          "missing_50ms": 11,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 21,
+          "reference": 29,
+          "matched_50ms": 21,
+          "missing_50ms": 8,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 25,
+          "reference": 30,
+          "matched_50ms": 23,
+          "missing_50ms": 7,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 33,
+          "matched_50ms": 25,
+          "missing_50ms": 8,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 20,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 2,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 2
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 40,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 80.3035113117455,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 6,
+      "seed": 1737,
+      "stars": 3.2475413005860836,
+      "predicted_labels": [
+        4.803196907043457,
+        8.772133827209473,
+        7.830968379974365,
+        4.100096702575684,
+        5.949569225311279
+      ],
+      "seconds": 0.5250857090577483,
+      "objects": 250,
+      "out_of_bounds_heads": 2,
+      "osu_sha256": "8391e3e66bd66e5bf18832eb3e86ed3959692aab27443572d5040d34a17c40c9",
+      "generated": {
+        "objects": 250,
+        "kinds": {
+          "1": 151,
+          "0": 99
+        },
+        "gaps_ms": {
+          "median": 425.0,
+          "under_80": 0,
+          "under_150": 2,
+          "under_250": 102
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 162,
+          "precision": 0.648,
+          "recall": 0.5,
+          "f1": 0.5644599303135889,
+          "matched_mean_abs_error_ms": 4.666666666666644,
+          "matched_signed_error_ms": 0.7407407407407407
+        },
+        "25": {
+          "matches": 222,
+          "precision": 0.888,
+          "recall": 0.6851851851851852,
+          "f1": 0.7735191637630662,
+          "matched_mean_abs_error_ms": 7.594594594594553,
+          "matched_signed_error_ms": 3.0990990990990244
+        },
+        "50": {
+          "matches": 227,
+          "precision": 0.908,
+          "recall": 0.7006172839506173,
+          "f1": 0.7909407665505227,
+          "matched_mean_abs_error_ms": 8.061674008810595,
+          "matched_signed_error_ms": 3.6651982378854537
+        },
+        "100": {
+          "matches": 227,
+          "precision": 0.908,
+          "recall": 0.7006172839506173,
+          "f1": 0.7909407665505227,
+          "matched_mean_abs_error_ms": 9.46696035242293,
+          "matched_signed_error_ms": 5.581497797356819
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.130434782604833,
+        "mean": 7.842782608697157,
+        "over_20ms": 13,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 7,
+        "both_as_circles_50ms": 5,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 21,
+          "reference": 25,
+          "matched_50ms": 21,
+          "missing_50ms": 4,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 22,
+          "reference": 30,
+          "matched_50ms": 20,
+          "missing_50ms": 10,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 28,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 22,
+          "reference": 31,
+          "matched_50ms": 18,
+          "missing_50ms": 13,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 22,
+          "reference": 31,
+          "matched_50ms": 20,
+          "missing_50ms": 11,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 24,
+          "reference": 29,
+          "matched_50ms": 22,
+          "missing_50ms": 7,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 21,
+          "reference": 30,
+          "matched_50ms": 19,
+          "missing_50ms": 11,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 33,
+          "matched_50ms": 25,
+          "missing_50ms": 8,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 20,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 30,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 75.96208233691277,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 7,
+      "seed": 1738,
+      "stars": 3.6278929977865,
+      "predicted_labels": [
+        4.944166660308838,
+        8.841358184814453,
+        7.94520378112793,
+        4.264767646789551,
+        5.367104530334473
+      ],
+      "seconds": 0.722451688721776,
+      "objects": 286,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "bb2af4f028d6628eb4639d3b03279604936445cd6d214bb4117de8725d258ac0",
+      "generated": {
+        "objects": 286,
+        "kinds": {
+          "1": 185,
+          "0": 101
+        },
+        "gaps_ms": {
+          "median": 222.0,
+          "under_80": 1,
+          "under_150": 25,
+          "under_250": 160
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 180,
+          "precision": 0.6293706293706294,
+          "recall": 0.5555555555555556,
+          "f1": 0.5901639344262295,
+          "matched_mean_abs_error_ms": 4.9111111111106664,
+          "matched_signed_error_ms": 0.6222222222219392
+        },
+        "25": {
+          "matches": 244,
+          "precision": 0.8531468531468531,
+          "recall": 0.7530864197530864,
+          "f1": 0.8,
+          "matched_mean_abs_error_ms": 7.733606557376683,
+          "matched_signed_error_ms": 2.4303278688521823
+        },
+        "50": {
+          "matches": 249,
+          "precision": 0.8706293706293706,
+          "recall": 0.7685185185185185,
+          "f1": 0.8163934426229508,
+          "matched_mean_abs_error_ms": 8.196787148594076,
+          "matched_signed_error_ms": 2.783132530120269
+        },
+        "100": {
+          "matches": 249,
+          "precision": 0.8706293706293706,
+          "recall": 0.7685185185185185,
+          "f1": 0.8163934426229508,
+          "matched_mean_abs_error_ms": 9.863453815260744,
+          "matched_signed_error_ms": 3.028112449798984
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.73913043479007,
+        "mean": 8.325174825176399,
+        "over_20ms": 22,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 10,
+        "both_as_circles_50ms": 4,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 23,
+          "missing_50ms": 4,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 21,
+          "reference": 25,
+          "matched_50ms": 20,
+          "missing_50ms": 5,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 33,
+          "reference": 30,
+          "matched_50ms": 27,
+          "missing_50ms": 3,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 28,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 27,
+          "reference": 31,
+          "matched_50ms": 21,
+          "missing_50ms": 10,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 26,
+          "reference": 31,
+          "matched_50ms": 22,
+          "missing_50ms": 9,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 30,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 10
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 25,
+          "reference": 29,
+          "matched_50ms": 23,
+          "missing_50ms": 6,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 26,
+          "reference": 30,
+          "matched_50ms": 23,
+          "missing_50ms": 7,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 26,
+          "reference": 33,
+          "matched_50ms": 26,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 20,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 29,
+        "overlapping_pairs_within_8px": 1,
+        "median_short_pair_head_distance_px": 36.6742416417845,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 8,
+      "seed": 1739,
+      "stars": 3.715712075837355,
+      "predicted_labels": [
+        4.767261505126953,
+        8.783952713012695,
+        7.831648349761963,
+        4.224502086639404,
+        5.190429210662842
+      ],
+      "seconds": 1.2345921155065298,
+      "objects": 308,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "b5d40b56c6e4702a9e6c7f202315cf6f42db6d80c53e16c9bc22280c37c19b83",
+      "generated": {
+        "objects": 308,
+        "kinds": {
+          "1": 263,
+          "0": 45
+        },
+        "gaps_ms": {
+          "median": 221.0,
+          "under_80": 0,
+          "under_150": 31,
+          "under_250": 191
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 188,
+          "precision": 0.6103896103896104,
+          "recall": 0.5802469135802469,
+          "f1": 0.5949367088607594,
+          "matched_mean_abs_error_ms": 4.590425531914768,
+          "matched_signed_error_ms": 3.6223404255317115
+        },
+        "25": {
+          "matches": 259,
+          "precision": 0.8409090909090909,
+          "recall": 0.7993827160493827,
+          "f1": 0.819620253164557,
+          "matched_mean_abs_error_ms": 7.432432432432379,
+          "matched_signed_error_ms": 6.505791505791396
+        },
+        "50": {
+          "matches": 261,
+          "precision": 0.8474025974025974,
+          "recall": 0.8055555555555556,
+          "f1": 0.8259493670886076,
+          "matched_mean_abs_error_ms": 7.570881226053615,
+          "matched_signed_error_ms": 6.651340996168502
+        },
+        "100": {
+          "matches": 262,
+          "precision": 0.8506493506493507,
+          "recall": 0.808641975308642,
+          "f1": 0.8291139240506329,
+          "matched_mean_abs_error_ms": 10.14503816793885,
+          "matched_signed_error_ms": 5.030534351144958
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 5.673913043505969,
+        "mean": 7.055194805206222,
+        "over_20ms": 11,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 9,
+        "both_as_circles_50ms": 1,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 23,
+          "missing_50ms": 4,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 27,
+          "reference": 25,
+          "matched_50ms": 22,
+          "missing_50ms": 3,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 27,
+          "reference": 30,
+          "matched_50ms": 23,
+          "missing_50ms": 7,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 31,
+          "reference": 34,
+          "matched_50ms": 29,
+          "missing_50ms": 5,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 29,
+          "reference": 31,
+          "matched_50ms": 21,
+          "missing_50ms": 10,
+          "extra_50ms": 8
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 25,
+          "reference": 31,
+          "matched_50ms": 22,
+          "missing_50ms": 9,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 29,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 11
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 30,
+          "reference": 29,
+          "matched_50ms": 26,
+          "missing_50ms": 3,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 28,
+          "reference": 30,
+          "matched_50ms": 25,
+          "missing_50ms": 5,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 29,
+          "reference": 33,
+          "matched_50ms": 28,
+          "missing_50ms": 5,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 29,
+          "reference": 27,
+          "matched_50ms": 24,
+          "missing_50ms": 3,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 12,
+        "overlapping_pairs_within_8px": 1,
+        "median_short_pair_head_distance_px": 27.610964614867765,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 9,
+      "seed": 1740,
+      "stars": 3.196164800588643,
+      "predicted_labels": [
+        4.855453968048096,
+        8.819852828979492,
+        7.985786437988281,
+        4.191331386566162,
+        5.592751979827881
+      ],
+      "seconds": 0.5753394849598408,
+      "objects": 237,
+      "out_of_bounds_heads": 3,
+      "osu_sha256": "7e865be6c4f64bcccfde0c2d92a3c67ea80ae134e75d487c2a0579f277209ae7",
+      "generated": {
+        "objects": 237,
+        "kinds": {
+          "1": 166,
+          "0": 71
+        },
+        "gaps_ms": {
+          "median": 431.0,
+          "under_80": 0,
+          "under_150": 0,
+          "under_250": 72
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 151,
+          "precision": 0.6371308016877637,
+          "recall": 0.4660493827160494,
+          "f1": 0.5383244206773619,
+          "matched_mean_abs_error_ms": 5.099337748344464,
+          "matched_signed_error_ms": 1.7748344370862703
+        },
+        "25": {
+          "matches": 219,
+          "precision": 0.9240506329113924,
+          "recall": 0.6759259259259259,
+          "f1": 0.7807486631016043,
+          "matched_mean_abs_error_ms": 8.310502283105135,
+          "matched_signed_error_ms": 4.8401826484019965
+        },
+        "50": {
+          "matches": 225,
+          "precision": 0.9493670886075949,
+          "recall": 0.6944444444444444,
+          "f1": 0.8021390374331551,
+          "matched_mean_abs_error_ms": 8.893333333333507,
+          "matched_signed_error_ms": 5.515555555555786
+        },
+        "100": {
+          "matches": 225,
+          "precision": 0.9493670886075949,
+          "recall": 0.6944444444444444,
+          "f1": 0.8021390374331551,
+          "matched_mean_abs_error_ms": 10.311111111111284,
+          "matched_signed_error_ms": 7.448888888889119
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.4347826087200275,
+        "mean": 8.607961841870324,
+        "over_20ms": 16,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 2,
+        "both_as_circles_50ms": 0,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 21,
+          "reference": 25,
+          "matched_50ms": 19,
+          "missing_50ms": 6,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 23,
+          "reference": 30,
+          "matched_50ms": 23,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 20,
+          "reference": 34,
+          "matched_50ms": 20,
+          "missing_50ms": 14,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 22,
+          "reference": 31,
+          "matched_50ms": 19,
+          "missing_50ms": 12,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 22,
+          "reference": 31,
+          "matched_50ms": 21,
+          "missing_50ms": 10,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 17,
+          "missing_50ms": 10,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 23,
+          "reference": 29,
+          "matched_50ms": 22,
+          "missing_50ms": 7,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 21,
+          "reference": 30,
+          "matched_50ms": 21,
+          "missing_50ms": 9,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 23,
+          "reference": 33,
+          "matched_50ms": 23,
+          "missing_50ms": 10,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 20,
+          "reference": 27,
+          "matched_50ms": 19,
+          "missing_50ms": 8,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 5,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 96.56603957913983,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 10,
+      "seed": 1741,
+      "stars": 3.081341280909927,
+      "predicted_labels": [
+        4.91751766204834,
+        8.857540130615234,
+        7.9862213134765625,
+        4.186863422393799,
+        5.634515285491943
+      ],
+      "seconds": 0.6324357632547617,
+      "objects": 229,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "9d3583620ed273a32d2f43504695a3feea1121b9ee29c21606b4cfe0f3c8a3fa",
+      "generated": {
+        "objects": 229,
+        "kinds": {
+          "1": 184,
+          "0": 45
+        },
+        "gaps_ms": {
+          "median": 431.0,
+          "under_80": 0,
+          "under_150": 5,
+          "under_250": 66
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 158,
+          "precision": 0.6899563318777293,
+          "recall": 0.4876543209876543,
+          "f1": 0.5714285714285714,
+          "matched_mean_abs_error_ms": 4.740506329113936,
+          "matched_signed_error_ms": 1.0316455696201725
+        },
+        "25": {
+          "matches": 209,
+          "precision": 0.9126637554585153,
+          "recall": 0.6450617283950617,
+          "f1": 0.755877034358047,
+          "matched_mean_abs_error_ms": 7.172248803827859,
+          "matched_signed_error_ms": 2.942583732057454
+        },
+        "50": {
+          "matches": 213,
+          "precision": 0.9301310043668122,
+          "recall": 0.6574074074074074,
+          "f1": 0.7703435804701627,
+          "matched_mean_abs_error_ms": 7.577464788732568,
+          "matched_signed_error_ms": 3.4272300469484627
+        },
+        "100": {
+          "matches": 214,
+          "precision": 0.9344978165938864,
+          "recall": 0.6604938271604939,
+          "f1": 0.7739602169981917,
+          "matched_mean_abs_error_ms": 9.957943925233819,
+          "matched_signed_error_ms": 6.415887850467395
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.478260869576376,
+        "mean": 7.687488133665424,
+        "over_20ms": 10,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 3,
+        "both_as_circles_50ms": 0,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 19,
+          "reference": 27,
+          "matched_50ms": 19,
+          "missing_50ms": 8,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 21,
+          "reference": 25,
+          "matched_50ms": 20,
+          "missing_50ms": 5,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 21,
+          "reference": 30,
+          "matched_50ms": 21,
+          "missing_50ms": 9,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 20,
+          "reference": 34,
+          "matched_50ms": 20,
+          "missing_50ms": 14,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 20,
+          "reference": 31,
+          "matched_50ms": 16,
+          "missing_50ms": 15,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 31,
+          "matched_50ms": 16,
+          "missing_50ms": 15,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 17,
+          "missing_50ms": 10,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 21,
+          "reference": 29,
+          "matched_50ms": 20,
+          "missing_50ms": 9,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 21,
+          "reference": 30,
+          "matched_50ms": 20,
+          "missing_50ms": 10,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 26,
+          "reference": 33,
+          "matched_50ms": 26,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 18,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 1,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 1
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 4,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 101.32409304323271,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 11,
+      "seed": 1742,
+      "stars": 3.456637390617578,
+      "predicted_labels": [
+        4.625672340393066,
+        8.732539176940918,
+        7.575946807861328,
+        4.083959102630615,
+        5.304679870605469
+      ],
+      "seconds": 0.7598174223676324,
+      "objects": 273,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "64fe31be0d3b9dae6125801fa23c5bf4644b986296e4a372be3e284983afa35d",
+      "generated": {
+        "objects": 273,
+        "kinds": {
+          "1": 196,
+          "0": 77
+        },
+        "gaps_ms": {
+          "median": 227.50000000000045,
+          "under_80": 0,
+          "under_150": 5,
+          "under_250": 144
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 168,
+          "precision": 0.6153846153846154,
+          "recall": 0.5185185185185185,
+          "f1": 0.5628140703517588,
+          "matched_mean_abs_error_ms": 4.5654761904761445,
+          "matched_signed_error_ms": 0.10119047619052762
+        },
+        "25": {
+          "matches": 230,
+          "precision": 0.8424908424908425,
+          "recall": 0.7098765432098766,
+          "f1": 0.7705192629815746,
+          "matched_mean_abs_error_ms": 7.391304347826084,
+          "matched_signed_error_ms": -0.48695652173906223
+        },
+        "50": {
+          "matches": 235,
+          "precision": 0.8608058608058609,
+          "recall": 0.7253086419753086,
+          "f1": 0.7872696817420436,
+          "matched_mean_abs_error_ms": 7.825531914893645,
+          "matched_signed_error_ms": -0.6340425531913917
+        },
+        "100": {
+          "matches": 236,
+          "precision": 0.8644688644688645,
+          "recall": 0.7283950617283951,
+          "f1": 0.7906197654941374,
+          "matched_mean_abs_error_ms": 9.694915254237316,
+          "matched_signed_error_ms": 0.39830508474586
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.521739130404134,
+        "mean": 8.036630036628642,
+        "over_20ms": 12,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 5,
+        "both_as_circles_50ms": 1,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 23,
+          "reference": 25,
+          "matched_50ms": 21,
+          "missing_50ms": 4,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 28,
+          "reference": 30,
+          "matched_50ms": 22,
+          "missing_50ms": 8,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 25,
+          "reference": 34,
+          "matched_50ms": 21,
+          "missing_50ms": 13,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 24,
+          "reference": 31,
+          "matched_50ms": 20,
+          "missing_50ms": 11,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 27,
+          "reference": 31,
+          "matched_50ms": 23,
+          "missing_50ms": 8,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 16,
+          "missing_50ms": 11,
+          "extra_50ms": 7
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 25,
+          "reference": 29,
+          "matched_50ms": 24,
+          "missing_50ms": 5,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 25,
+          "reference": 30,
+          "matched_50ms": 22,
+          "missing_50ms": 8,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 25,
+          "reference": 33,
+          "matched_50ms": 25,
+          "missing_50ms": 8,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 1,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 1
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 17,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 108.00462953040486,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 12,
+      "seed": 1743,
+      "stars": 3.5315597449155374,
+      "predicted_labels": [
+        4.739758491516113,
+        8.672709465026855,
+        7.825634479522705,
+        4.220746994018555,
+        5.8093647956848145
+      ],
+      "seconds": 0.45181761775165796,
+      "objects": 270,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "9ad3c29087368efc45b7a8b12a81c501f88193f4a2702c94e770e6c780b023e6",
+      "generated": {
+        "objects": 270,
+        "kinds": {
+          "1": 121,
+          "0": 149
+        },
+        "gaps_ms": {
+          "median": 221.0,
+          "under_80": 0,
+          "under_150": 22,
+          "under_250": 152
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 208,
+          "precision": 0.7703703703703704,
+          "recall": 0.6419753086419753,
+          "f1": 0.7003367003367004,
+          "matched_mean_abs_error_ms": 4.149038461538536,
+          "matched_signed_error_ms": -0.052884615384576034
+        },
+        "25": {
+          "matches": 239,
+          "precision": 0.8851851851851852,
+          "recall": 0.7376543209876543,
+          "f1": 0.8047138047138047,
+          "matched_mean_abs_error_ms": 5.4853556485357045,
+          "matched_signed_error_ms": 0.8577405857741376
+        },
+        "50": {
+          "matches": 239,
+          "precision": 0.8851851851851852,
+          "recall": 0.7376543209876543,
+          "f1": 0.8047138047138047,
+          "matched_mean_abs_error_ms": 5.4853556485357045,
+          "matched_signed_error_ms": 0.8577405857741376
+        },
+        "100": {
+          "matches": 239,
+          "precision": 0.8851851851851852,
+          "recall": 0.7376543209876543,
+          "f1": 0.8047138047138047,
+          "matched_mean_abs_error_ms": 5.853556485355789,
+          "matched_signed_error_ms": 1.309623430962422
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 4.608695652192519,
+        "mean": 5.392914653782922,
+        "over_20ms": 3,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 11,
+        "both_as_circles_50ms": 9,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 23,
+          "reference": 25,
+          "matched_50ms": 20,
+          "missing_50ms": 5,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 30,
+          "matched_50ms": 21,
+          "missing_50ms": 9,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 26,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 27,
+          "reference": 31,
+          "matched_50ms": 23,
+          "missing_50ms": 8,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 26,
+          "reference": 31,
+          "matched_50ms": 22,
+          "missing_50ms": 9,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 6
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 24,
+          "reference": 29,
+          "matched_50ms": 23,
+          "missing_50ms": 6,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 28,
+          "reference": 30,
+          "matched_50ms": 25,
+          "missing_50ms": 5,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 21,
+          "reference": 33,
+          "matched_50ms": 20,
+          "missing_50ms": 13,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 22,
+          "missing_50ms": 5,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 70,
+        "overlapping_pairs_within_8px": 5,
+        "median_short_pair_head_distance_px": 83.27149621757741,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 13,
+      "seed": 1744,
+      "stars": 3.452922501002752,
+      "predicted_labels": [
+        4.810592174530029,
+        8.802427291870117,
+        7.8319268226623535,
+        4.189505577087402,
+        5.844523906707764
+      ],
+      "seconds": 0.6075013801455498,
+      "objects": 257,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "08a869b7d3e9ebd3e25c544d5798dbf7135777718545b9e476813779f3a14e4a",
+      "generated": {
+        "objects": 257,
+        "kinds": {
+          "0": 86,
+          "1": 171
+        },
+        "gaps_ms": {
+          "median": 227.0,
+          "under_80": 0,
+          "under_150": 1,
+          "under_250": 142
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 176,
+          "precision": 0.6848249027237354,
+          "recall": 0.5432098765432098,
+          "f1": 0.6058519793459552,
+          "matched_mean_abs_error_ms": 4.857954545454556,
+          "matched_signed_error_ms": 0.4602272727271177
+        },
+        "25": {
+          "matches": 233,
+          "precision": 0.9066147859922179,
+          "recall": 0.7191358024691358,
+          "f1": 0.802065404475043,
+          "matched_mean_abs_error_ms": 7.484978540772656,
+          "matched_signed_error_ms": 1.0042918454933114
+        },
+        "50": {
+          "matches": 237,
+          "precision": 0.9221789883268483,
+          "recall": 0.7314814814814815,
+          "f1": 0.8158347676419966,
+          "matched_mean_abs_error_ms": 7.877637130801871,
+          "matched_signed_error_ms": 1.2784810126580426
+        },
+        "100": {
+          "matches": 238,
+          "precision": 0.9260700389105059,
+          "recall": 0.7345679012345679,
+          "f1": 0.8192771084337349,
+          "matched_mean_abs_error_ms": 10.634453781512727,
+          "matched_signed_error_ms": 4.0630252100838495
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 6.39130434782818,
+        "mean": 7.742175604806718,
+        "over_20ms": 14,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 6,
+        "both_as_circles_50ms": 2,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 19,
+          "reference": 27,
+          "matched_50ms": 19,
+          "missing_50ms": 8,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 27,
+          "reference": 25,
+          "matched_50ms": 22,
+          "missing_50ms": 3,
+          "extra_50ms": 5
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 27,
+          "reference": 30,
+          "matched_50ms": 24,
+          "missing_50ms": 6,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 22,
+          "reference": 34,
+          "matched_50ms": 21,
+          "missing_50ms": 13,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 20,
+          "reference": 31,
+          "matched_50ms": 18,
+          "missing_50ms": 13,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 21,
+          "reference": 31,
+          "matched_50ms": 19,
+          "missing_50ms": 12,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 24,
+          "reference": 27,
+          "matched_50ms": 21,
+          "missing_50ms": 6,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 22,
+          "reference": 29,
+          "matched_50ms": 22,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 26,
+          "reference": 30,
+          "matched_50ms": 23,
+          "missing_50ms": 7,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 27,
+          "reference": 33,
+          "matched_50ms": 26,
+          "missing_50ms": 7,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 22,
+          "reference": 27,
+          "matched_50ms": 22,
+          "missing_50ms": 5,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 25,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 93.86160024205851,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 14,
+      "seed": 1745,
+      "stars": 3.0460010225737584,
+      "predicted_labels": [
+        4.566157341003418,
+        8.524456977844238,
+        7.485431671142578,
+        4.134840965270996,
+        5.826206207275391
+      ],
+      "seconds": 0.3914648490026593,
+      "objects": 212,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "ce826afa64937aa436ccb8ca7cf5bc04b61679af5f8759a460d5cfbae2346eff",
+      "generated": {
+        "objects": 212,
+        "kinds": {
+          "0": 95,
+          "1": 116,
+          "2": 1
+        },
+        "gaps_ms": {
+          "median": 430.0,
+          "under_80": 0,
+          "under_150": 1,
+          "under_250": 88
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 124,
+          "precision": 0.5849056603773585,
+          "recall": 0.38271604938271603,
+          "f1": 0.4626865671641791,
+          "matched_mean_abs_error_ms": 4.5887096774192555,
+          "matched_signed_error_ms": 1.49193548387081
+        },
+        "25": {
+          "matches": 187,
+          "precision": 0.8820754716981132,
+          "recall": 0.5771604938271605,
+          "f1": 0.6977611940298507,
+          "matched_mean_abs_error_ms": 8.379679144384895,
+          "matched_signed_error_ms": 6.016042780748491
+        },
+        "50": {
+          "matches": 193,
+          "precision": 0.910377358490566,
+          "recall": 0.595679012345679,
+          "f1": 0.7201492537313433,
+          "matched_mean_abs_error_ms": 9.03108808290151,
+          "matched_signed_error_ms": 6.740932642486966
+        },
+        "100": {
+          "matches": 194,
+          "precision": 0.9150943396226415,
+          "recall": 0.5987654320987654,
+          "f1": 0.7238805970149254,
+          "matched_mean_abs_error_ms": 9.860824742267997,
+          "matched_signed_error_ms": 6.7989690721648675
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.326086956499256,
+        "mean": 9.081419196069245,
+        "over_20ms": 19,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 5,
+        "both_as_circles_50ms": 5,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 17,
+          "reference": 27,
+          "matched_50ms": 17,
+          "missing_50ms": 10,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 14,
+          "reference": 25,
+          "matched_50ms": 14,
+          "missing_50ms": 11,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 20,
+          "reference": 30,
+          "matched_50ms": 16,
+          "missing_50ms": 14,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 21,
+          "reference": 34,
+          "matched_50ms": 18,
+          "missing_50ms": 16,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 19,
+          "reference": 31,
+          "matched_50ms": 17,
+          "missing_50ms": 14,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 17,
+          "reference": 31,
+          "matched_50ms": 16,
+          "missing_50ms": 15,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 20,
+          "reference": 29,
+          "matched_50ms": 19,
+          "missing_50ms": 10,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 20,
+          "reference": 30,
+          "matched_50ms": 17,
+          "missing_50ms": 13,
+          "extra_50ms": 3
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 22,
+          "reference": 33,
+          "matched_50ms": 22,
+          "missing_50ms": 11,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 19,
+          "missing_50ms": 8,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 45,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 76.00657866263946,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    },
+    {
+      "candidate": 15,
+      "seed": 1746,
+      "stars": 3.572339083442469,
+      "predicted_labels": [
+        5.067724227905273,
+        9.03870964050293,
+        8.414873123168945,
+        4.176142692565918,
+        5.450677394866943
+      ],
+      "seconds": 0.545440305955708,
+      "objects": 247,
+      "out_of_bounds_heads": 0,
+      "osu_sha256": "f527cd900ca339ca5b9dc3e4b02aae20d22c7d5bed55171c8825a794f3ae7312",
+      "generated": {
+        "objects": 247,
+        "kinds": {
+          "1": 156,
+          "0": 91
+        },
+        "gaps_ms": {
+          "median": 425.0,
+          "under_80": 0,
+          "under_150": 9,
+          "under_250": 100
+        }
+      },
+      "reference": {
+        "objects": 324,
+        "kinds": {
+          "1": 239,
+          "0": 85
+        },
+        "gaps_ms": {
+          "median": 218.0,
+          "under_80": 0,
+          "under_150": 40,
+          "under_250": 230
+        }
+      },
+      "onsets": {
+        "10": {
+          "matches": 157,
+          "precision": 0.6356275303643725,
+          "recall": 0.4845679012345679,
+          "f1": 0.5499124343257443,
+          "matched_mean_abs_error_ms": 4.961783439490293,
+          "matched_signed_error_ms": 2.5031847133757354
+        },
+        "25": {
+          "matches": 227,
+          "precision": 0.9190283400809717,
+          "recall": 0.7006172839506173,
+          "f1": 0.7950963222416813,
+          "matched_mean_abs_error_ms": 7.977973568281909,
+          "matched_signed_error_ms": 4.665198237885457
+        },
+        "50": {
+          "matches": 232,
+          "precision": 0.9392712550607287,
+          "recall": 0.7160493827160493,
+          "f1": 0.8126094570928196,
+          "matched_mean_abs_error_ms": 8.478448275862103,
+          "matched_signed_error_ms": 5.237068965517299
+        },
+        "100": {
+          "matches": 232,
+          "precision": 0.9392712550607287,
+          "recall": 0.7160493827160493,
+          "f1": 0.8126094570928196,
+          "matched_mean_abs_error_ms": 9.974137931034518,
+          "matched_signed_error_ms": 7.112068965517299
+        }
+      },
+      "generated_distance_to_reference_quarter_beat_ms": {
+        "median": 7.130434782585897,
+        "mean": 8.170920612575676,
+        "over_20ms": 11,
+        "note": "diagnostic only; native triplets and intentional unsnapped notes are possible"
+      },
+      "short_circle_pairs": {
+        "reference": 36,
+        "both_onsets_recovered_50ms": 12,
+        "both_as_circles_50ms": 9,
+        "definition": "consecutive circles, positive gap <= 0.51 native beat; overlapping pairs allowed"
+      },
+      "segments": [
+        {
+          "start_ms": 0,
+          "end_ms": 8000,
+          "generated": 21,
+          "reference": 27,
+          "matched_50ms": 20,
+          "missing_50ms": 7,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 8000,
+          "end_ms": 16000,
+          "generated": 20,
+          "reference": 25,
+          "matched_50ms": 19,
+          "missing_50ms": 6,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 16000,
+          "end_ms": 24000,
+          "generated": 25,
+          "reference": 30,
+          "matched_50ms": 25,
+          "missing_50ms": 5,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 24000,
+          "end_ms": 32000,
+          "generated": 26,
+          "reference": 34,
+          "matched_50ms": 24,
+          "missing_50ms": 10,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 32000,
+          "end_ms": 40000,
+          "generated": 26,
+          "reference": 31,
+          "matched_50ms": 22,
+          "missing_50ms": 9,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 40000,
+          "end_ms": 48000,
+          "generated": 21,
+          "reference": 31,
+          "matched_50ms": 19,
+          "missing_50ms": 12,
+          "extra_50ms": 2
+        },
+        {
+          "start_ms": 48000,
+          "end_ms": 56000,
+          "generated": 23,
+          "reference": 27,
+          "matched_50ms": 19,
+          "missing_50ms": 8,
+          "extra_50ms": 4
+        },
+        {
+          "start_ms": 56000,
+          "end_ms": 64000,
+          "generated": 18,
+          "reference": 29,
+          "matched_50ms": 18,
+          "missing_50ms": 11,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 64000,
+          "end_ms": 72000,
+          "generated": 23,
+          "reference": 30,
+          "matched_50ms": 22,
+          "missing_50ms": 8,
+          "extra_50ms": 1
+        },
+        {
+          "start_ms": 72000,
+          "end_ms": 80000,
+          "generated": 26,
+          "reference": 33,
+          "matched_50ms": 26,
+          "missing_50ms": 7,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 80000,
+          "end_ms": 88000,
+          "generated": 18,
+          "reference": 27,
+          "matched_50ms": 18,
+          "missing_50ms": 9,
+          "extra_50ms": 0
+        },
+        {
+          "start_ms": 88000,
+          "end_ms": 96000,
+          "generated": 0,
+          "reference": 0,
+          "matched_50ms": 0,
+          "missing_50ms": 0,
+          "extra_50ms": 0
+        }
+      ],
+      "spatial_pairs": {
+        "short_circle_pairs": 41,
+        "overlapping_pairs_within_8px": 0,
+        "median_short_pair_head_distance_px": 131.47243057006287,
+        "definition": "consecutive circles within 0.51 native beats; raw head distance, before client stacking"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "hparams": {
+    "emb_dim": 6,
+    "style_dim": 32,
+    "n_downs": 3,
+    "stride": 3,
+    "latent_args": {
+      "h_dim": 128,
+      "ae_args": {
+        "n_layers": 8,
+        "expand": 4,
+        "radius": 2
+      },
+      "style_head_dim": 64,
+      "style_heads": 16
+    },
+    "diffusion_args": {
+      "global_cond_dim": 512,
+      "backbone_dim": 512,
+      "backbone_args": {
+        "depth": 8,
+        "expand": 4,
+        "head_dim": 64,
+        "n_heads": 16,
+        "radius": 2,
+        "dropout": 0.0
+      },
+      "u_head_dim": 64
+    },
+    "style_args": {
+      "label_features": 128,
+      "h_dim": 256,
+      "depth": 8,
+      "expand": 4,
+      "dropout": 0.0
+    }
+  },
+  "state_elements_by_stage": {
+    "latent": 12388836,
+    "diffusion": 46877103,
+    "style": 5967393
+  }
+}
