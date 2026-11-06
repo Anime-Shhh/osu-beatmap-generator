@@ -945,6 +945,6 @@ diagnostics, not claimed measures of musical taste or instrument selection.
 
 Source/hash contracts, frozen chart identities, full-song audio interventions,
 native timing/export checks, a48GPU-hour ledger and strict promotion gates are
-implemented. Data preparation and initial smoke tests completed; storage currently
-prevents training. Implementation is not evidence of a useful VAE or better maps.
+implemented. Data preparation, cleanup and expanded smoke tests completed. Gated pilot
+job1062088 is submitted; adaptation results are not yet available. Implementation is not evidence of a useful VAE or better maps.
 See [pilot record](docs/dreamer-pilot-2026-11-05.md) for settings, status and limits.

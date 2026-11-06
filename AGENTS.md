@@ -95,3 +95,18 @@ All34 were removed after an off-host hash-verified recovery archive; relevant
 records and unique artifacts are in `osu_project/legacy_snapshot_records`.
 Project quota reclaimed59.39MiB. Home quota is separate and remains below8GiB;
 uv-cache removal still lacks authorization, and no new GPU jobs were submitted.
+
+Latest update: user explicitly authorized uv-cache cleaning and eleven numbered
+V2/legacy checkpoint deletions; both completed. Six best/latest checkpoints were
+hash-verified unchanged; synthetic-run checkpoints remain. Home now has over16GiB
+free.13 tests passed after cleanup. Remote ledgers: pilot_20261105/approved-cleanup/.
+source_d846f29 is deployed; expanded GPU smoke submission hit SSH expiration
+before execution. Reconnect, then submit smoke and the gated pilot.
+
+Pilot is now submitted as job1062088 from immutable source_afdcdea. Cleanup
+reclaimed8.84GiB home/10.12GiB project; storage gate clears.14 tests passed.
+Smoke1062086 failed on an overly strict measurable-star assertion under bad audio;
+fixed smoke1062087 passed on A10040GB and retained invalid-output diagnostics.
+Full pipeline begins with frozen baseline evaluation, then gated training.
+Read pilot-status.json and pilot-1062088.log before any new submissions; do not
+change the running source or reset the shared GPU budget. No quality gain yet.

@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "kind": "ae",
+      "loss": 13.0,
+      "shape": [
+        1,
+        9,
+        2052
+      ],
+      "reconstruction": 13.0,
+      "kl": 0.0,
+      "mu_variance_min": 0.6844147443771362
+    },
+    {
+      "kind": "vae",
+      "loss": 13.000000953674316,
+      "shape": [
+        1,
+        9,
+        2052
+      ],
+      "reconstruction": 13.0,
+      "kl": 1.6294912099838257,
+      "mu_variance_min": 0.6844147443771362
+    }
+  ],
+  "exports": [
+    {
+      "condition": "aligned",
+      "stars": 2.5158598405817045,
+      "invalid": false,
+      "errors": []
+    },
+    {
+      "condition": "zero",
+      "stars": null,
+      "invalid": true,
+      "errors": [
+        "ValueError(\"difficulty attribute 'aim' is non-finite\")"
+      ]
+    },
+    {
+      "condition": "shift+500",
+      "stars": 1.0181365314629673,
+      "invalid": false,
+      "errors": []
+    },
+    {
+      "condition": "shift-500",
+      "stars": 2.2678735045952894,
+      "invalid": false,
+      "errors": []
+    },
+    {
+      "condition": "wrong",
+      "stars": null,
+      "invalid": true,
+      "errors": [
+        "ValueError(\"difficulty attribute 'aim' is non-finite\")"
+      ]
+    }
+  ],
+  "seed": 1731,
+  "device": "NVIDIA A100-PCIE-40GB",
+  "torch": "2.10.0+cu128"
+}

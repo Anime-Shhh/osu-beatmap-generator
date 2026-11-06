@@ -1,0 +1,192 @@
+{
+  "authorized_exact_paths": [
+    "v2_runs/run_20261014_real/planner/planner-epoch-0024.pt",
+    "v2_runs/run_20261014_real/planner/planner-epoch-0049.pt",
+    "v2_runs/run_20261014_real/geometry/geometry-epoch-0024.pt",
+    "v2_runs/run_20261014_real/geometry/geometry-epoch-0049.pt",
+    "v2_runs/run_20261014_real/geometry/geometry-epoch-0074.pt",
+    "models/checkpoint_epoch077_loss2.1064.pt",
+    "models/checkpoint_epoch079_loss2.1064.pt",
+    "models/checkpoint_epoch083_loss2.1063.pt",
+    "models_a100_20261009_144455/checkpoint_epoch022_loss2.0893.pt",
+    "models_a100_20261009_144455/checkpoint_epoch029_loss2.0889.pt",
+    "models_a100_20261009_144455/checkpoint_epoch038_loss2.0876.pt"
+  ],
+  "protected": [
+    {
+      "path": "/common/users/asj102/osu_project/models/best.pt",
+      "sha256": "7ad5bd160b7a345c1e19d8307a5d2b57d7edda487c767f1aa48b14f34d397177",
+      "bytes": 1121334774,
+      "blocks": 1111917568,
+      "nlink": 1,
+      "inode": 885146128,
+      "mtime_ns": 1774660606130415668
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models_a100_20261009_144455/best.pt",
+      "sha256": "9531f4be62cb79fe7147bb0691ad9847586738adc7da28937edfa6e2e22b367c",
+      "bytes": 1121328182,
+      "blocks": 1110983680,
+      "nlink": 1,
+      "inode": 1511484138,
+      "mtime_ns": 1791575438143040029
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/best.pt",
+      "sha256": "a991a335083180d0200ffda0695158665a144ab7461d6465d26e7e926b203bb0",
+      "bytes": 617613019,
+      "blocks": 617088000,
+      "nlink": 1,
+      "inode": 75495032,
+      "mtime_ns": 1791988167849119099
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/latest.pt",
+      "sha256": "d9d7fc8514ed23c4623b62e1c1b972d4315b5ea5f56d0f6d64707a3a7b472183",
+      "bytes": 617614207,
+      "blocks": 617088000,
+      "nlink": 1,
+      "inode": 75796216,
+      "mtime_ns": 1791990233420271507
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/latest.pt",
+      "sha256": "2442fbfff63534a4edc569835ee13d38a7e706a07455d5ddf259585bbcaa91c6",
+      "bytes": 1200276931,
+      "blocks": 1171686400,
+      "nlink": 1,
+      "inode": 1586915892,
+      "mtime_ns": 1791970833796961060
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/best.pt",
+      "sha256": "553c5c9a43240d112f1b0729fbe94f6371e73c6976aa2fc2f207e6ed0796770c",
+      "bytes": 1200274987,
+      "blocks": 1171624960,
+      "nlink": 1,
+      "inode": 1586654534,
+      "mtime_ns": 1791967059633246709
+    }
+  ],
+  "candidates": [
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/planner-epoch-0024.pt",
+      "sha256": "79eb6f5c5b11fb7b06be5cd5bbb43155c345f732ca606962ea0c98abe8126410",
+      "bytes": 1200288659,
+      "blocks": 1171764224,
+      "nlink": 1,
+      "inode": 1583500948,
+      "mtime_ns": 1791963612172153958
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/planner-epoch-0049.pt",
+      "sha256": "4a78a832aea247726804093f8f745a3320ec675a1c70efe2ff620ee5b1e7d557",
+      "bytes": 1200288659,
+      "blocks": 1171710976,
+      "nlink": 1,
+      "inode": 1586849730,
+      "mtime_ns": 1791969607963982350
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/geometry-epoch-0024.pt",
+      "sha256": "765e29a2e1d9a09dafffd13b409c3a70621f32d69d0d99535797aef12cd8902e",
+      "bytes": 617621993,
+      "blocks": 617092096,
+      "nlink": 1,
+      "inode": 573611084,
+      "mtime_ns": 1791975980817022080
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/geometry-epoch-0049.pt",
+      "sha256": "bbee06b67761292e2747acd2366cd928e7f266ad5afd1fa5b2ccf6a25b9c2b21",
+      "bytes": 617621993,
+      "blocks": 617092096,
+      "nlink": 1,
+      "inode": 1241645918,
+      "mtime_ns": 1791981162733737797
+    },
+    {
+      "path": "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/geometry-epoch-0074.pt",
+      "sha256": "3ea7f35afbadc606037809fd79c689e707f964ee0776fd98b880cb38b036e2c0",
+      "bytes": 617621993,
+      "blocks": 617092096,
+      "nlink": 1,
+      "inode": 75645278,
+      "mtime_ns": 1791988669844291457
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models/checkpoint_epoch077_loss2.1064.pt",
+      "sha256": "3f29b741c4662caa76a6e141c9d359e1c872f5521aa1d15e26c7f33d2bd6c5ce",
+      "bytes": 1121399472,
+      "blocks": 1111536640,
+      "nlink": 1,
+      "inode": 885346428,
+      "mtime_ns": 1774659894740045033
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models/checkpoint_epoch079_loss2.1064.pt",
+      "sha256": "d7a4dae4a2ac88d7bd96425b693137161a53b3d79cb9045e2d50241ca9a7f8ad",
+      "bytes": 1121399472,
+      "blocks": 1111704576,
+      "nlink": 1,
+      "inode": 885348036,
+      "mtime_ns": 1774660143241190488
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models/checkpoint_epoch083_loss2.1063.pt",
+      "sha256": "846a97e773b700194452623910a63cce31b4c88408984a65ff5e75044fad747b",
+      "bytes": 1121399472,
+      "blocks": 1111958528,
+      "nlink": 1,
+      "inode": 885347304,
+      "mtime_ns": 1774660538725217930
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models_a100_20261009_144455/checkpoint_epoch022_loss2.0893.pt",
+      "sha256": "ece664f7d384525ac4a707b0eb05dac24d2ba3ffd7cecb53d993bbe0f483cf74",
+      "bytes": 1121392880,
+      "blocks": 1111114752,
+      "nlink": 1,
+      "inode": 1516194876,
+      "mtime_ns": 1791573840845066723
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models_a100_20261009_144455/checkpoint_epoch029_loss2.0889.pt",
+      "sha256": "092c133dc2f7ea995291f0692a0fa9540717aa5ed011fef1d01e808223e9379e",
+      "bytes": 1121392880,
+      "blocks": 1111114752,
+      "nlink": 1,
+      "inode": 1514592002,
+      "mtime_ns": 1791574540688679991
+    },
+    {
+      "path": "/common/users/asj102/osu_project/models_a100_20261009_144455/checkpoint_epoch038_loss2.0876.pt",
+      "sha256": "ba12754a413bfa2b0159bb96283832265a52771c78a75fc147746d7dce015bef",
+      "bytes": 1121392880,
+      "blocks": 1111032832,
+      "nlink": 1,
+      "inode": 1514608952,
+      "mtime_ns": 1791575436416008532
+    }
+  ],
+  "prepared": 1793943532.3949413,
+  "deleted": [
+    "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/planner-epoch-0024.pt",
+    "/common/users/asj102/osu_project/v2_runs/run_20261014_real/planner/planner-epoch-0049.pt",
+    "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/geometry-epoch-0024.pt",
+    "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/geometry-epoch-0049.pt",
+    "/common/users/asj102/osu_project/v2_runs/run_20261014_real/geometry/geometry-epoch-0074.pt",
+    "/common/users/asj102/osu_project/models/checkpoint_epoch077_loss2.1064.pt",
+    "/common/users/asj102/osu_project/models/checkpoint_epoch079_loss2.1064.pt",
+    "/common/users/asj102/osu_project/models/checkpoint_epoch083_loss2.1063.pt",
+    "/common/users/asj102/osu_project/models_a100_20261009_144455/checkpoint_epoch022_loss2.0893.pt",
+    "/common/users/asj102/osu_project/models_a100_20261009_144455/checkpoint_epoch029_loss2.0889.pt",
+    "/common/users/asj102/osu_project/models_a100_20261009_144455/checkpoint_epoch038_loss2.0876.pt"
+  ],
+  "quota_before": "Disk quotas for user asj102 (uid 1905238253): \n     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace\n      /dev/sda4    3124  3145728 2097152             774       0       0        \ncommunis.lcsr.rutgers.edu:/common/home 34923753  52428800 52428800          267795       0       0        \neternal.lcsr.rutgers.edu:/common/users 104808779  104857600 104857600           75983       0       0        \n",
+  "completed": 1793943594.4792602,
+  "quota_after": "Disk quotas for user asj102 (uid 1905238253): \n     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace\n      /dev/sda4    3188  3145728 2097152             786       0       0        \ncommunis.lcsr.rutgers.edu:/common/home 34923802  52428800 52428800          267797       0       0        \neternal.lcsr.rutgers.edu:/common/users 104808779  104857600 104857600           75983       0       0        \n",
+  "quota_settled": "Disk quotas for user asj102 (uid 1905238253): \n     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace\n /dev/nvme0n1p4   11624  3145728 2097152             111       0       0        \ncommunis.lcsr.rutgers.edu:/common/home 34924482  52428800 52428800          267852       0       0        \neternal.lcsr.rutgers.edu:/common/users 94200146  104857600 104857600           75972       0       0        \n",
+  "quota_settled_time": 1793979307.990055,
+  "actual_quota_bytes_reclaimed": 10863240192
+}

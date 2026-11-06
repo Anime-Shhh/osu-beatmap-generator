@@ -1,0 +1,20 @@
+{
+  "command": [
+    "/common/home/asj102/personalCS/osu_beatmap_generator/venv/bin/uv",
+    "cache",
+    "clean",
+    "--cache-dir",
+    "/common/home/asj102/.cache/uv"
+  ],
+  "version": "uv 0.11.8 (x86_64-unknown-linux-gnu)",
+  "quota_before": "Disk quotas for user asj102 (uid 1905238253): \n     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace\n      /dev/sda4    3124  3145728 2097152             772       0       0        \ncommunis.lcsr.rutgers.edu:/common/home 44190767  52428800 52428800          312814       0       0        \neternal.lcsr.rutgers.edu:/common/users 104808779  104857600 104857600           75983       0       0        \n",
+  "start": 1793943537.9731548,
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "Clearing cache at: .cache/uv\nRemoved 64083 files (17.3GiB)\n",
+  "quota_after": "Disk quotas for user asj102 (uid 1905238253): \n     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace\n      /dev/sda4    3124  3145728 2097152             772       0       0        \ncommunis.lcsr.rutgers.edu:/common/home 38148840  52428800 52428800          271896       0       0        \neternal.lcsr.rutgers.edu:/common/users 104808779  104857600 104857600           75983       0       0        \n",
+  "completed": 1793943570.7352173,
+  "quota_settled": "Disk quotas for user asj102 (uid 1905238253): \n     Filesystem  blocks   quota   limit   grace   files   quota   limit   grace\n /dev/nvme0n1p4   11624  3145728 2097152             111       0       0        \ncommunis.lcsr.rutgers.edu:/common/home 34924482  52428800 52428800          267852       0       0        \neternal.lcsr.rutgers.edu:/common/users 94200146  104857600 104857600           75972       0       0        \n",
+  "quota_settled_time": 1793979307.9880624,
+  "actual_quota_bytes_reclaimed": 9488675840
+}

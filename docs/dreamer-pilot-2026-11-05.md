@@ -1,5 +1,9 @@
 # Joint latent / conditional VAE pilot
 
+Current status (November6): cleanup and expanded GPU smoke completed; gated
+pilot job **1062088** is submitted, beginning with baseline evaluation.
+No adapted-model quality result is available yet.
+
 Implementation follows the user-approved 48 GPU-hour plan. This is a running
 experiment, not evidence that a new model is better or that a VAE is useful.
 The pinned external osu-dreamer v8 source and weights remain unchanged. No V2
@@ -191,3 +195,57 @@ Recovery archive and full per-file inventory:
 Archive SHA256: `2802843e92d49abcdf64ed69ec7aa5f9607a2c2f93f17ce1cbc0efb04804a29c`.
 The cleanup ledger and archive verification are also retained in this repository's
 pilot evidence directory.
+
+## Authorized cache/checkpoint cleanup
+
+The user explicitly approved `uv cache clean` and eleven exact numbered V2/legacy
+checkpoint paths. Cleanup completed in that order. The uv executable was found at
+`/common/home/asj102/personalCS/osu_beatmap_generator/venv/bin/uv` (version0.11.8);
+it ran with `--cache-dir /common/home/asj102/.cache/uv`. The command's logical
+17.3GiB removal report is not treated as physically reclaimed quota. Home quota
+subsequently showed34,923,802KiB used of52,428,800KiB, clearing the8GiB gate.
+
+The eleven approved numbered checkpoints were hashed and removed. All six
+best/latest files in their four parent directories were hash-verified before and
+after deletion. Other best/latest/last files, datasets, recent caches, Python
+environments and synthetic-run checkpoints were outside the deletion list.
+The remote ledger is `approved-cleanup/checkpoints.json`; cache evidence is
+`approved-cleanup/uv-clean.json`. Project-quota reclamation awaits a settled read.
+
+All13 focused tests passed after cleanup using the installed iLab environments.
+The deployed immutable source snapshot is `source_d846f29`. Submission of the
+expanded GPU smoke was blocked by SSH expiration; reconnection is pending.
+No expanded smoke or full pilot job has been submitted as of this update.
+
+Settled cleanup evidence is now local: `uv-cleanup.json` and
+`intermediate-checkpoint-cleanup.json` in the pilot evidence directory. Recorded
+quota reductions are8.84GiB in home and10.12GiB in project (minor concurrent
+metadata writes are included). uv's17.3GiB logical-file report is not the freed
+quota measurement. GPU smoke1062086 was submitted after SSH reconnection; its
+expanded checks are running before the full gated pilot can be submitted.
+
+## Gated pilot launch
+
+Smoke1062086 stopped because the harness incorrectly required measurable stars
+under every intervention. The evaluator passed a valid native fixture and the
+unchanged v8 Kaguya output (4.0323217 stars). The harness now records invalid
+exports explicitly, uses a fixed seed, and logs every intervention.14 focused
+tests passed after this fix. No malformed candidate is dropped from evaluation.
+
+Smoke1062087 passed on NVIDIA A100-PCIE-40GB, torch2.10.0+cu128. Correct audio and
+both shifts yielded measurable native maps on the12-second training crop; zero
+and reversed-audio smoke conditions produced non-finite aim attributes and were
+recorded invalid. This is a runtime check, not the full wrong-song benchmark.
+AE/VAE gradients, frozen weights, identity initialization and sampling passed.
+
+Full coordinator job1062088 uses immutable source `source_afdcdea`. It starts
+with the frozen24-source, four-seed baseline and all five audio conditions, then
+advances to codecs and gated generator adaptation. No stage bypasses a failing
+contract or storage check. The48-hour GPU budget includes the failed smoke.
+Completed preliminary allocations total121 seconds; the full job is capped at
+47h50m, keeping the maximum combined allocation below48 hours.
+
+Monitor `pilot-status.json`, `gpu-budget.json`, and `pilot-1062088.log` under
+`/common/home/asj102/osu_flow_runs/pilot_20261105`. Do not overwrite deployed
+source or repeat locked-test evaluation. A submitted job is not a completed
+experiment or evidence that AE/VAE adaptation improves map quality.
