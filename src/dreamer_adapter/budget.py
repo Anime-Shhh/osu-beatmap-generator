@@ -19,7 +19,7 @@ class Budget:
         self.lock=self.path.with_suffix('.lock').open('a')
         fcntl.flock(self.lock,fcntl.LOCK_EX)
         self.ledger=json.loads(self.path.read_text()) if self.path.exists() else {'runs':[]}
-        if any(r['status']=='running' for r in self.ledger['runs']):
+        if any(r['status']=='running' and r['slot']==self.slot for r in self.ledger['runs']):
             raise RuntimeError('another GPU command active or needs accounting reconciliation')
         used=sum(r['seconds'] for r in self.ledger['runs'] if r['slot']==self.slot)
         self.seconds=HOURS[self.slot]*3600-used
@@ -31,5 +31,7 @@ class Budget:
         return self
     def __exit__(self,kind,value,tb):
         fcntl.flock(self.lock,fcntl.LOCK_EX)
+        self.ledger=json.loads(self.path.read_text())
+        self.record=next(r for r in self.ledger['runs'] if r['slot']==self.slot and r['start']==self.record['start'])
         self.record.update(seconds=time.time()-self.record['start'],status='failed' if kind else 'complete')
         write_json(self.path,self.ledger);fcntl.flock(self.lock,fcntl.LOCK_UN);self.lock.close()

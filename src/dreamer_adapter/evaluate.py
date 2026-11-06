@@ -30,6 +30,14 @@ def decode(signal,labels,version='experimental'):
         return decode_beatmap(Metadata('audio.mp3','Evaluation','Unknown',version),labels,signal)
 
 
+def score_signal(signal,labels,reference,requested):
+    try:return native_metrics(decode(signal,labels),reference,requested)
+    except ZeroDivisionError as exc:
+        result=native_metrics('',reference,requested)
+        result.update(invalid=True,stars=None,star_error=12.,errors=['upstream decoder: '+repr(exc)])
+        return result
+
+
 def sample(model,audio,labels,steps=8,codec=None,generator_state=None,return_labels=False):
     if codec is None:
         charts,out_labels=model.sample(audio,labels,steps)
@@ -102,18 +110,17 @@ def evaluate(manifest,upstream,output,codec_path=None,generator_path=None,split=
                                 extra['posterior_variance_mean']=float(lv.float().exp().mean())
                             extra['cursor_mse']=float((pred[7:]-x[7:]).square().mean())
                             extra['shuffled_cursor_mse']=float((shuffled[7:]-x[7:]).square().mean())
-                            shuffled_text=decode(shuffled.cpu().numpy(),labels.numpy())
-                            extra['shuffled_metrics']=native_metrics(shuffled_text,reference,float(labels[0]))
+                            extra['shuffled_metrics']=score_signal(shuffled.cpu().numpy(),labels.numpy(),reference,float(labels[0]))
                             if codec is not None and codec.kind=='vae':
                                 sampled=codec.reconstruct(a[None],x[None],sample=True)[0][0]
-                                extra['sampled_metrics']=native_metrics(decode(sampled.cpu().numpy(),labels.numpy()),reference,float(labels[0]))
+                                extra['sampled_metrics']=score_signal(sampled.cpu().numpy(),labels.numpy(),reference,float(labels[0]))
                         else:
                             pred,out_labels=sample(model,a,request,codec=codec,generator_state=gs,return_labels=True)
                             export_labels=out_labels.cpu().numpy()
                     if not torch.isfinite(pred).all():raise ValueError('nonfinite output')
-                    text=decode(pred.cpu().numpy(),export_labels)
+                    metrics=score_signal(pred.cpu().numpy(),export_labels,reference,float(labels[0]))
                     item={'group':row['group'],'chart':row['sha256'],'seed':seed,'mode':mode,'condition':condition,
-                          'metrics':native_metrics(text,reference,float(labels[0])),**extra}
+                          'metrics':metrics,**extra}
                     all_results.append(item)
                     with (output/'records.jsonl').open('a') as f:f.write(json.dumps(item)+'\n')
         print(json.dumps({'completed_source':row['group'],'records':len(all_results)}),flush=True)

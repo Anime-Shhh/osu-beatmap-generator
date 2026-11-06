@@ -222,3 +222,20 @@ def test_validation_preserves_training_rng_even_on_failure():
     with pytest.raises(ValueError):failing_evaluation()
     assert torch.equal(torch.get_rng_state(),expected) and random.getstate()==py
     assert np.array_equal(np.random.get_state()[1],n[1])
+
+
+def test_parallel_budget_preserves_both_slots(tmp_path):
+    from src.dreamer_adapter.budget import Budget
+    p=tmp_path/'ledger.json'
+    with Budget(p,'codec-ae'):
+        with Budget(p,'codec-vae001'):pass
+    rows=json.loads(p.read_text())['runs']
+    assert len(rows)==2 and all(r['status']=='complete' for r in rows)
+
+
+def test_decoder_zero_duration_is_invalid_not_dropped():
+    from src.dreamer_adapter.evaluate import score_signal
+    from src.v2.mapspec import mapspec_from_osu
+    with patch('src.dreamer_adapter.evaluate.decode',side_effect=ZeroDivisionError('duration')):
+        r=score_signal(None,None,mapspec_from_osu(OSU),4.5)
+    assert r['invalid'] and r['onsets']['25']['matches']==0
