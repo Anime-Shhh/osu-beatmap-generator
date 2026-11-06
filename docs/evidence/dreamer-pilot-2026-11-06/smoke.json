@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "kind": "ae",
+      "loss": 13.0,
+      "shape": [
+        1,
+        9,
+        2052
+      ],
+      "reconstruction": 13.0,
+      "kl": 0.0,
+      "mu_variance_min": 0.6843171715736389
+    },
+    {
+      "kind": "vae",
+      "loss": 13.000000953674316,
+      "shape": [
+        1,
+        9,
+        2052
+      ],
+      "reconstruction": 13.0,
+      "kl": 1.6294764280319214,
+      "mu_variance_min": 0.6843171715736389
+    }
+  ]
+}

@@ -1,0 +1,163 @@
+{
+  "before_free_bytes": 9399795712,
+  "deleted": [
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-0.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-1.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-3.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-4.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-5.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-6.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-7.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-8.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-9.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-10.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-11.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-12.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-13.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-14.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-15.osu"
+  ],
+  "protected": [
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-2.osu",
+    "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/Kaguya-osu-dreamer-v8.osz"
+  ],
+  "proofs": [
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-0.osu",
+      "sha256": "85d7bdac8971fee5538294737c8e28b7910370bfa752b44b1dbf860d7760576e",
+      "evaluation_complete": true,
+      "seed": 1731,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-1.osu",
+      "sha256": "6e1fec34c5e2384b0e48627d5a092cfedaffebe336fd0409ea39e19ff52f250b",
+      "evaluation_complete": true,
+      "seed": 1732,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-3.osu",
+      "sha256": "06f952a9f67cc9c765fb496bd1899d1ae2a801841aa61686d95f14acc1ede488",
+      "evaluation_complete": true,
+      "seed": 1734,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-4.osu",
+      "sha256": "f7da3f31d3393bdcd57da1c924f097e327652315060623ac88e4c6f08765587f",
+      "evaluation_complete": true,
+      "seed": 1735,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-5.osu",
+      "sha256": "e5cc288467110adc854fadf0ceb49e36508e922b16be6ecad603e314c82645a3",
+      "evaluation_complete": true,
+      "seed": 1736,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-6.osu",
+      "sha256": "8391e3e66bd66e5bf18832eb3e86ed3959692aab27443572d5040d34a17c40c9",
+      "evaluation_complete": true,
+      "seed": 1737,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-7.osu",
+      "sha256": "bb2af4f028d6628eb4639d3b03279604936445cd6d214bb4117de8725d258ac0",
+      "evaluation_complete": true,
+      "seed": 1738,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-8.osu",
+      "sha256": "b5d40b56c6e4702a9e6c7f202315cf6f42db6d80c53e16c9bc22280c37c19b83",
+      "evaluation_complete": true,
+      "seed": 1739,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-9.osu",
+      "sha256": "7e865be6c4f64bcccfde0c2d92a3c67ea80ae134e75d487c2a0579f277209ae7",
+      "evaluation_complete": true,
+      "seed": 1740,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-10.osu",
+      "sha256": "9d3583620ed273a32d2f43504695a3feea1121b9ee29c21606b4cfe0f3c8a3fa",
+      "evaluation_complete": true,
+      "seed": 1741,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-11.osu",
+      "sha256": "64fe31be0d3b9dae6125801fa23c5bf4644b986296e4a372be3e284983afa35d",
+      "evaluation_complete": true,
+      "seed": 1742,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-12.osu",
+      "sha256": "9ad3c29087368efc45b7a8b12a81c501f88193f4a2702c94e770e6c780b023e6",
+      "evaluation_complete": true,
+      "seed": 1743,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-13.osu",
+      "sha256": "08a869b7d3e9ebd3e25c544d5798dbf7135777718545b9e476813779f3a14e4a",
+      "evaluation_complete": true,
+      "seed": 1744,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-14.osu",
+      "sha256": "ce826afa64937aa436ccb8ca7cf5bc04b61679af5f8759a460d5cfbae2346eff",
+      "evaluation_complete": true,
+      "seed": 1745,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    },
+    {
+      "path": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/candidate-15.osu",
+      "sha256": "f527cd900ca339ca5b9dc3e4b02aae20d22c7d5bed55171c8825a794f3ae7312",
+      "evaluation_complete": true,
+      "seed": 1746,
+      "source_revision": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+      "metrics": "/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/kaguya/comparison.json",
+      "metrics_sha256": "674bef350ee0e6804949153a0592b2462722cc8ceaf40bba6ef7784a35ae1615"
+    }
+  ],
+  "after_free_bytes": 9399794688,
+  "actual_quota_bytes_freed": -1024
+}

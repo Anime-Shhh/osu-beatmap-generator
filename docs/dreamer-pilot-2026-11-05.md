@@ -1,0 +1,168 @@
+# Joint latent / conditional VAE pilot
+
+Implementation follows the user-approved 48 GPU-hour plan. This is a running
+experiment, not evidence that a new model is better or that a VAE is useful.
+The pinned external osu-dreamer v8 source and weights remain unchanged. No V2
+training, RL, generated-map positive targets, or human-review request is used.
+
+## Interfaces
+
+`python -m src.dreamer_adapter --help` exposes `prepare`, `compact`, `cleanup`,
+`train-codec`, `train-generator`, `evaluate`, `diagnostics`, `decide`, and `generate`.
+GPU commands take a JSON `--config` and require a Slurm allocation plus a shared
+`budget_ledger` and one predeclared `budget_slot`. Immutable configs are written
+by the sequential coordinator, `python -m src.dreamer_adapter.pilot`.
+
+The generation configuration contains `audio`, `stars`, `upstream`, `output`,
+optional `manifest`/`codec_path`/`generator_path`, `seed`, `ar`, `od`, `cs`, `hp`,
+`steps`, and optional `clock_json`. Outputs are map.osu, map.osz and audit.json.
+The upstream style model predicts settings; requested and predicted settings
+are separately recorded. Actual stars are calculated after export, displayed
+in the difficulty name, and checked against the requested ±0.5 tolerance.
+The archive is a draft even when its difficulty passes.
+
+Checkpoints bind the exact upstream weight hash, source version, feature
+pipeline, data manifest, codec hash and normalization statistics. All upstream
+Python source hashes are checked before loading. Initialization and exact resume
+are distinct. Resume restores optimizer and RNG state and validates config/data.
+
+## Frozen data and evaluation
+
+Only verified ranked standard charts from the recovered source manifest are
+eligible. Historical source splits are retained; all Kaguya sources are excluded.
+Exactly 24 validation and 24 test source groups are fixed by sorted source hashes
+before acquisition. The reference closest to 4.5 stars is chosen from the original eligible native
+charts and its exact hash frozen before training. Failed conversion cannot
+silently substitute another difficulty. Requests use that reference's difficulty labels;
+no reference events or timing map enter generation. Published upstream training
+membership is unknown, so these are only held out from our adaptation.
+
+Original audio hashes are checked against the pinned dataset revision. Existing
+mel features are never substituted for v8 resonator features. Source audio is
+transient. New caches are losslessly compressed and equality-checked; the redundant
+new uncompressed cache is removed only after verification. Native source maps
+and all historical caches remain intact.
+
+Evaluation separately measures native signal round-trip, pretrained/adapted
+reconstruction, and full generation. It records 10/25/50ms onset and type metrics,
+short pairs, raw repeated positions, slider duration, coverage, measured stars,
+and rendered-body validity. Four generation seeds are paired across aligned,
+zero, ±500ms zero-padded shifts, and duration-matched wrong-song feature streams.
+Wrong-song resizing is a diagnostic intervention, not a claim of natural audio.
+Full intermediate maps/tensors are not retained by routine evaluations.
+
+## Training and decisions
+
+Both codec variants freeze chart features, audio features, style extraction and
+style generation. They train identical temporal/decoder paths with an identity
+mean adapter. VAE adds a diagonal Gaussian posterior, log variance [-10,2], and
+KL ramp over 2,000 steps, with beta .001 or .01. Both retain paired-half style
+swapping, upstream latent masking, and hit/position/velocity/acceleration losses.
+Style regularization and label losses are constant with the frozen heads and
+are not misrepresented as trainable objectives. AE has the original .2 temporal
+training noise; deterministic reconstruction uses the mean. VAE reconstruction
+is checked both at its mean and with posterior samples.
+
+Codec training: AdamW 1e-4, effective batch32, 2052-frame crops, BF16, clip1,
+max10k updates, evaluation every500, four non-improving evaluations to stop.
+Checkpoint score averages onset/type F1 at10ms and pair recall, with a bounded
+slider-duration penalty. No test data chooses weights.
+
+The VAE gates require onset F1≥.97, pair recall≥.95, median matched-slider
+error≤12ms, at most one-point regression, and measurable latent-shuffle damage.
+Sampling must also preserve these details. A failed VAE consumes no generator
+allocation. A passing VAE is not yet a selected generator.
+
+Generator adaptation freezes the codec, caches posterior moments and audio
+features, computes normalization only from training latents, and fine-tunes the
+upstream distance/direction objective. AdamW3e-5, effective batch32, 152-latent
+crops, clip1, EMA.99, max20k updates, full-song validation every1000. VAE targets
+are sampled from their cached posterior; deterministic targets use their means.
+The generator operates in normalized coordinates; the decoder receives the
+inverse transform. Incomplete padded final chunks are excluded from training
+and normalization. Separate codec identities cannot share latent caches. Validation
+restores training RNG states even on failure. A common-completed-update comparison
+is retained alongside each arm’s best-checkpoint results.
+
+Final promotion requires +3pp onset F1 at25ms with a positive paired bootstrap
+interval, no >1pp fine-timing/pair regression, no worse stars/invalid rate, and
+significant aligned-versus-wrong-audio advantage. A VAE must additionally beat
+the AE generator under its non-regression rules. A qualifying model receives a
+second generator training seed with the same frozen codec; failure to reproduce
+the improvement prevents promotion. Otherwise unchanged v8 remains selected.
+Only the preselected configuration is evaluated on the locked test list.
+
+Timing replacement requires an audio-only constant grid with ≥16 beats,
+median residual≤10ms, p90≤25ms and evidence of 4/4 downbeat spacing. It preserves
+object timestamps and recomputes slider SV, rejecting unsupported velocities.
+A native reparse checks starts/endpoints within2ms. No reference phase correction.
+
+Reward diagnostics use real maps and explicit corruptions. Reference-relative
+components are explicitly not deployable musicality rewards. Wrong-audio attack
+alignment, difficulty changes, timing, deletion, duplication, short-pattern,
+movement and duration corruptions are reported individually; ≥90% detection on
+at least12 eligible sources is required. Failures are retained. No scalar reward
+or reward-based generator update is enabled.
+
+## Resources, retention, and status
+
+Budgets: baseline4h (including smoke), three codecs4h each, two generator arms6h
+each, confirmation8h, diagnostics4h, final evaluation8h. Slots share one ledger;
+ordinary failures count against it. An interrupted job leaves an active record
+requiring explicit reconciliation against Slurm accounting. The coordinator
+allocation is capped at47h50m, leaving room for the preliminary smoke job.
+
+Before every training command, require8GiB quota headroom and record that check
+against the manifest. Failure stops training and writes an exact storage inventory;
+the threshold is not relaxed for subsequent arms. Keep one best weight artifact and one resumable last checkpoint
+per arm. Source/data checks fail closed; no historic dataset deletion fallback.
+
+Remote root: `/common/home/asj102/osu_flow_runs/pilot_20261105`.
+- CPU preparation1046611 failed on audio decoding. Retry1046631 completed with
+  2,957 ranked charts /681 audio sources and zero rejected charts. A logged FFmpeg
+  fallback verifies decoded duration against the immutable source within100ms.
+- Compression1047507 completed:1,513,630,458 cache bytes; every array verified equal.
+  Only the new redundant uncompressed cache was removed; its manifests and journal
+  remain. Native inputs and historical caches were preserved.
+- GPU smoke job1046622 passed real AE/VAE backward/optimizer/reconstruction checks.
+- Thirteen focused tests passed, including source leakage, contracts, masking, audio
+  interventions, native duration round-trip, collapse gates, budget failures and
+  protected cleanup, frozen reference identities and lossless compression.
+  The RNG-resume test also passed. The expanded end-to-end GPU sampler smoke
+  remains pending behind the storage gate.
+  Python compilation and Slurm shell syntax checks passed.
+- Pip download-cache cleanup completed; NFS quota reporting lagged deletion and
+  then showed approximately6.45GiB reclaimed. Installed environments preserved.
+- Fifteen unselected v8 Kaguya .osu files were deleted with retained metric/hash/
+  seed/source proofs; the selected map, archive and all metrics remain. These
+  small files were not the cause of tens of GB of storage usage.
+
+November6: SSH was re-established. Home quota reports8,438,752,256 free bytes
+(7.86GiB), below the required8GiB. No full training or new baseline evaluation
+has been submitted. `storage-inventory-20261106.json` records the exact inventory.
+The separately discovered uv cache is untouched; additional deletion is not
+inferred from the approved pip-cache cleanup.
+
+Previous audio/native-flow checkpoints remain unchanged as historical baselines;
+see `inference-check-2026-11-04.md`. Their12-source scores are not a paired
+24-source pilot comparison. Promotion uses fresh unchanged-v8 evaluation.
+
+No training-quality, model-promotion or final evaluation result is claimed yet.
+
+Local evidence is retained in `docs/evidence/dreamer-pilot-2026-11-06/`: storage
+inventory, lossless-compression audit, initial GPU smoke and cleanup ledgers. The
+pip ledger's immediate post-delete quota reading was stale; it is preserved as
+recorded rather than rewritten to imply a contemporaneous measurement.
+
+The uv audit found13,830,438,912 allocated bytes in package archives, of which
+4,360,668,160 bytes are shared through hardlinks. Potentially reclaimable bytes
+are9,469,770,752 (8.82GiB). No symlink consumers outside the uv cache were found
+under the user's home/project allocations. Explicit cleanup approval is pending.
+
+Next execution steps: resolve the8GiB gate, run the expanded GPU smoke from a new
+immutable source snapshot, then submit `dreamer_pilot_full.sbatch` with `PILOT`,
+`SOURCE` and `BEAT_CHECKPOINT` set. The checkpoint is
+`/common/users/asj102/osu_project/flow_runs/run_20261025/beat-tracker-weights/hub/checkpoints/beat_this-final0.ckpt`.
+Its SHA256 is
+`8c328b45f59d8dd3dff219253ff6a8d6482be57d0133a29140e2febbf8eb8331`.
+Do not submit training while the gate fails or overwrite existing stage outputs.

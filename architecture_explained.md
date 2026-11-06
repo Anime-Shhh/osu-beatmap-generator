@@ -921,3 +921,30 @@ not improve consistently. Training overlap of published weights is unknown.
 Its exporter does not recover a musical timing grid, so it is not ranked-ready.
 The audit, architectural comparison, version hashes, reproducible Slurm command
 and remaining faults are in [the v8 report](docs/osu-dreamer-review-2026-11-05.md).
+
+
+## 14. Joint latent AE / conditional VAE pilot (November6)
+
+The isolated `src/dreamer_adapter` package adapts published65M-parameter v8. It
+preserves9 chart/cursor signals,6 temporal channels at27× compression,32 style
+dimensions, and audio features feeding both generator and decoder. The existing
+audio/native-flow and unchanged v8 checkpoints remain intact.
+
+The codec control adds an identity-initialized6→6 mean projection. Conditional
+VAE arms add a diagonal log-variance projection and sampled temporal posterior,
+with KL maxima0.001/0.01. Chart/audio features and style extraction stay frozen;
+only temporal projection and chart decoding adapt. A VAE must preserve native
+timing, short pairs and slider duration, respond to latent shuffling, and then
+improve independently generated maps before selection.
+
+Selected codecs are frozen for distance/direction generator adaptation on real
+ranked-map latents with training-only normalization. Generation uses audio and
+requested difficulty/profile, never reference event timing or chart history.
+No reinforcement learning is enabled. Reward components are corruption-tested
+diagnostics, not claimed measures of musical taste or instrument selection.
+
+Source/hash contracts, frozen chart identities, full-song audio interventions,
+native timing/export checks, a48GPU-hour ledger and strict promotion gates are
+implemented. Data preparation and initial smoke tests completed; storage currently
+prevents training. Implementation is not evidence of a useful VAE or better maps.
+See [pilot record](docs/dreamer-pilot-2026-11-05.md) for settings, status and limits.

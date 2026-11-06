@@ -78,3 +78,14 @@ training overlap is unknown and upstream export lacks musical timing recovery.
 Do not claim this was trained locally, is a held-out score or is ranked-ready.
 The upstream baseline is a promising direction for joint chart/cursor modeling;
 retain it unchanged when testing adaptations. No jobs remain from this check.
+
+
+November6 pilot: isolated `src/dreamer_adapter` implements the approved joint
+latent AE/VAE experiment; see `docs/dreamer-pilot-2026-11-05.md`. Preparation
+1046631 and verified compression1047507 completed; no full training is launched.
+Home quota is below the required8GiB. Preserve historical data and do not relax
+the threshold. The uv cache is inventoried, not authorized for removal.
+Deployed source snapshots are immutable; upload a new snapshot for changes.
+Thirteen focused tests and initial real-data GPU smoke passed; further changes
+require verification before submitting the coordinator. All pilot GPU work,
+including failures, shares the48-hour budget ledger.

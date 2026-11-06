@@ -1,0 +1,10 @@
+{
+  "before_free_bytes": 2927301632,
+  "deleted": [
+    "/common/home/asj102/.cache/pip"
+  ],
+  "protected": [],
+  "pip_logical_bytes": 7039994145,
+  "after_free_bytes": 2926531584,
+  "actual_quota_bytes_freed": -770048
+}
