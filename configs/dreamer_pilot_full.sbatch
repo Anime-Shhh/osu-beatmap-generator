@@ -14,4 +14,4 @@ cd "$SOURCE"
 /common/users/asj102/osu_project/env/bin/python -u -m src.dreamer_adapter.pilot \
  --root "$PILOT" --upstream /common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt \
  --manifest "$PILOT/cache-compact/manifest.json" --beat-checkpoint "$BEAT_CHECKPOINT" \
- --beat-checkpoint-sha256 8c328b45f59d8dd3dff219253ff6a8d6482be57d0133a29140e2febbf8eb8331
+ --beat-checkpoint-sha256 8c328b45f59d8dd3dff219253ff6a8d6482be57d0133a29140e2febbf8eb8331 ${PARALLEL_INPUTS:+--parallel-inputs}

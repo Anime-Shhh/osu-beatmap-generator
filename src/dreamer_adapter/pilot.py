@@ -10,7 +10,7 @@ from .contracts import write_json,digest
 from .decisions import codec_gate,promotion_gate
 
 
-def run(root,upstream,manifest,beat_checkpoint=None,beat_checkpoint_sha256=None):
+def run(root,upstream,manifest,beat_checkpoint=None,beat_checkpoint_sha256=None,parallel_inputs=False):
     root=Path(root);configs=root/'configs';configs.mkdir(exist_ok=True)
     state={'phase':'starting','steps':[],'promoted':False};write_json(root/'pilot-status.json',state)
     common={'manifest':str(manifest),'upstream':str(upstream),'budget_ledger':str(root/'gpu-budget.json')}
@@ -28,10 +28,13 @@ def run(root,upstream,manifest,beat_checkpoint=None,beat_checkpoint_sha256=None)
         checkpoint=root/name/'best.pt';st=torch.load(checkpoint,map_location='cpu',weights_only=True)
         return checkpoint,read(root/name/f"validation-{st['step']}"/'metrics.json')
     try:
-        launch('baseline','evaluate','baseline',output=str(root/'baseline'))
-        baseline=read(root/'baseline/metrics.json')
+        if not parallel_inputs:launch('baseline','evaluate','baseline',output=str(root/'baseline'))
+        baseline=read(root/('baseline-retry' if parallel_inputs else 'baseline')/'metrics.json')
+        if not baseline.get('complete'):raise ValueError('incomplete parallel baseline')
         for name,kind,beta in [('codec-ae','ae',0.),('codec-vae001','vae',.001),('codec-vae01','vae',.01)]:
-            launch(name,'train-codec',name,output=str(root/name),kind=kind,beta=beta)
+            if parallel_inputs:
+                if not (root/name/'complete.json').exists():raise ValueError('incomplete parallel codec')
+            else:launch(name,'train-codec',name,output=str(root/name),kind=kind,beta=beta)
         ae_path,ae_report=codec_report('codec-ae');qualified=[];gates={}
         for name in ('codec-vae001','codec-vae01'):
             path,report=codec_report(name);gate=codec_gate(ae_report,report);gates[name]=gate
@@ -91,4 +94,5 @@ def run(root,upstream,manifest,beat_checkpoint=None,beat_checkpoint_sha256=None)
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--root',required=True);p.add_argument('--upstream',required=True)
     p.add_argument('--manifest',required=True);p.add_argument('--beat-checkpoint');p.add_argument('--beat-checkpoint-sha256')
+    p.add_argument('--parallel-inputs',action='store_true')
     run(**vars(p.parse_args()))
