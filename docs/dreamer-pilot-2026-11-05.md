@@ -166,3 +166,28 @@ immutable source snapshot, then submit `dreamer_pilot_full.sbatch` with `PILOT`,
 Its SHA256 is
 `8c328b45f59d8dd3dff219253ff6a8d6482be57d0133a29140e2febbf8eb8331`.
 Do not submit training while the gate fails or overwrite existing stage outputs.
+
+## Project-folder cleanup follow-up
+
+The user authorized removing obsolete `codex_*` source snapshots inside
+`/common/users/asj102/osu_project`, preserving relevant records. All34 folders
+were removed after a recovery archive on the Mac was verified against6,130 file
+hashes. No assumption that every deployed edit existed on GitHub was necessary.
+
+584 original record/artifact paths are represented by129 unique retained files
+in `legacy_snapshot_records/`;105 readable report/config/log files are exposed
+in its `reports/` directory. `index.json` maps old paths to retained objects.
+Unique smoke-test tensors were retained; historical datasets, run directories,
+checkpoints, original audio and both installed environments were untouched.
+
+Settled project quota reclaimed62,270,464 bytes (59.39MiB). The34 folders occupied
+about274MiB, but most space was retained unique tensors, not obsolete source code.
+Project and home are separate allocations: this cleanup did not clear the8GiB
+home gate. Home remains about7.86GiB free, and the uv cache remains untouched.
+No new GPU jobs were submitted.
+
+Recovery archive and full per-file inventory:
+`/Users/anime_shh/personalCS/projects/codex-mds/osu/2026-11-06-cleanup/`.
+Archive SHA256: `2802843e92d49abcdf64ed69ec7aa5f9607a2c2f93f17ce1cbc0efb04804a29c`.
+The cleanup ledger and archive verification are also retained in this repository's
+pilot evidence directory.

@@ -89,3 +89,9 @@ Deployed source snapshots are immutable; upload a new snapshot for changes.
 Thirteen focused tests and initial real-data GPU smoke passed; further changes
 require verification before submitting the coordinator. All pilot GPU work,
 including failures, shares the48-hour budget ledger.
+
+The user subsequently authorized cleaning obsolete project `codex_*` folders.
+All34 were removed after an off-host hash-verified recovery archive; relevant
+records and unique artifacts are in `osu_project/legacy_snapshot_records`.
+Project quota reclaimed59.39MiB. Home quota is separate and remains below8GiB;
+uv-cache removal still lacks authorization, and no new GPU jobs were submitted.
