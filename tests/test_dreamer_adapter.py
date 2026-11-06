@@ -143,6 +143,15 @@ def test_bad_slider_is_counted_invalid():
     assert native_metrics(bad,reference)['invalid']
 
 
+def test_valid_native_map_is_measurable():
+    from src.dreamer_adapter.metrics import native_metrics
+    from src.v2.mapspec import mapspec_from_osu
+    measured=native_metrics(OSU,mapspec_from_osu(OSU))
+    assert not measured['invalid'] and measured['stars'] is not None
+    assert measured['onsets']['10']['f1']==1.
+    assert measured['slider_duration_median_ms']==0.
+
+
 def test_frozen_reference_is_not_substituted():
     from src.dreamer_adapter.data import selected_rows
     m={'groups':{'val':['a']},'reference_chart_hashes':{'val':{'a':'chosen'}},
