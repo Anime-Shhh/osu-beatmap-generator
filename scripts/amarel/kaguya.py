@@ -1,0 +1,67 @@
+"""Matched original-audio Kaguya inference after an Amarel portability repeat."""
+import argparse
+import hashlib
+import random
+import zipfile
+from pathlib import Path
+import numpy as np
+import torch
+from src.dreamer_adapter.contracts import artifact_path, digest, write_json
+from src.dreamer_adapter.evaluate import decode
+from src.dreamer_adapter.metrics import native_metrics, summarize
+from src.v2.evaluation import RosuDifficultyCalculator
+from src.v2.mapspec import mapspec_from_osu
+
+
+@torch.inference_mode()
+def run(checkpoint, output):
+    from osu_dreamer.data.load_audio import make_spec, load_wave
+    from osu_dreamer.models.inference.artifact import load_inference
+    output=Path(output);output.mkdir(parents=True,exist_ok=False)
+    torch.set_num_threads(1)
+    archive=artifact_path('/common/users/asj102/osu_project/1147361 Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) [no video].osz')
+    calc=RosuDifficultyCalculator();refs=[]
+    with zipfile.ZipFile(archive) as z:
+        for name in z.namelist():
+            if name.endswith('.osu'):
+                text=z.read(name).decode('utf-8-sig');spec=mapspec_from_osu(text)
+                if spec.general.mode==0:refs.append((abs(calc.calculate(text).stars-4.6),name,text))
+        _,name,text=min(refs);reference=mapspec_from_osu(text)
+        audio=z.read(str(Path(name).parent/reference.general.audio_filename))
+    expected='6ee5686d629635b982d5ccd97e4bcac5a7fa01969ab13c37587ef180b90bbe17'
+    assert hashlib.sha256(audio).hexdigest()==expected,'original Kaguya audio changed'
+    audio_path=output/'audio.mp3';audio_path.write_bytes(audio)
+    features=torch.tensor(make_spec(load_wave(audio_path)),device='cuda',dtype=torch.float32)
+    d=reference.difficulty;labels=torch.tensor([[4.6,d.approach_rate,d.overall_difficulty,d.circle_size,d.hp_drain_rate]],device='cuda')
+    result={}
+    for name,path in [('published',artifact_path('/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt')),('amarel-repeat',Path(checkpoint))]:
+        model=load_inference(path).cuda().eval();rows=[];texts={}
+        for seed in (1731,1732,1733,1734):
+            torch.manual_seed(seed);np.random.seed(seed);random.seed(seed)
+            signals,settings=model.sample(features,labels,8)
+            try:text=decode(signals[0].cpu().numpy(),settings[0].cpu().numpy(),name+' experimental')
+            except (ZeroDivisionError,ValueError):text=''
+            metrics=native_metrics(text,reference,4.6)
+            rows.append(dict(group='kaguya-development',seed=seed,metrics=metrics));texts[seed]=text
+        measurable=[r for r in rows if r['metrics']['stars'] is not None and texts[r['seed']]]
+        chosen=min(measurable,key=lambda r:abs(r['metrics']['stars']-4.6)) if measurable else None
+        delivery=None
+        if chosen:
+            text=texts[chosen['seed']];stars=chosen['metrics']['stars']
+            import re
+            for key,value in [('Title','DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size)'),('Artist','Suzuki Masayuki'),('BeatmapID','0'),('BeatmapSetID','-1'),('Version',f'{name} {stars:.2f} stars (4.6 requested)')]:
+                text=re.sub(r'(?m)^'+key+r'\s*:.*$',key+': '+value,text)
+            (output/(name+'.osu')).write_text(text)
+            packaged=output/(name+'.osz')
+            with zipfile.ZipFile(packaged,'w',zipfile.ZIP_DEFLATED) as z:z.writestr('audio.mp3',audio);z.writestr(name+'.osu',text)
+            with zipfile.ZipFile(packaged) as z:assert z.testzip() is None and hashlib.sha256(z.read('audio.mp3')).hexdigest()==expected
+            delivery=dict(seed=chosen['seed'],stars=stars,target_pass=abs(stars-4.6)<=.2,sha256=digest(packaged),invalid=chosen['metrics']['invalid'])
+        result[name]=dict(checkpoint_sha256=digest(path),summary=summarize(rows),rows=rows,selected=delivery)
+        write_json(output/'comparison.json',dict(audio_sha256=expected,requested_stars=4.6,target_tolerance=.2,results=result,pretraining_overlap='unknown',purpose='Amarel portability repeat; no model promotion'))
+        print(name,result[name]['summary'],flush=True)
+        del model;torch.cuda.empty_cache()
+    audio_path.unlink()
+
+
+if __name__=='__main__':
+    p=argparse.ArgumentParser();p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);run(**vars(p.parse_args()))
