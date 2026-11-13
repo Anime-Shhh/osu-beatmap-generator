@@ -9,5 +9,5 @@
 #SBATCH --time=02:00:00
 set -euo pipefail
 source "$SLURM_SUBMIT_DIR/scripts/amarel/environment.sh"
-cd "$OSU_PROJECT_ROOT/repo"
+cd "$OSU_REPO_ROOT"
 python -m scripts.upstream_comparison.train --root "$OSU_PROJECT_ROOT/upstream" --output "$OSU_PROJECT_ROOT/runs/dreamer-$SLURM_JOB_ID" --kind dreamer --steps 2000 --seconds 5400

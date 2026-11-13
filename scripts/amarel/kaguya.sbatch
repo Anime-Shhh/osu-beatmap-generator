@@ -9,5 +9,5 @@
 #SBATCH --time=00:20:00
 set -euo pipefail
 source "$SLURM_SUBMIT_DIR/scripts/amarel/environment.sh"
-cd "$OSU_PROJECT_ROOT/repo"
+cd "$OSU_REPO_ROOT"
 python -m scripts.amarel.kaguya --checkpoint "$1" --output "$OSU_PROJECT_ROOT/runs/kaguya-$SLURM_JOB_ID"
