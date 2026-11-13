@@ -4,19 +4,19 @@ Focus: the non-autoregressive audio/native flow pipeline, the joint dreamer base
 
 ## What 27× means
 
-It counts time positions, not the total number of learned parameters or a guaranteed speedup. A chart starts as nine signals sampled every98/16384seconds, about5.98ms. Dreamer's chart encoder projects those channels into an internal feature width and applies three temporal reductions. In `UNetEncoder`, each stage processes features, applies a learned depthwise convolution, and then `AvgPool1d(3)` averages each group of three positions. Thus a sequence with27,000 positions becomes9,000, then3,000, then1,000. The temporal head projects each remaining position into six latent values, followed by RMS normalization. A separate style head produces32 values shared across the chart.
+It counts time positions, not the total number of learned parameters or a guaranteed speedup. A chart starts as nine signals sampled every 98/16384 seconds, about 5.98 ms. Dreamer's chart encoder projects those channels into an internal feature width and applies three temporal reductions. In `UNetEncoder`, each stage processes features, applies a learned depthwise convolution, and then `AvgPool1d(3)` averages each group of three positions. Thus a sequence with 27,000 positions becomes 9,000, then 3,000, then 1,000. The temporal head projects each remaining position into six latent values, followed by RMS normalization. A separate style head produces 32 values shared across the chart.
 
-The result has shape `[6, 1000]` in that example, not one vector of six values for the entire song. Learned filtering mixes neighboring information before pooling; these are not independent fixed summaries of individual27-frame chunks.
+The result has shape `[6, 1000]` in that example, not one vector of six values for the entire song. Learned filtering mixes neighboring information before pooling; these are not independent fixed summaries of individual 27-frame chunks.
 
-The decoder projects the six channels back to an internal width and applies three3× upsampling stages. Its `nn.Upsample(scale_factor=3)` repeats positions by default; convolution and learned processing refine the expanded features. At matching resolutions, the decoder also receives audio-encoder skip features. The final projection produces nine chart signals. Native decoding turns those signals into objects and curves.
+The decoder projects the six channels back to an internal width and applies three 3× upsampling stages. Its `nn.Upsample(scale_factor=3)` repeats positions by default; convolution and learned processing refine the expanded features. At matching resolutions, the decoder also receives audio-encoder skip features. The final projection produces nine chart signals. Native decoding turns those signals into objects and curves.
 
-This is learned, lossy compression. The decoder does not mathematically recover all discarded information. It uses learned chart regularities, the style code and audio features to reconstruct details. One compressed position spans roughly161.5ms, but the decoded timeline returns to about5.98ms frames and can represent multiple objects within that interval.
+This is learned, lossy compression. The decoder does not mathematically recover all discarded information. It uses learned chart regularities, the style code and audio features to reconstruct details. One compressed position spans roughly 161.5 ms, but the decoded timeline returns to about 5.98 ms frames and can represent multiple objects within that interval.
 
 ## Which encoder encodes what?
 
 The chart encoder compresses a human map during codec training and latent-target preparation. Independent generation does not require that human map: the generator samples a new temporal latent from noise, conditioned on audio and style.
 
-The audio encoder is a separate network. It extracts useful musical features at multiple resolutions. Its features guide both the latent generator and final decoder. An encoder is any learned transformation into another representation; it need not reduce dimensions. In our earlier flow code, the audio path initially expands101 feature channels into128 while preserving the10ms timeline.
+The audio encoder is a separate network. It extracts useful musical features at multiple resolutions. Its features guide both the latent generator and final decoder. An encoder is any learned transformation into another representation; it need not reduce dimensions. In our earlier flow code, the audio path initially expands 101 feature channels into 128 while preserving the 10 ms timeline.
 
 ## What our existing flow architecture does
 
@@ -36,11 +36,11 @@ Thus iterative noise-to-output generation is present in both rhythm and geometry
 | Generated state | Dense onset values, then explicit geometry | Six-channel compressed temporal latent |
 | Rhythm/placement relationship | Placement receives already-selected events | Shared latent represents timing and movement together |
 | Audio access | Rhythm and geometry both receive audio | Generator receives audio and decoder receives multiscale audio skips |
-| Context |20.48s rhythm windows and64-event geometry windows | Compressed whole-song inference |
+| Context | 20.48 s rhythm windows and 64-event geometry windows | Compressed whole-song inference |
 | Sampling method | Linear-path flow matching | Distance/direction field with eight-step distance marching |
 | AE/VAE | No joint chart autoencoder in this pipeline | Ordinary pretrained codec; our optional VAE changes the temporal posterior |
 
-In our VAE trial, the encoder predicts mean and variance for each temporal code value, samples a code during training, and adds KL divergence regularization. This changes the codec, not the role of the separate generator. The latest2,000-update dreamer fine-tune retained the published codec and added no VAE or KL term.
+In our VAE trial, the encoder predicts mean and variance for each temporal code value, samples a code during training, and adds KL divergence regularization. This changes the codec, not the role of the separate generator. The latest 2,000-update dreamer fine-tune retained the published codec and added no VAE or KL term.
 
 ## Current decision
 
