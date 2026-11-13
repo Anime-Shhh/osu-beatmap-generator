@@ -1,0 +1,165 @@
+{
+  "config": {
+    "kind": "geometry",
+    "smoke": false,
+    "seed": 1731,
+    "max_steps": 2000,
+    "max_seconds": 5400,
+    "batch": 32,
+    "microbatch": 8,
+    "lr": 3e-05,
+    "precision": "bf16",
+    "clip": 1.0,
+    "selection": "fixed final update; no Kaguya selection",
+    "upstream_commit": "532dc5d3026d23bf1578e7b1ba755ee4471b8d78",
+    "crop": 128,
+    "ema": 0.9999,
+    "weight_decay": 0.0,
+    "conditioning": "null style; real times/types/spacing",
+    "frozen": "existing class embedding table",
+    "sources": 632,
+    "charts": 2725,
+    "initial_checkpoint_sha256": "4c309a440de094271bb39fda38f448319bbaa872b8607447129740ee7b09b928"
+  },
+  "binding": {
+    "upstream": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+    "weights": "010b3d80cdce13550dccd5f3f6677cd5dab7df5fd98fdd5c9d3e8e5ba6c149b6",
+    "features": "dreamer-v8-resonators-0.1.1-16384-98-72-u8",
+    "manifest": "7a0a8042ef53a8faf6575ae15ca83b5462fc365f0f4d6f5ed7658cfa67adb4c0",
+    "codec": "upstream",
+    "normalization": null
+  },
+  "conversion_failures": [
+    {
+      "chart": "a2a6da47ec80178141bc7a0930090b8a0434e4a410c682ec40383eb959853c44",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "cb16f45c6f481baf8932f72f2e7d101dda319dd139eb6b3a0825fd6f2e9ca222",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "a2d68058eead0ace458bd9b63af3de9bb3771cc438af834fdf8db4238b5f0bed",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "212d0109d3430fd72f669d8e1019dce934975688d1e4a4239867a8345a53bfe6",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "e54102232e6b4259c9fec426dbb3be9bb0ec940f5349b5a9f7e56635bd59ca27",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "0de44c104114b82606d56338a3be15dfda50db4d565ada796c75c33cf272dae9",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "4c6b780e49ab08a3e639417782b1d901f0f90ef37e4bfab1e4e0ca59b9db5d1e",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "68b15f45519f5db33cd3d488e8a0200e8aed34f7c93b796239c5661bf390ba1d",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "63d87c5091a1dd361e6a521992e6e9614e952c43fe0e1b1b5cc0ae171eb37859",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "cc9ae022bee4dc62bb8f4ccf4f789202498598aa44a85a970d54fbc44f48bbf3",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "05ca125de0d171dd8a12062adcf0c2df93e02119e34a64fe3fe64f1d87e6db2e",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "bcf6fdfb2a3b5f3815d33bd91e84a601b20dd41bb577525ad547204734a17d95",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "fb89b79cc8e4f4b5c32737a307f6f7bc54a572ba28c6bdf0da96b964097a8fba",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "faeced15462f6112c6a8d362dd503395288a27fd15582f6612e60b6880040aea",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "1c368fca457e082443f18a710917cddfe6d40e545311fd94856c32fbdcf66f32",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "98d778cf7f7378de81914970db916a920271e1036807b0bf64f34c1d5b3e8b69",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "f1365392ebe06b7881d263b69bb65c3c3d245c2e60fd2a1bd6319299323e46ba",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "ba3cdb2a0c22d00f95444e3555e734028ebe7580dddc162742274368ad14620b",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "13831b001e71c7f842ebabc66f893360f05c39f8c4fe43f7ebcbce72a61d153a",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "2cf4e02c25157346fe9d57e42a9c4e699f9b7643496289ecc4435cc9c346b1cf",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "4cb31fb7179e72725b6b3c84fc48479bfe9a25c4d8302187417986c33020708c",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "e908a5f384e9ccfcc89c67f8ad3f3a9fb0d6adaabd1d9cff12ab581fa4f0d780",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "8293ca68ec9d83e3259ac79e7c800394e9292fd31b90754bdb7a6449cf85cde3",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "48ffea59ab7e50020fdb13e09817095ddeffeefbd53bbbebdf4ec635084d1fae",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "c862ca40032093f4827af1678b63be8a2002b735a392faa71644d1ecc0c13041",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "be1970d30f49f3d7be8a99ffefdd93c1d9cbd76e42184f7d21ba348cb9c4de8f",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "2502aa4d8559faa13999f28399497d5007fe77faf8eb8f4816ddf6c92c065b80",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "b015e1f91c86f549d2d7d44df6da766bc788522a0873ad2324c3a9363bcf0366",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "a933989dec71074964da5ce6edf020fee72072ebad6534ddab56952510f2bd9c",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "72c1d47bee680b8ff78ae7103f4d49cfa165fb0f51ead649e6f329b245cc71aa",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "38a8b4f2ec4d2de2b2bcc518c3fed3ff54b6fa0346eda19c50612992fe32c1be",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    },
+    {
+      "chart": "b25dcc8f6d7989d4379b633b11f5f3a36e1f181b94080fd8b23ac08532bb76d2",
+      "error": "ValueError('fewer than 128 sequence elements')"
+    }
+  ],
+  "gpu": "NVIDIA RTX 4500 Ada Generation",
+  "cache": "RAM only",
+  "kaguya_excluded": true
+}

@@ -110,3 +110,12 @@ fixed smoke1062087 passed on A10040GB and retained invalid-output diagnostics.
 Full pipeline begins with frozen baseline evaluation, then gated training.
 Read pilot-status.json and pilot-1062088.log before any new submissions; do not
 change the running source or reset the shared GPU budget. No quality gain yet.
+
+November 9 upstream comparison completed: see docs/upstream-comparison-results-2026-11-09.md.
+Both osu-dreamer v8 and OliBomby/osu-diffusion completed 2,000-update pretrained
+fine-tuning, jobs1087334/1087335, followed by successful Kaguya comparison1087336.
+All related jobs ended successfully. Six hash/audio-verified archives and report
+are on the Mac in osu-beatmap-generator/codex files/upstream-kaguya-20261107/.
+Dreamer selected4.24 stars for4.6 request; geometry with human rhythm4.58, generated
+chain4.34. Human-rhythm timing scores are inherited, not audio generation results.
+All geometry exports retain strict native validation findings. No model promoted.
