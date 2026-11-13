@@ -239,3 +239,37 @@ def test_decoder_zero_duration_is_invalid_not_dropped():
     with patch('src.dreamer_adapter.evaluate.decode',side_effect=ZeroDivisionError('duration')):
         r=score_signal(None,None,mapspec_from_osu(OSU),4.5)
     assert r['invalid'] and r['onsets']['25']['matches']==0
+
+
+def test_relocated_artifacts_preserve_identity_and_fail_closed(tmp_path, monkeypatch):
+    from src.dreamer_adapter.contracts import artifact_path, identity
+    original = '/common/home/asj102/native/chart.osu'
+    manifest = {'native_path': original, 'sha256': 'unchanged'}
+    before = identity(manifest)
+    monkeypatch.setenv('OSU_ARTIFACT_ROOT', str(tmp_path))
+    resolved = artifact_path(original)
+    assert resolved == tmp_path / 'common/home/asj102/native/chart.osu'
+    assert identity(manifest) == before
+    with pytest.raises(FileNotFoundError):
+        digest(resolved)
+    resolved.parent.mkdir(parents=True)
+    resolved.write_text('native contents')
+    assert digest(resolved) == digest(artifact_path(original))
+    assert artifact_path('/scratch/asj102/local') == Path('/scratch/asj102/local')
+    with pytest.raises(ValueError):
+        artifact_path('/common/home/../secret')
+    monkeypatch.setenv('OSU_ARTIFACT_ROOT', 'relative')
+    with pytest.raises(ValueError):
+        artifact_path(original)
+
+
+def test_explicit_cluster_storage_gate(tmp_path, monkeypatch):
+    from src.dreamer_adapter.contracts import require_space
+    from types import SimpleNamespace
+    monkeypatch.setenv('OSU_STORAGE_ROOT', str(tmp_path))
+    with patch('shutil.disk_usage', return_value=SimpleNamespace(free=9*1024**3)):
+        assert require_space(8) == 9*1024**3
+    with patch('shutil.disk_usage', return_value=SimpleNamespace(free=7*1024**3)):
+        with pytest.raises(RuntimeError):require_space(8)
+    monkeypatch.setenv('OSU_STORAGE_ROOT', 'relative')
+    with pytest.raises(ValueError):require_space(8)

@@ -1,3 +1,4 @@
+from .contracts import artifact_path
 import json
 import random
 from pathlib import Path
@@ -23,7 +24,7 @@ def read_manifest(path,verify=False):
         for a in m['audio'].values():
             if digest(path.parent/a['path'])!=a['sha256']:raise ValueError('audio feature changed')
         for r in m['rows']:
-            if digest(path.parent/r['map_path'])!=r['map_sha256'] or digest(r['native_path'])!=r['sha256']:
+            if digest(path.parent/r['map_path'])!=r['map_sha256'] or digest(artifact_path(r['native_path']))!=r['sha256']:
                 raise ValueError('chart changed')
     return m
 
@@ -51,7 +52,7 @@ def selected_rows(m,split):
 def freeze_references(frozen, available):
     """Select from all originally eligible native charts, never surviving conversions."""
     from osu_dreamer.osu.beatmap import Beatmap
-    native_root=Path(available[0]['native_path']).parent
+    native_root=artifact_path(available[0]['native_path']).parent
     choices={s:{} for s in ('val','test')}
     for split in choices:
         for group in frozen['groups'][split]:

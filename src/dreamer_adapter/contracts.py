@@ -7,6 +7,25 @@ import subprocess
 from . import UPSTREAM_COMMIT, UPSTREAM_WEIGHTS, FEATURE_KEY
 
 
+def artifact_path(path):
+    """Resolve a copied iLab artifact without rewriting its provenance manifest.
+
+    OSU_ARTIFACT_ROOT contains the original common/... directory hierarchy.
+    Explicit relocation never falls back to an original path if a copy is absent.
+    Content verification remains the caller's responsibility.
+    """
+    path = Path(path)
+    root = os.environ.get('OSU_ARTIFACT_ROOT')
+    if root and path.is_absolute() and path.parts[1:2] == ('common',):
+        if '..' in path.parts:
+            raise ValueError('artifact path must not contain parent traversal')
+        root = Path(root)
+        if not root.is_absolute():
+            raise ValueError('OSU_ARTIFACT_ROOT must be absolute')
+        return root / path.relative_to('/')
+    return path
+
+
 def digest(path):
     h = hashlib.sha256()
     with Path(path).open('rb') as f:
@@ -46,6 +65,17 @@ def quota_free_bytes():
 
 
 def require_space(gib=8):
+    storage_root = os.environ.get('OSU_STORAGE_ROOT')
+    if storage_root:
+        # Explicit cluster relocation. This is filesystem availability, not a user quota claim.
+        import shutil
+        root = Path(storage_root)
+        if not root.is_absolute() or not root.is_dir():
+            raise ValueError('OSU_STORAGE_ROOT must name an existing absolute directory')
+        free = shutil.disk_usage(root).free
+        if free < gib*1024**3:
+            raise RuntimeError(f'Storage filesystem free {free/1024**3:.2f} GiB < {gib}')
+        return free
     free = quota_free_bytes()
     if free < gib*1024**3: raise RuntimeError(f'Home quota free {free/1024**3:.2f} GiB < {gib}')
     return free

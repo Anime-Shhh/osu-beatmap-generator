@@ -1,3 +1,4 @@
+from .contracts import artifact_path
 import contextlib
 import functools
 import io
@@ -83,7 +84,7 @@ def evaluate(manifest,upstream,output,codec_path=None,generator_path=None,split=
     from .data import load_pair
     for row in rows:
         audio,x,labels=load_pair(root,m,row);audio,x=audio.cuda(),x.cuda()
-        reference=mapspec_from_osu(Path(row['native_path']).read_text(encoding='utf-8-sig'))
+        reference=mapspec_from_osu(artifact_path(row['native_path']).read_text(encoding='utf-8-sig'))
         # Match the target's actual difficulty/profile; no chart events or clock enter generation.
         request=labels[None].cuda()
         otherrow=min((r for r in rows if r['group']!=row['group']),key=lambda r:abs(m['audio'][r['audio_key']]['frames']-audio.shape[-1]))

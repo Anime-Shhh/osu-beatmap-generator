@@ -2,6 +2,7 @@
 import hashlib
 import time
 from pathlib import Path
+from .contracts import artifact_path
 from .contracts import write_json,digest
 from .data import read_manifest,selected_rows
 from .generate import generate
@@ -14,7 +15,7 @@ def examples(manifest,upstream,output,codec_path=None,generator_path=None,second
     m=read_manifest(manifest);wanted={}
     # Select identities before inference; never choose by matching human events.
     for r in selected_rows(m,'val'):
-        spec=mapspec_from_osu(Path(r['native_path']).read_text(encoding='utf-8-sig'))
+        spec=mapspec_from_osu(artifact_path(r['native_path']).read_text(encoding='utf-8-sig'))
         if spec.general.audio_filename.lower().endswith('.mp3'):wanted[r['audio_key']]=r
         if len(wanted)==2:break
     if len(wanted)!=2:raise ValueError('two MP3 validation sources required')

@@ -5,6 +5,7 @@ import math
 from pathlib import Path
 import time
 import numpy as np
+from .contracts import artifact_path
 from .contracts import write_json,digest
 from .data import read_manifest,selected_rows,load_pair
 from scripts.compare_native_rhythm import compare,events_of
@@ -73,7 +74,7 @@ def diagnostics(manifest,output,beat_checkpoint=None,beat_checkpoint_sha256=None
     m=read_manifest(manifest,verify=True);rows=selected_rows(m,'val');cases=[];started=time.monotonic()
     for row in rows:
         a,_,_=load_pair(Path(manifest).parent,m,row)
-        native=mapspec_from_osu(Path(row['native_path']).read_text(encoding='utf-8-sig'))
+        native=mapspec_from_osu(artifact_path(row['native_path']).read_text(encoding='utf-8-sig'))
         truth=events_of(native);base=score_components(truth,truth,native.timing_map,a.numpy())
         for name,component,events in corruptions(truth):
             score=score_components(events,truth,native.timing_map,a.numpy())[component]
@@ -85,7 +86,7 @@ def diagnostics(manifest,output,beat_checkpoint=None,beat_checkpoint_sha256=None
         from src.v2.mapspec import compile_osu
         from src.v2.evaluation import RosuDifficultyCalculator
         calc=RosuDifficultyCalculator()
-        original_text=Path(row['native_path']).read_text(encoding='utf-8-sig')
+        original_text=artifact_path(row['native_path']).read_text(encoding='utf-8-sig')
         original_stars=calc.calculate(original_text).stars
         altered=replace(native,difficulty=replace(native.difficulty,circle_size=max(0,native.difficulty.circle_size-2)))
         changed_stars=calc.calculate(compile_osu(altered,validate=False)).stars
@@ -124,7 +125,7 @@ def diagnostics(manifest,output,beat_checkpoint=None,beat_checkpoint_sha256=None
             wave,sr=load_audio(path);beats,downbeats=tracker(wave[0].numpy(),sr)
         finally:path.unlink(missing_ok=True)
         clock=clock_candidate(np.asarray(beats)*1000,np.asarray(downbeats)*1000)
-        row=wanted.pop(key);text=Path(row['native_path']).read_text(encoding='utf-8-sig');spec=mapspec_from_osu(text)
+        row=wanted.pop(key);text=artifact_path(row['native_path']).read_text(encoding='utf-8-sig');spec=mapspec_from_osu(text)
         segments=spec.timing_map.segments;constant=all(abs(s.beat_length_ms-segments[0].beat_length_ms)<1e-6 and s.meter==4 for s in segments)
         record={'group':row['group'],'clock':clock,'reference_constant_4_4':constant}
         if constant and clock.get('accepted'):

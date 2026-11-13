@@ -3,7 +3,7 @@ import argparse, copy, json, random, sys, time
 from pathlib import Path
 import numpy as np
 import torch
-from src.dreamer_adapter.contracts import digest, write_json, require_space, bind
+from src.dreamer_adapter.contracts import digest, write_json, require_space, bind, artifact_path
 from src.dreamer_adapter.data import read_manifest, load_pair
 from src.dreamer_adapter.model import load_upstream, pad
 from src.dreamer_adapter.train import save_torch
@@ -13,11 +13,11 @@ def run(root, output, kind, steps=2000, seconds=5400, seed=1731, smoke=False):
     root=Path(root); output=Path(output); output.mkdir(parents=True,exist_ok=False)
     require_space(); torch.set_num_threads(1); torch.manual_seed(seed); random.seed(seed); np.random.seed(seed)
     torch.set_float32_matmul_precision('high')
-    manifest=Path('/common/home/asj102/osu_flow_runs/pilot_20261105/cache-compact/manifest.json')
+    manifest=artifact_path('/common/home/asj102/osu_flow_runs/pilot_20261105/cache-compact/manifest.json')
     m=read_manifest(manifest,verify=True); started=time.monotonic()
     training_rows=[r for r in m['rows'] if r['split']=='train']
     if smoke:training_rows=training_rows[:16]
-    upstream='/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt'
+    upstream=artifact_path('/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt')
     config=dict(kind=kind,smoke=smoke,seed=seed,max_steps=steps,max_seconds=seconds,batch=32,microbatch=8,lr=3e-5,
                 precision='bf16',clip=1.,selection='fixed final update; no Kaguya selection',
                 upstream_commit='0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc' if kind=='dreamer' else '532dc5d3026d23bf1578e7b1ba755ee4471b8d78')
@@ -52,7 +52,7 @@ def run(root, output, kind, steps=2000, seconds=5400, seed=1731, smoke=False):
         for i,r in enumerate(training_rows):
             if r['split']!='train':continue
             try:
-                seq=beatmap_to_sequence(Beatmap.from_path(r['native_path']))
+                seq=beatmap_to_sequence(Beatmap.from_path(artifact_path(r['native_path'])))
                 if seq.shape[-1]<128:raise ValueError('fewer than 128 sequence elements')
                 groups.setdefault(r['group'],[]).append(seq)
             except Exception as e:failures.append({'chart':r['sha256'],'error':repr(e)})

@@ -119,3 +119,10 @@ are on the Mac in osu-beatmap-generator/codex files/upstream-kaguya-20261107/.
 Dreamer selected4.24 stars for4.6 request; geometry with human rhythm4.58, generated
 chain4.34. Human-rhythm timing scores are inherited, not audio generation results.
 All geometry exports retain strict native validation findings. No model promoted.
+
+November13 direction: use Amarel for new work, and focus on joint dreamer-style
+non-autoregressive generation. Historical V2 code remains but is not the training
+focus. See docs/amarel-migration-2026-11-13.md and scripts/amarel/. The user has
+authorized copying verified data/checkpoints to their Amarel account. Preserve
+iLab originals and existing manifest/checkpoint identities. Use the user's sole
+Git author/committer identity; do not add co-author attribution.
