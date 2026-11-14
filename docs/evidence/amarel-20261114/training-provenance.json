@@ -1,0 +1,35 @@
+{
+  "config": {
+    "kind": "dreamer",
+    "smoke": false,
+    "seed": 1731,
+    "max_steps": 2000,
+    "max_seconds": 5400,
+    "batch": 32,
+    "microbatch": 8,
+    "lr": 3e-05,
+    "precision": "bf16",
+    "clip": 1.0,
+    "selection": "fixed final update; no Kaguya selection",
+    "upstream_commit": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+    "crop": 152,
+    "ema": 0.99,
+    "codec": "unchanged upstream RMS-normalized",
+    "weight_decay": 0.01,
+    "sources": 633,
+    "charts": 2757,
+    "initial_checkpoint_sha256": "010b3d80cdce13550dccd5f3f6677cd5dab7df5fd98fdd5c9d3e8e5ba6c149b6"
+  },
+  "binding": {
+    "upstream": "0ec0b8e72fb1642fc3ecb365a61df4ec36e060dc",
+    "weights": "010b3d80cdce13550dccd5f3f6677cd5dab7df5fd98fdd5c9d3e8e5ba6c149b6",
+    "features": "dreamer-v8-resonators-0.1.1-16384-98-72-u8",
+    "manifest": "7a0a8042ef53a8faf6575ae15ca83b5462fc365f0f4d6f5ed7658cfa67adb4c0",
+    "codec": "upstream",
+    "normalization": null
+  },
+  "conversion_failures": [],
+  "gpu": "NVIDIA L40S",
+  "cache": "RAM only",
+  "kaguya_excluded": true
+}
