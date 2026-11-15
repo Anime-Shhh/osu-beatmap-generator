@@ -11,7 +11,7 @@ set -euo pipefail
 source "$SLURM_SUBMIT_DIR/scripts/amarel/environment.sh"
 cd "$OSU_REPO_ROOT"
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONUNBUFFERED=1
-DATA_DIR="$OSU_ARTIFACT_ROOT/common/users/asj102/osu_project/v2_runs/run_20261014_real/data_300"
+DATA_DIR="$OSU_PROJECT_ROOT/datasets/v2-ranked-20261115"
 RUN_DIR="$OSU_PROJECT_ROOT/runs/v2-$SLURM_JOB_ID"
 mkdir "$RUN_DIR"
 python -m pip freeze > "$RUN_DIR/environment.txt"
