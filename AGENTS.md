@@ -126,3 +126,11 @@ focus. See docs/amarel-migration-2026-11-13.md and scripts/amarel/. The user has
 authorized copying verified data/checkpoints to their Amarel account. Preserve
 iLab originals and existing manifest/checkpoint identities. Use the user's sole
 Git author/committer identity; do not add co-author attribution.
+
+November 15: the user explicitly requested a fresh autoregressive V2 retrain on
+Amarel and independent-generation comparison with published/fine-tuned Dreamer.
+This authorizes V2 training for this experiment despite the earlier pivot.
+See docs/v2-amarel-retrain-2026-11-15.md. Do not use synthetic historical weights,
+compare teacher-forced token accuracy to generation F1, or claim equal training
+data/pretraining budgets. Branch names on GitHub now have no `codex/` prefix;
+the active branch is `audio-native-flow`.
