@@ -15,7 +15,18 @@ DATA_DIR="$OSU_PROJECT_ROOT/datasets/v2-ranked-20261115"
 RUN_DIR="$OSU_PROJECT_ROOT/runs/v2-$SLURM_JOB_ID"
 mkdir "$RUN_DIR"
 python -m pip freeze > "$RUN_DIR/environment.txt"
-git rev-parse HEAD > "$RUN_DIR/source.txt"
+python - "$RUN_DIR" <<'PYINFO'
+import json,re,sys
+from pathlib import Path
+import torch
+repo=Path.cwd()
+gitdir=Path((repo/'.git').read_text().removeprefix('gitdir: ').strip())
+revision=(gitdir/'HEAD').read_text().strip()
+if not re.fullmatch('[0-9a-f]{40}',revision):
+    raise ValueError('Training requires an immutable detached source worktree')
+root=Path(sys.argv[1]);(root/'source.txt').write_text(revision+'\n')
+(root/'hardware.json').write_text(json.dumps({'gpu_names':[torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())], 'torch':torch.__version__,'cuda':torch.version.cuda},indent=2))
+PYINFO
 python -c 'from pathlib import Path; import sys; from scripts.amarel.compare_v2 import checked_songs; checked_songs(Path(sys.argv[1]))' "$RUN_DIR"
 FEATURE_PIPELINE_KEY=$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["feature_pipeline_key"])' "$DATA_DIR/materialization.json")
 NUM_GPUS=$(python -c 'import torch; print(torch.cuda.device_count())')
