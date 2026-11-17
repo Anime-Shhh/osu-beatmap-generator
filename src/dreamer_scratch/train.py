@@ -234,9 +234,47 @@ def encode(args,binding):
     write_json(root/'manifest.json',dict(binding=binding,codec_sha256=digest(p),rows=records,bytes=size))
 
 
+
+@torch.inference_mode()
+def evaluate(args,binding):
+    from src.dreamer_adapter.contracts import artifact_path
+    from src.dreamer_adapter.metrics import native_metrics,summarize
+    from src.dreamer_adapter.evaluate import decode
+    from src.dreamer_adapter.model import intervene
+    from src.v2.mapspec import mapspec_from_osu
+    from osu_dreamer.models.inference.artifact import load_inference
+    run=Path(args.run);p=run/'scratch-inference.pt'
+    export=json.loads((run/'export.json').read_text())
+    if export['binding']!=binding or digest(p)!=export['sha256']:raise ValueError('scratch export identity mismatch')
+    model=load_inference(p).cuda().eval();m=read_manifest(args.manifest)
+    rows=selected_rows(m,'val');records=[];out=run/'validation';out.mkdir(exist_ok=False)
+    for index,row in enumerate(rows):
+        a,_,labels=load_pair(Path(args.manifest).parent,m,row);a=a.cuda()
+        other=load_pair(Path(args.manifest).parent,m,rows[(index+1)%len(rows)])[0].cuda()
+        reference=mapspec_from_osu(artifact_path(row['native_path']).read_text(encoding='utf-8-sig'))
+        best_text=None;best_error=float('inf')
+        for condition in ('aligned','wrong'):
+            audio=intervene(a,condition,other)
+            for seed in (1731,1732,1733,1734):
+                random.seed(seed);np.random.seed(seed);torch.manual_seed(seed)
+                signal,settings=model.sample(audio,labels[None].cuda(),8)
+                try:text=decode(signal[0].cpu().numpy(),settings[0].cpu().numpy(),'Dreamer from scratch')
+                except (ValueError,ZeroDivisionError):text=''
+                metrics=native_metrics(text,reference,float(labels[0]))
+                records.append(dict(group=row['group'],seed=seed,condition=condition,metrics=metrics))
+                if condition=='aligned' and not metrics['invalid'] and metrics['star_error']<best_error:
+                    best_text=text;best_error=metrics['star_error']
+                with (out/'records.jsonl').open('a') as f:f.write(json.dumps(records[-1])+'\n')
+        if best_text:(out/(str(index)+'.osu')).write_text(best_text)
+        print(json.dumps({'validation_sources_completed':index+1}),flush=True)
+    write_json(out/'metrics.json',dict(binding=binding,checkpoint_sha256=digest(p),split='val',sources=len(rows),
+        test_used=False,rows=records,summaries={c:summarize([r for r in records if r['condition']==c]) for c in ('aligned','wrong')},
+        quality='reference similarity and audio-intervention diagnostics, not a human-quality score'))
+
+
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('stage',choices=['codec','encode','generator','style','export'])
+    p.add_argument('stage',choices=['codec','encode','generator','style','export','evaluate'])
     for name in ('upstream','manifest','run'):p.add_argument('--'+name,required=True)
     p.add_argument('--seed',type=int,default=1731);p.add_argument('--smoke',action='store_true')
     args=p.parse_args();torch.set_num_threads(1)
@@ -252,7 +290,8 @@ def main():
     bp=run/'binding.json'
     if bp.exists() and json.loads(bp.read_text())!=binding:raise ValueError('run binding mismatch')
     if not bp.exists() and int(os.environ.get('LOCAL_RANK','0'))==0:write_json(bp,binding)
-    if args.stage=='encode':encode(args,binding)
+    if args.stage=='evaluate':evaluate(args,binding)
+    elif args.stage=='encode':encode(args,binding)
     elif args.stage=='export':
         paths=[best(run,s) for s in ('codec','generator','style')]
         parents=[]
