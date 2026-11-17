@@ -3,6 +3,7 @@
 No published checkpoint is accepted. Parent weights must belong to this run.
 """
 import argparse
+from dataclasses import asdict, is_dataclass
 import hashlib
 import json
 import random
@@ -19,7 +20,7 @@ import yaml
 
 from src.dreamer_adapter.contracts import digest, write_json
 from src.dreamer_adapter.data import read_manifest, load_pair, selected_rows
-from osu_dreamer.models.inference.artifact import dataclass_from_dict, save_inference
+from osu_dreamer.models.inference.artifact import dataclass_from_dict
 from osu_dreamer.models.latent.model import LatentModelArgs
 from osu_dreamer.models.latent.train import LatentTrainer
 from osu_dreamer.models.diffusion.model import DiffusionModelArgs
@@ -154,7 +155,9 @@ class Progress(pl.Callback):
 def fit(args, stage, binding):
     pl.seed_everything(args.seed,workers=True)
     model=build(stage,args.upstream)  # Constructors only: no pretrained-weight loader.
-    model.scratch_binding=binding;model.scratch_stage=stage
+    stage_binding=dict(binding)
+    if stage!='codec':stage_binding['codec_sha256']=digest(best(args.run,'codec'))
+    model.scratch_binding=stage_binding;model.scratch_stage=stage
     out=Path(args.run)/stage;out.mkdir(parents=True,exist_ok=True)
     fresh=not (out/'last.ckpt').exists()
     if fresh:
@@ -162,10 +165,12 @@ def fit(args, stage, binding):
         if not (out/'initialization.json').exists():
             if int(os.environ.get('LOCAL_RANK','0'))==0:write_json(out/'initialization.json',init)
         elif json.loads((out/'initialization.json').read_text())!=init:raise ValueError('initialization mismatch')
-    else:check_checkpoint(out/'last.ckpt',binding,stage)
+    else:check_checkpoint(out/'last.ckpt',stage_binding,stage)
     if stage!='codec':
         cache=json.loads((Path(args.run)/'latents/manifest.json').read_text())
         if cache['binding']!=binding or cache['codec_sha256']!=digest(best(args.run,'codec')):raise ValueError('latent cache provenance mismatch')
+        for row in cache['rows']:
+            if digest(Path(args.run)/'latents'/row['file'])!=row['sha256']:raise ValueError('cached latent changed')
     train=Charts(args.manifest,True,args.smoke) if stage=='codec' else Latents(Path(args.run)/'latents',stage,True,args.smoke)
     val=Charts(args.manifest,False,args.smoke) if stage=='codec' else Latents(Path(args.run)/'latents',stage,False,args.smoke)
     devices=torch.cuda.device_count()
@@ -242,7 +247,7 @@ def main():
         head=rp.read_text().strip() if rp.exists() else next(line.split()[0] for line in (git/'packed-refs').read_text().splitlines() if line.endswith(' '+ref))
     if head!=UPSTREAM:raise ValueError('upstream source revision mismatch')
     m=read_manifest(args.manifest,verify=True)
-    binding=dict(schema=SCHEMA,upstream=UPSTREAM,manifest_sha256=digest(args.manifest),seed=args.seed,smoke=args.smoke)
+    binding=dict(schema=SCHEMA,upstream=UPSTREAM,manifest_sha256=digest(args.manifest),seed=args.seed,smoke=args.smoke,program_sha256=digest(__file__),config_sha256={name:digest(Path(args.upstream)/'osu_dreamer/models'/name/'model.yml') for name in ('latent','diffusion','style')})
     run=Path(args.run);run.mkdir(parents=True,exist_ok=True)
     bp=run/'binding.json'
     if bp.exists() and json.loads(bp.read_text())!=binding:raise ValueError('run binding mismatch')
@@ -250,8 +255,21 @@ def main():
     if args.stage=='encode':encode(args,binding)
     elif args.stage=='export':
         paths=[best(run,s) for s in ('codec','generator','style')]
-        for path,stage in zip(paths,('codec','generator','style')):check_checkpoint(path,binding,stage)
-        save_inference(*map(str,paths),str(run/'scratch-inference.pt'))
+        parents=[]
+        for path,stage in zip(paths,('codec','generator','style')):
+            expected=dict(binding)
+            if stage!='codec':expected['codec_sha256']=digest(paths[0])
+            parents.append(check_checkpoint(path,expected,stage))
+        codec,generator,style=parents
+        keys=['emb_dim','style_dim','n_downs','stride','latent_args']
+        hp={k:codec['hyper_parameters'][k] for k in keys}
+        hp.update(diffusion_args=generator['hyper_parameters']['diffusion_args'],style_args=style['hyper_parameters']['style_args'])
+        hp={k:asdict(v) if is_dataclass(v) else v for k,v in hp.items()}
+        state={k:v for k,v in codec['state_dict'].items() if k.startswith('latent.')}
+        for parent,prefix in [(generator,'diffusion'),(style,'style')]:
+            stem=prefix+'_ema.module.'
+            state.update({prefix+'.'+k.removeprefix(stem):v for k,v in parent['state_dict'].items() if k.startswith(stem)})
+        torch.save(dict(hparams=hp,state_dict=state,from_scratch=binding),run/'scratch-inference.pt')
         write_json(run/'export.json',dict(binding=binding,parents=[digest(p) for p in paths],sha256=digest(run/'scratch-inference.pt'),quality='not independently evaluated',pretrained_weights=False))
     else:fit(args,args.stage,binding)
 
