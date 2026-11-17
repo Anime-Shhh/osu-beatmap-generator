@@ -61,26 +61,28 @@ def type_diagnostics(text,reference):
 
 
 @torch.inference_mode()
-def run(v2_checkpoint,dreamer_checkpoint,output):
+def run(v2_checkpoint,dreamer_checkpoint,output,v2_label="v2-retrained"):
+    if v2_label not in ("v2-retrained", "v2-ilab-alignment"):
+        raise ValueError("unknown V2 checkpoint label")
     from osu_dreamer.data.load_audio import make_spec,load_wave
     from osu_dreamer.models.inference.artifact import load_inference
     root=Path(output);root.mkdir(parents=True,exist_ok=False);torch.set_num_threads(1)
     songs=checked_songs(root);results={}
-    checkpoints={'v2-retrained':Path(v2_checkpoint),'dreamer-published':artifact_path('/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt'),'dreamer-finetuned':Path(dreamer_checkpoint)}
+    checkpoints={v2_label:Path(v2_checkpoint),'dreamer-published':artifact_path('/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt'),'dreamer-finetuned':Path(dreamer_checkpoint)}
     for name,path in checkpoints.items():
-        model=load_v2_models(path,device='cuda') if name=='v2-retrained' else load_inference(path).cuda().eval()
+        model=load_v2_models(path,device='cuda') if name==v2_label else load_inference(path).cuda().eval()
         rows=[];deliveries=[]
         for song in songs:
             folder=root/name/song['id'];folder.mkdir(parents=True)
             reference=mapspec_from_osu(Path(song['reference']).read_text());d=reference.difficulty
-            if name=='v2-retrained':
+            if name==v2_label:
                 wave,sr=load_audio(song['audio']);features,clocks=extract_audio_features(wave,sr,models=model)
             else:features=torch.tensor(make_spec(load_wave(song['audio'])),device='cuda',dtype=torch.float32)
             candidates=[]
             for seed in (1731,1732,1733,1734):
                 torch.manual_seed(seed);np.random.seed(seed);random.seed(seed);started=time.monotonic();text='';error=None
                 try:
-                    if name=='v2-retrained':
+                    if name==v2_label:
                         request=GenerationRequest(audio_filename='audio.mp3',target_star=song['target_star'],seed=seed,candidate_count=1,
                             ar=d.approach_rate,od=d.overall_difficulty,cs=d.circle_size,hp=d.hp_drain_rate,
                             feature_revision=features.feature_cache.pipeline_revision,model_revision=model.model_revision)
@@ -96,7 +98,7 @@ def run(v2_checkpoint,dreamer_checkpoint,output):
                 metrics=native_metrics(text,reference,song['target_star'])
                 row=dict(group=song['id'],seed=seed,metrics=metrics,seconds=time.monotonic()-started,error=error,types=type_diagnostics(text,reference))
                 rows.append(row)
-                if text and metrics['stars'] is not None:candidates.append((abs(metrics['stars']-song['target_star']),seed,text,metrics))
+                if text and metrics['stars'] is not None and not metrics['invalid']:candidates.append((abs(metrics['stars']-song['target_star']),seed,text,metrics))
                 write_json(folder/'metrics.json',[r for r in rows if r['group']==song['id']])
                 print(json.dumps(dict(model=name,song=song['id'],seed=seed,seconds=row['seconds'],f1_25=metrics['onsets']['25']['f1'])),flush=True)
             if candidates:
@@ -111,4 +113,4 @@ def run(v2_checkpoint,dreamer_checkpoint,output):
         del model;torch.cuda.empty_cache()
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--v2-checkpoint',required=True);p.add_argument('--dreamer-checkpoint',required=True);p.add_argument('--output',required=True);run(**vars(p.parse_args()))
+    p=argparse.ArgumentParser();p.add_argument('--v2-checkpoint',required=True);p.add_argument('--dreamer-checkpoint',required=True);p.add_argument('--output',required=True);p.add_argument('--v2-label',default='v2-retrained');run(**vars(p.parse_args()))
