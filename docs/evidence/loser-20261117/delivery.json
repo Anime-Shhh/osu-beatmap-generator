@@ -1,0 +1,60 @@
+{
+  "archive": "/scratch/asj102/osu_project/runs/loser-playtest-20261117/Loser-Dreamer.osz",
+  "archive_sha256": "333bd4f366d374382baccbc74672b428c45d2f9c5cb0c73930110e70525fe0b7",
+  "audio_sha256": "94658ced5d028fd9125767354448dd026d2b7fca6cf2a04f81626c301341cc0b",
+  "checkpoint_sha256": "4ce0057bd61300e0ded4a7b2e88d0a69a8643c82488d0a85edb78dc032d0695f",
+  "source_commit": "22d3903",
+  "source_jobs": [
+    63985469,
+    63985533,
+    63985561
+  ],
+  "selections": [
+    {
+      "requested_stars": 2,
+      "source_job": 63985469,
+      "seed": 1744,
+      "stars": 2.029028243514669,
+      "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+      "invalid": false,
+      "errors": [],
+      "objects": 275,
+      "first_object_ms": 646.0,
+      "last_object_ms": 219041.0,
+      "target_pass": true,
+      "filename": "dreamer-2.osu",
+      "sha256": "f55b13253e93dff1e2b84d10e01cff4690996021f8ba8f528aa92a4dab71fba9"
+    },
+    {
+      "requested_stars": 3,
+      "source_job": 63985469,
+      "seed": 1734,
+      "stars": 2.9971389189622384,
+      "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+      "invalid": false,
+      "errors": [],
+      "objects": 368,
+      "first_object_ms": 658.0,
+      "last_object_ms": 219047.0,
+      "target_pass": true,
+      "filename": "dreamer-3.osu",
+      "sha256": "4f972fb6ea1038fbb469e4c4893a12b83254b8d25cbb40dca9b014a2b0e48f84"
+    },
+    {
+      "requested_stars": 4,
+      "source_job": 63985533,
+      "seed": 1769,
+      "stars": 3.7697124688289367,
+      "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+      "invalid": false,
+      "errors": [],
+      "objects": 485,
+      "first_object_ms": 646.0,
+      "last_object_ms": 219106.0,
+      "target_pass": false,
+      "filename": "dreamer-4.osu",
+      "sha256": "8ec5797bab38195aebda9c87519bcca12a4eb2eacaf2d55efeccfe1545d913b6"
+    }
+  ],
+  "verified": true
+}

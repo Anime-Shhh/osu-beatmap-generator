@@ -1,0 +1,209 @@
+{
+  "title": "Loser",
+  "artist": "Tame Impala",
+  "audio_sha256": "94658ced5d028fd9125767354448dd026d2b7fca6cf2a04f81626c301341cc0b",
+  "audio_source": null,
+  "duration_ms": 222307.84580498867,
+  "checkpoint": "/scratch/asj102/osu_project/runs/dreamer-63885268/final.pt",
+  "checkpoint_sha256": "4ce0057bd61300e0ded4a7b2e88d0a69a8643c82488d0a85edb78dc032d0695f",
+  "sampler_steps": 8,
+  "target_tolerance": 0.2,
+  "device": "cuda",
+  "selection": "closest measured stars among valid candidates",
+  "timing": "upstream native export; no reference timing or post-hoc snapping",
+  "results": [
+    {
+      "requested_stars": 4.0,
+      "conditioning": [
+        4.0,
+        7.0,
+        6.0,
+        4.0,
+        6.0
+      ],
+      "candidates": [
+        {
+          "seed": 1779,
+          "stars": 2.7153492268014836,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": true,
+          "errors": [
+            "rendered body outside playfield"
+          ],
+          "objects": 446,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219035.0
+        },
+        {
+          "seed": 1780,
+          "stars": 3.044913837311654,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 532,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219035.0
+        },
+        {
+          "seed": 1781,
+          "stars": 2.962562270029919,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": true,
+          "errors": [
+            "rendered body outside playfield"
+          ],
+          "objects": 501,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219274.0
+        },
+        {
+          "seed": 1782,
+          "stars": 3.0899451546656724,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 443,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219035.0
+        },
+        {
+          "seed": 1783,
+          "stars": 3.5402558273074103,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 606,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219005.0
+        },
+        {
+          "seed": 1784,
+          "stars": 3.642393873466731,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 511,
+          "first_object_ms": 646.0,
+          "last_object_ms": 218999.0
+        },
+        {
+          "seed": 1785,
+          "stars": 3.059420195943717,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 537,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219047.0
+        },
+        {
+          "seed": 1786,
+          "stars": 2.6955865098568372,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 453,
+          "first_object_ms": 658.0,
+          "last_object_ms": 219011.0
+        },
+        {
+          "seed": 1787,
+          "stars": 3.164793090483896,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 525,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219023.0
+        },
+        {
+          "seed": 1788,
+          "stars": 3.3354717758221395,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 627,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219023.0
+        },
+        {
+          "seed": 1789,
+          "stars": 3.2887695803589603,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 671,
+          "first_object_ms": 658.0,
+          "last_object_ms": 219047.0
+        },
+        {
+          "seed": 1790,
+          "stars": 3.4148013016379792,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 565,
+          "first_object_ms": 640.0,
+          "last_object_ms": 219214.0
+        },
+        {
+          "seed": 1791,
+          "stars": 2.9526180912570714,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 333,
+          "first_object_ms": 2303.0,
+          "last_object_ms": 219035.0
+        },
+        {
+          "seed": 1792,
+          "stars": 3.791201611256007,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": true,
+          "errors": [
+            "rendered body outside playfield"
+          ],
+          "objects": 572,
+          "first_object_ms": 640.0,
+          "last_object_ms": 220871.0
+        },
+        {
+          "seed": 1793,
+          "stars": 3.0271675805873692,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 416,
+          "first_object_ms": 640.0,
+          "last_object_ms": 217007.0
+        },
+        {
+          "seed": 1794,
+          "stars": 2.9717069061586083,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 576,
+          "first_object_ms": 640.0,
+          "last_object_ms": 219023.0
+        }
+      ],
+      "selected": {
+        "seed": 1784,
+        "stars": 3.642393873466731,
+        "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+        "invalid": false,
+        "errors": [],
+        "objects": 511,
+        "first_object_ms": 646.0,
+        "last_object_ms": 218999.0,
+        "target_pass": false,
+        "filename": "dreamer-4.osu",
+        "sha256": "0e3347fd58363e788bf0edd3323326c6acd10a59af435f62edd9020c17c7e572"
+      }
+    }
+  ],
+  "archive_sha256": "0894070d704231b4b6d9f1ce6a3a00ae7df1d30573ebf6a450571c6ce02b33ec",
+  "archive_verified": true
+}

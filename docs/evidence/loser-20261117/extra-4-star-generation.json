@@ -1,0 +1,371 @@
+{
+  "title": "Loser",
+  "artist": "Tame Impala",
+  "audio_sha256": "94658ced5d028fd9125767354448dd026d2b7fca6cf2a04f81626c301341cc0b",
+  "audio_source": null,
+  "duration_ms": 222307.84580498867,
+  "checkpoint": "/scratch/asj102/osu_project/runs/dreamer-63885268/final.pt",
+  "checkpoint_sha256": "4ce0057bd61300e0ded4a7b2e88d0a69a8643c82488d0a85edb78dc032d0695f",
+  "sampler_steps": 8,
+  "target_tolerance": 0.2,
+  "device": "cuda",
+  "selection": "closest measured stars among valid candidates",
+  "timing": "upstream native export; no reference timing or post-hoc snapping",
+  "results": [
+    {
+      "requested_stars": 4.0,
+      "conditioning": [
+        4.0,
+        7.0,
+        6.0,
+        4.0,
+        6.0
+      ],
+      "candidates": [
+        {
+          "seed": 1747,
+          "stars": 3.642963404307912,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": true,
+          "errors": [
+            "event 512: coordinate is outside the osu! playfield",
+            "rendered body outside playfield"
+          ],
+          "objects": 535,
+          "first_object_ms": 628.0,
+          "last_object_ms": 219011.0
+        },
+        {
+          "seed": 1748,
+          "stars": 3.3208544868377383,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 511,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219023.0
+        },
+        {
+          "seed": 1749,
+          "stars": 3.5209261010667783,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 528,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219005.0
+        },
+        {
+          "seed": 1750,
+          "stars": 3.6677644126989164,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": true,
+          "errors": [
+            "event 234: coordinate is outside the osu! playfield",
+            "rendered body outside playfield"
+          ],
+          "objects": 591,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219052.0
+        },
+        {
+          "seed": 1751,
+          "stars": 3.6822299113245642,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 739,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219029.0
+        },
+        {
+          "seed": 1752,
+          "stars": 3.066476890198189,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 500,
+          "first_object_ms": 640.0,
+          "last_object_ms": 219017.0
+        },
+        {
+          "seed": 1753,
+          "stars": 2.960054207057928,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 517,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219824.0
+        },
+        {
+          "seed": 1754,
+          "stars": 3.582367458433945,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 494,
+          "first_object_ms": 658.0,
+          "last_object_ms": 219052.0
+        },
+        {
+          "seed": 1755,
+          "stars": 3.3451353269060142,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 615,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219214.0
+        },
+        {
+          "seed": 1756,
+          "stars": 3.5409268683057826,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 626,
+          "first_object_ms": 640.0,
+          "last_object_ms": 219160.0
+        },
+        {
+          "seed": 1757,
+          "stars": 3.4628741516504724,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 645,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219005.0
+        },
+        {
+          "seed": 1758,
+          "stars": null,
+          "invalid": true,
+          "errors": [
+            "ValueError(\"difficulty attribute 'aim' is non-finite\")"
+          ]
+        },
+        {
+          "seed": 1759,
+          "stars": 3.5118743480634236,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 539,
+          "first_object_ms": 1771.0,
+          "last_object_ms": 219017.0
+        },
+        {
+          "seed": 1760,
+          "stars": 3.232677969947211,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 530,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219226.0
+        },
+        {
+          "seed": 1761,
+          "stars": 3.74468176452742,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 698,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219017.0
+        },
+        {
+          "seed": 1762,
+          "stars": 3.3864474389041566,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 544,
+          "first_object_ms": 646.0,
+          "last_object_ms": 217545.0
+        },
+        {
+          "seed": 1763,
+          "stars": 2.952761028935497,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 293,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219011.0
+        },
+        {
+          "seed": 1764,
+          "stars": 3.0443595726618105,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": true,
+          "errors": [
+            "event 20: coordinate is outside the osu! playfield",
+            "event 332: coordinate is outside the osu! playfield",
+            "rendered body outside playfield"
+          ],
+          "objects": 457,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219052.0
+        },
+        {
+          "seed": 1765,
+          "stars": 3.325621301814969,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 508,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219064.0
+        },
+        {
+          "seed": 1766,
+          "stars": 3.7586506370639574,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 676,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219011.0
+        },
+        {
+          "seed": 1767,
+          "stars": 3.0926017725011588,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 505,
+          "first_object_ms": 640.0,
+          "last_object_ms": 219088.0
+        },
+        {
+          "seed": 1768,
+          "stars": 3.130333134964657,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 523,
+          "first_object_ms": 646.0,
+          "last_object_ms": 217653.0
+        },
+        {
+          "seed": 1769,
+          "stars": 3.7697124688289367,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 485,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219106.0
+        },
+        {
+          "seed": 1770,
+          "stars": 3.206563158913782,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 437,
+          "first_object_ms": 652.0,
+          "last_object_ms": 219286.0
+        },
+        {
+          "seed": 1771,
+          "stars": 3.2192780944366413,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 340,
+          "first_object_ms": 646.0,
+          "last_object_ms": 217557.0
+        },
+        {
+          "seed": 1772,
+          "stars": 3.1939327443009917,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 555,
+          "first_object_ms": 640.0,
+          "last_object_ms": 217192.0
+        },
+        {
+          "seed": 1773,
+          "stars": 3.083108513218747,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 628,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219035.0
+        },
+        {
+          "seed": 1774,
+          "stars": 3.2099580866933866,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 418,
+          "first_object_ms": 634.0,
+          "last_object_ms": 219029.0
+        },
+        {
+          "seed": 1775,
+          "stars": 3.268654439064918,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 545,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219041.0
+        },
+        {
+          "seed": 1776,
+          "stars": 2.715384248421475,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 416,
+          "first_object_ms": 658.0,
+          "last_object_ms": 219023.0
+        },
+        {
+          "seed": 1777,
+          "stars": 3.265034669945832,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 567,
+          "first_object_ms": 628.0,
+          "last_object_ms": 217563.0
+        },
+        {
+          "seed": 1778,
+          "stars": 2.8845987228927057,
+          "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+          "invalid": false,
+          "errors": [],
+          "objects": 510,
+          "first_object_ms": 646.0,
+          "last_object_ms": 219023.0
+        }
+      ],
+      "selected": {
+        "seed": 1769,
+        "stars": 3.7697124688289367,
+        "calculator": "rosu-pp-py/4.0.2/stable/no-mods",
+        "invalid": false,
+        "errors": [],
+        "objects": 485,
+        "first_object_ms": 646.0,
+        "last_object_ms": 219106.0,
+        "target_pass": false,
+        "filename": "dreamer-4.osu",
+        "sha256": "8ec5797bab38195aebda9c87519bcca12a4eb2eacaf2d55efeccfe1545d913b6"
+      }
+    }
+  ],
+  "archive_sha256": "e2552f71fb4eaf7e9ebae5ed11d673f3b3fe49ff0460165b51c206c789937253",
+  "archive_verified": true
+}
