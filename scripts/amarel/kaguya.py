@@ -14,13 +14,13 @@ from src.v2.mapspec import mapspec_from_osu
 
 
 @torch.inference_mode()
-def run(checkpoint, output, target_stars=4.6, candidates=4, fine_tuned_only=False):
+def run(checkpoint, output, target_stars=4.6, candidates=4, fine_tuned_only=False, device="cuda", threads=1):
     from osu_dreamer.data.load_audio import make_spec, load_wave
     from osu_dreamer.models.inference.artifact import load_inference
     if not 0 < target_stars <= 15 or not 1 <= candidates <= 64:
         raise ValueError('invalid target difficulty or candidate count')
     output=Path(output);output.mkdir(parents=True,exist_ok=False)
-    torch.set_num_threads(1)
+    torch.set_num_threads(threads)
     archive=artifact_path('/common/users/asj102/osu_project/1147361 Suzuki Masayuki - DADDY ! DADDY ! DO ! feat. Suzuki Airi (TV Size) [no video].osz')
     calc=RosuDifficultyCalculator();refs=[]
     with zipfile.ZipFile(archive) as z:
@@ -33,12 +33,12 @@ def run(checkpoint, output, target_stars=4.6, candidates=4, fine_tuned_only=Fals
     expected='6ee5686d629635b982d5ccd97e4bcac5a7fa01969ab13c37587ef180b90bbe17'
     assert hashlib.sha256(audio).hexdigest()==expected,'original Kaguya audio changed'
     audio_path=output/'audio.mp3';audio_path.write_bytes(audio)
-    features=torch.tensor(make_spec(load_wave(audio_path)),device='cuda',dtype=torch.float32)
-    d=reference.difficulty;labels=torch.tensor([[target_stars,d.approach_rate,d.overall_difficulty,d.circle_size,d.hp_drain_rate]],device='cuda')
+    features=torch.tensor(make_spec(load_wave(audio_path)),device=device,dtype=torch.float32)
+    d=reference.difficulty;labels=torch.tensor([[target_stars,d.approach_rate,d.overall_difficulty,d.circle_size,d.hp_drain_rate]],device=device)
     result={}
     paths=[('finetuned',Path(checkpoint))] if fine_tuned_only else [('published',artifact_path('/common/home/asj102/osu_flow_runs/dreamer_v8_20261105/v8.pt')),('amarel-repeat',Path(checkpoint))]
     for name,path in paths:
-        model=load_inference(path).cuda().eval();rows=[];texts={}
+        model=load_inference(path).to(device).eval();rows=[];texts={}
         for seed in range(1731,1731+candidates):
             torch.manual_seed(seed);np.random.seed(seed);random.seed(seed)
             signals,settings=model.sample(features,labels,8)
@@ -64,9 +64,10 @@ def run(checkpoint, output, target_stars=4.6, candidates=4, fine_tuned_only=Fals
         result[name]=dict(checkpoint_sha256=digest(path),summary=summarize(rows),rows=rows,selected=delivery)
         write_json(output/'comparison.json',dict(audio_sha256=expected,requested_stars=target_stars,target_tolerance=.2,results=result,pretraining_overlap='unknown',purpose='Amarel portability repeat; no model promotion'))
         print(name,result[name]['summary'],flush=True)
-        del model;torch.cuda.empty_cache()
+        del model
+        if device=='cuda':torch.cuda.empty_cache()
     audio_path.unlink()
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);p.add_argument('--target-stars',type=float,default=4.6);p.add_argument('--candidates',type=int,default=4);p.add_argument('--fine-tuned-only',action='store_true');run(**vars(p.parse_args()))
+    p=argparse.ArgumentParser();p.add_argument('--checkpoint',required=True);p.add_argument('--output',required=True);p.add_argument('--target-stars',type=float,default=4.6);p.add_argument('--candidates',type=int,default=4);p.add_argument('--fine-tuned-only',action='store_true');p.add_argument('--device',choices=['cuda','cpu'],default='cuda');p.add_argument('--threads',type=int,default=1);run(**vars(p.parse_args()))
