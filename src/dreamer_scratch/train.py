@@ -270,7 +270,16 @@ def main():
             stem=prefix+'_ema.module.'
             state.update({prefix+'.'+k.removeprefix(stem):v for k,v in parent['state_dict'].items() if k.startswith(stem)})
         torch.save(dict(hparams=hp,state_dict=state,from_scratch=binding),run/'scratch-inference.pt')
-        write_json(run/'export.json',dict(binding=binding,parents=[digest(p) for p in paths],sha256=digest(run/'scratch-inference.pt'),quality='not independently evaluated',pretrained_weights=False))
+        from osu_dreamer.models.inference.artifact import load_inference
+        for stage in ('codec','generator','style'):
+            report=json.loads((run/stage/'result.json').read_text())
+            if report['initial_sha256']==report['final_parameter_sha256']:raise ValueError('stage weights did not change')
+        exported=load_inference(run/'scratch-inference.pt').cuda().eval()
+        a,_,labels=load_pair(Path(args.manifest).parent,m,selected_rows(m,'val')[0])
+        with torch.inference_mode():
+            signal,out_labels=exported.sample(a[:,:2052].cuda(),labels[None].cuda(),8)
+        if signal.shape!=(1,9,2052) or not torch.isfinite(signal).all() or not torch.isfinite(out_labels).all():raise ValueError('exported inference smoke failed')
+        write_json(run/'export.json',dict(binding=binding,parents=[digest(p) for p in paths],sha256=digest(run/'scratch-inference.pt'),quality='not independently evaluated',pretrained_weights=False,inference_smoke='finite 2052-frame output'))
     else:fit(args,args.stage,binding)
 
 

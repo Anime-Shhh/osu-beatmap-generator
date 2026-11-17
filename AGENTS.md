@@ -134,3 +134,11 @@ See docs/v2-amarel-retrain-2026-11-15.md. Do not use synthetic historical weight
 compare teacher-forced token accuracy to generation F1, or claim equal training
 data/pretraining budgets. Branch names on GitHub now have no `codex/` prefix;
 the active branch is `audio-native-flow`.
+
+November 17: the user explicitly requires true from-scratch Dreamer training.
+Previous Dreamer fine-tunes do not meet this objective. See
+`docs/dreamer-from-scratch-2026-11-17.md` and `src/dreamer_scratch/`.
+No published weights, pretrained audio encoders, or old learned latent caches
+may initialize this run. Keep upstream architecture attribution and distinguish
+random-initialization reproduction from architectural novelty. Preserve existing
+baseline checkpoints and pending V2 comparisons.
