@@ -3,10 +3,22 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import torch
-from src.dreamer_scratch.train import build, signature, check_checkpoint
+from src.dreamer_scratch.train import build, signature, check_checkpoint, AllocationTimer, Progress
 
 
 class ScratchTests(unittest.TestCase):
+    def test_resumed_allocation_gets_fresh_time_budget(self):
+        timer=AllocationTimer(duration={'hours':47},interval='step')
+        initial=timer.state_dict()
+        timer.load_state_dict({'time_elapsed':{'train':47*3600,'validate':1,'test':0}})
+        self.assertEqual(timer.state_dict(),initial)
+
+    def test_nonfinite_training_stops(self):
+        callback=Progress()
+        callback.on_train_batch_end(None,None,{'loss':torch.tensor(1.)},None,0)
+        with self.assertRaises(FloatingPointError):
+            callback.on_train_batch_end(None,None,{'loss':torch.tensor(float('nan'))},None,0)
+
     def test_no_pretrained_load_and_reproducible_initialization(self):
         upstream=Path(os.environ['OSU_PROJECT_ROOT'])/'upstream/osu-dreamer'
         for stage in ('codec','generator','style'):

@@ -16,4 +16,12 @@ Training stages:
 
 Training stages use BF16, clipping 1, preserved effective batches across supported GPU counts, and 48-hour Slurm allocations. An internal 47-hour timer saves resumable state; an incomplete stage fails rather than silently letting dependent stages use unfinished training. Keep one best and one last checkpoint per stage. At the November 17 resource check, two GPUs forecast an earlier start than four. Full training must depend on a successful real-data GPU smoke covering all stages and export. Smoke checkpoints are isolated and never initialize the full run.
 
-The first import checks found missing TensorBoard and Matplotlib in the inference-focused Amarel environment; these dependencies were installed without replacing the environments or numerical Torch/NumPy versions. Results and job IDs will be appended after submission/verification. No claim of pretrained-level quality is made before evaluation.
+The first import checks found missing TensorBoard and Matplotlib in the inference-focused Amarel environment. Installation temporarily upgraded NumPy; NumPy was restored to 1.26.4 with compatible plotting dependencies, and `pip check` passed. Torch was unchanged. Three initialization/provenance unit tests passed on Amarel. No claim of pretrained-level quality is made before evaluation.
+
+## Submission interruption and November 18 continuation
+
+The last confirmed GPU smoke submission is job 64002714, using immutable source `0125250` and run directory `/scratch/asj102/osu_project/runs/scratch-smoke-0125250`. Its latest observed state on November 17 was PENDING. The later attempted deployment of `dfc38f5` and dependent full training chain was **not executed**: automatic approval review encountered a usage-limit failure. Consequently there are no verified full scratch-training job IDs. Do not report the intended chain as submitted.
+
+November 18 SSH attempts initially failed DNS lookup and then reached Amarel but failed authentication; the user was asked to reconnect. Local review added a fresh per-allocation timer budget on resume, explicit final optimizer-state checkpointing, rejection of nonfinite training losses, and explicit trusted full-state restoration after provenance checks. Syntax and diff checks pass locally; the two new regression tests and the updated end-to-end GPU smoke remain to be run on Amarel. Code changes require a new immutable snapshot and smoke directory because checkpoint bindings include the training program's hash.
+
+Resume API reference: https://lightning.ai/docs/pytorch/stable/optional-api/api/lightning.pytorch.trainer.trainer.Trainer . Full-state resume is necessary for our dataclass hyperparameters and optimizer/callback state; it does not authorize loading foreign checkpoints.

@@ -146,7 +146,20 @@ class Latents(Dataset):
         return h,z,s,labels
 
 
+class AllocationTimer(Timer):
+    """A resumed allocation gets a new wall-clock budget, not a new optimizer."""
+    def load_state_dict(self, state_dict):
+        # Timer normally restores elapsed wall time from last.ckpt. Reusing an
+        # exhausted 47-hour budget would immediately stop the next allocation.
+        pass
+
+
 class Progress(pl.Callback):
+    def on_train_batch_end(self, trainer, module, outputs, batch, batch_idx):
+        loss = outputs.get('loss') if isinstance(outputs, dict) else outputs
+        if loss is not None and not torch.isfinite(loss).all():
+            raise FloatingPointError('nonfinite scratch training loss')
+
     def on_validation_end(self, trainer, module):
         if trainer.is_global_zero:
             print(json.dumps({'stage':module.scratch_stage,'step':trainer.global_step,'metrics':{k:float(v) for k,v in trainer.callback_metrics.items()}}),flush=True)
@@ -174,6 +187,7 @@ def fit(args, stage, binding):
     train=Charts(args.manifest,True,args.smoke) if stage=='codec' else Latents(Path(args.run)/'latents',stage,True,args.smoke)
     val=Charts(args.manifest,False,args.smoke) if stage=='codec' else Latents(Path(args.run)/'latents',stage,False,args.smoke)
     devices=torch.cuda.device_count()
+    if devices < 1:raise RuntimeError('submit scratch training through a GPU allocation')
     batch=2 if args.smoke else (8 if stage=='codec' else 32 if stage=='generator' else 128)
     effective=32 if stage=='codec' else 128 if stage=='generator' else 512
     if effective%(devices*batch):raise ValueError('GPU count does not divide effective batch')
@@ -181,7 +195,7 @@ def fit(args, stage, binding):
     monitor={'codec':'eval/score','generator':'val/loss','style':'val/energy_dist'}[stage]
     mode='max' if stage=='codec' else 'min'
     checkpoint=ModelCheckpoint(dirpath=out,filename='best',monitor=monitor,mode=mode,save_top_k=1,save_last=True,enable_version_counter=False)
-    callbacks=[checkpoint,Progress(),Timer(duration={'hours':47},interval='step')]
+    callbacks=[checkpoint,Progress(),AllocationTimer(duration={'hours':47},interval='step')]
     if stage=='codec' and not args.smoke:callbacks.append(EarlyStopping(monitor=monitor,mode=mode,patience=10,min_delta=.001))
     steps=2 if args.smoke else {'codec':60000,'generator':60000,'style':20000}[stage]
     trainer=pl.Trainer(accelerator='gpu',devices=devices,strategy='ddp_find_unused_parameters_true' if devices>1 else 'auto',
@@ -191,7 +205,11 @@ def fit(args, stage, binding):
         num_sanity_val_steps=0,limit_train_batches=2 if args.smoke else 1.,
         check_val_every_n_epoch=1,deterministic=False)
     trainer.fit(model,DataLoader(train,batch_size=batch,num_workers=0 if args.smoke else 2,shuffle=True),
-                DataLoader(val,batch_size=1,num_workers=0 if args.smoke else 1),ckpt_path=None if fresh else out/'last.ckpt')
+                DataLoader(val,batch_size=1,num_workers=0 if args.smoke else 1),
+                ckpt_path=None if fresh else out/'last.ckpt', weights_only=False)
+    # All ranks participate; preserve the final optimizer state even when the
+    # allocation timer stops between regular validation checkpoints.
+    trainer.save_checkpoint(out/'last.ckpt')
     if trainer.is_global_zero:
         early=any(isinstance(c,EarlyStopping) and c.stopped_epoch>0 for c in callbacks)
         complete=trainer.global_step>=steps or early
