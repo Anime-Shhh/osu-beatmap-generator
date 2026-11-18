@@ -25,3 +25,21 @@ The last confirmed GPU smoke submission is job 64002714, using immutable source 
 November 18 SSH attempts initially failed DNS lookup and then reached Amarel but failed authentication; the user was asked to reconnect. Local review added a fresh per-allocation timer budget on resume, explicit final optimizer-state checkpointing, rejection of nonfinite training losses, and explicit trusted full-state restoration after provenance checks. Syntax and diff checks pass locally; the two new regression tests and the updated end-to-end GPU smoke remain to be run on Amarel. Code changes require a new immutable snapshot and smoke directory because checkpoint bindings include the training program's hash.
 
 Resume API reference: https://lightning.ai/docs/pytorch/stable/optional-api/api/lightning.pytorch.trainer.trainer.Trainer . Full-state resume is necessary for our dataclass hyperparameters and optimizer/callback state; it does not authorize loading foreign checkpoints.
+
+## November 18 verified submissions
+
+SSH access was restored through the default `amarel` ControlMaster (the explicit `/tmp` socket was absent). Prior smoke 64002714 is confirmed COMPLETED in 10:24 with exit 0: two optimizer updates in each of codec/generator/style changed the initial weights, and the assembled artifact generated finite 2,052-frame signals. This validates plumbing, not map quality. Full training does not reuse those smoke weights.
+
+Updated immutable source `31b2ec2` at `/scratch/asj102/osu_project/sources/scratch-31b2ec2` includes allocation-resume and distributed metric fixes. All six scratch unit tests passed on Amarel, and `pip check` found no broken requirements. The pipeline was actually submitted successfully this time, with job IDs persisted incrementally in `runs/dreamer-scratch-20261118/jobs.json`:
+
+| Stage | Job | Dependency | GPUs | Limit |
+|---|---:|---|---:|---|
+| Updated real-data smoke | 64030937 | none | 2 | 20 minutes |
+| Random-initialized codec | 64030938 | smoke success | 2 | 48 hours |
+| New latent cache | 64030939 | codec success | 1 | 2 hours |
+| Random-initialized temporal generator | 64030940 | cache success | 2 | 48 hours |
+| Random-initialized style generator | 64030941 | cache success | 1 | 48 hours |
+| Export and finite-inference check | 64030942 | both generators succeed | 1 | 20 minutes |
+| Frozen validation + wrong audio | 64030943 | export success | 1 | 2 hours |
+
+Full run root: `/scratch/asj102/osu_project/runs/dreamer-scratch-20261118`. Updated smoke root: `/scratch/asj102/osu_project/runs/scratch-smoke-31b2ec2`. Logs: `/scratch/asj102/osu_project/logs/scratch-JOBID.log`. At the first post-submission check, smoke was RUNNING on gpuk006 and all other stages were dependency-pending. Actual codec allocation was checked as 2 GPUs and `TimeLimit=2-00:00:00`. Non-submitting forecasts favored 2 GPUs (November 18 16:36) over 4 (23:43); no speculative duplicate full runs were submitted. Source-separated datasets and prior checkpoint baselines remain unchanged.
