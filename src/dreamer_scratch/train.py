@@ -57,6 +57,11 @@ class Bound:
         kwargs.setdefault('sync_dist', True)
         return super().log(name, value, *args, **kwargs)
 
+    def log_dict(self, dictionary, *args, **kwargs):
+        # Lightning's log_dict otherwise forwards its own False default to log.
+        kwargs.setdefault('sync_dist', True)
+        return super().log_dict(dictionary, *args, **kwargs)
+
 
 class Codec(Bound, LatentTrainer):
     def plot_val(self, batch):

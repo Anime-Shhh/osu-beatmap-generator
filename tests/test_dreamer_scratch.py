@@ -3,10 +3,16 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import torch
-from src.dreamer_scratch.train import build, signature, check_checkpoint, AllocationTimer, Progress
+from src.dreamer_scratch.train import build, signature, check_checkpoint, AllocationTimer, Progress, Bound
 
 
 class ScratchTests(unittest.TestCase):
+    def test_dictionary_metrics_default_to_distributed_reduction(self):
+        class Parent:
+            def log_dict(self, dictionary, **kwargs):return kwargs
+        class Model(Bound, Parent):pass
+        self.assertTrue(Model().log_dict({'loss':1.})['sync_dist'])
+
     def test_resumed_allocation_gets_fresh_time_budget(self):
         timer=AllocationTimer(duration={'hours':47},interval='step')
         initial=timer.state_dict()
