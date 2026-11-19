@@ -43,3 +43,15 @@ Updated immutable source `31b2ec2` at `/scratch/asj102/osu_project/sources/scrat
 | Frozen validation + wrong audio | 64030943 | export success | 1 | 2 hours |
 
 Full run root: `/scratch/asj102/osu_project/runs/dreamer-scratch-20261118`. Updated smoke root: `/scratch/asj102/osu_project/runs/scratch-smoke-31b2ec2`. Logs: `/scratch/asj102/osu_project/logs/scratch-JOBID.log`. At the first post-submission check, smoke was RUNNING on gpuk006 and all other stages were dependency-pending. Actual codec allocation was checked as 2 GPUs and `TimeLimit=2-00:00:00`. Non-submitting forecasts favored 2 GPUs (November 18 16:36) over 4 (23:43); no speculative duplicate full runs were submitted. Source-separated datasets and prior checkpoint baselines remain unchanged.
+
+## November 19 completion audit
+
+All six full-run stages completed successfully (exit 0), with final validation ending November 18 at 21:33:29 Eastern. Codec training ran 2:28:25 and early-stopped at 20,000 updates; best reconstruction score was at update 10,000. Generator ran 60,000 updates in 2:20:38, but best validation loss was at update 3,750; final training/validation losses were about 1.03/37.97, compared with best validation loss 11.69. This divergence is consistent with substantial overfitting and warrants investigation. Style completed 20,000 updates in 33:07; best validation energy distance was at update 2,772. Export used the retained best checkpoint from every stage, not the final weights. No jobs remain running from this pipeline.
+
+The final artifact `/scratch/asj102/osu_project/runs/dreamer-scratch-20261118/scratch-inference.pt` was SHA-256 verified as `c4e6daa4b85b79bf03ce56f75611a51e79cd7a184d5bc7d9a80dd553a8c2afac`. Export provenance confirms `pretrained_weights=false`, and each learned stage changed from its recorded random initialization.
+
+Independent full-song validation used 24 sources, four seeds each, with aligned and duration-matched wrong-song audio; locked test data were not used. Aligned onset F1 at 10/25/50 ms is 48.20%/60.15%/61.74%; typed onset F1 at 25 ms 35.61%; short-pair recovery 17.77%; mean absolute star error .345; median matched-slider duration error 78.58 ms. Wrong-song onset F1 at 25 ms is 15.27%, indicating substantial dependence on supplied audio (no paired significance test performed in this status check).
+
+Critical limitation: **87/96 aligned outputs (90.625%) fail native validation**, all with at least one rendered body outside the playfield; five also report a degenerate slider without travel direction. Other errors include out-of-bounds event coordinates. Mean star error and onset metrics include invalid outputs and do not establish playable quality. This model is not promoted as a usable replacement for pretrained Dreamer. Do not compare its 24-source metrics directly with the earlier three-source Dreamer audit. No repair, clipping, re-training or new test evaluation was performed during this status check.
+
+Compact verified evidence: `docs/evidence/dreamer-scratch-20261119/status-summary.json`. Full per-seed metrics remain under the run's `validation/metrics.json` and `validation/records.jsonl` on Amarel.
