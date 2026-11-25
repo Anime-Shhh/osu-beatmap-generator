@@ -20,3 +20,6 @@ data
 .cursor/
 venv/
 .env
+# The patterns above are unanchored, so they also match the v3 source packages: keep those.
+!src/v3/data/
+!src/v3/models/
