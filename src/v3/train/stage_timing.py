@@ -150,7 +150,7 @@ class TimingStage:
             const = [s for s in songs if len(s["red_lines"]) == 1]
             self._val = const[:: max(1, len(const) // self.val_n)][: self.val_n]
         audio = Audio(self.root)
-        passed, octave, med = 0, 0, []
+        passed, shaped, octave, med, shifts = 0, 0, 0, [], []
         for s in self._val:
             x, t0 = audio.window(s["audio"], 0.0, s["frames"] * FRAME_MS)
             beat, down, tempo = model.activations(x, dev)
@@ -161,7 +161,13 @@ class TimingStage:
             octave += int(rep["ok"] and not good_ratio)
             if good_ratio:
                 med.append(rep["median_ms"])
+                shifts.append(abs(rep["shift_ms"]))
                 passed += int(rep["max_ms"] <= 5.0 and rep["median_ms"] <= 2.0)
+                shaped += int(rep["shape_max_ms"] <= 5.0 and rep["shape_median_ms"] <= 2.0)
         n = max(1, len(self._val))
-        return {"select": passed / n, "drift_pass_rate": passed / n, "tempo_ratio_errors": octave / n,
-                "median_err_ms": float(np.median(med)) if med else float("nan")}
+        # Selection uses the grid's shape (tempo, sections, drift) with its constant offset removed: a single
+        # human chart's offset scatters ~7 ms (IQR) against the audio, so the raw pass rate mostly ranks how
+        # closely a checkpoint copies that scatter (see drift_report). The raw rate is still reported.
+        return {"select": shaped / n, "shape_pass_rate": shaped / n, "drift_pass_rate": passed / n,
+                "tempo_ratio_errors": octave / n, "median_err_ms": float(np.median(med)) if med else float("nan"),
+                "median_abs_shift_ms": float(np.median(shifts)) if shifts else float("nan")}

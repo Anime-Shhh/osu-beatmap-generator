@@ -1,11 +1,17 @@
 """Beat activations -> osu! red lines (BPM, offset, meter), plus drift evaluation.
 
-Constant-tempo first: tempo candidates (tempo head, activation autocorrelation,
-octave variants) are scored by fitting a grid to activation peaks with iterated
-weighted least squares. If residuals are too large, the peaks are segmented
-greedily into piecewise-constant sections (rubato / live recordings / tempo
-changes), each becoming a red line. BPMs snap to the roundest value whose
-accumulated drift stays within tolerance; offsets land on measure starts.
+Constant-tempo first. Tempo candidates (tempo head, activation autocorrelation, octave variants) are
+refined to a precise period by peak phase coherence, fitted to the activation peaks with iterated
+weighted least squares, and scored by grid support, the tempo prior, and how much of T's strong
+beat-peak weight the grid accounts for. A single grid is kept unless some stretch of the song stops
+fitting it (windowed test); only then are the peaks segmented into piecewise-constant sections (tempo
+changes, rubato, live recordings), and the split is kept only if it fits clearly better. BPMs snap to
+the roundest value whose accumulated drift stays within tolerance; offsets land on measure starts.
+
+Measured on 1,106 held-out songs (2026-11-25), the previous decision rule split 11% of steady songs:
+it counted every peak (strong half-beat peaks or slightly jittery peaks failed it), coarse candidates
+(tempo bins are ~3.5% apart) lost beat count on long fast songs, and half tempo could win on the tempo
+prior alone because it lands on beats too.
 """
 from __future__ import annotations
 
@@ -20,8 +26,15 @@ from src.v3.models.timing import TEMPO_BINS, bin_bpm
 
 PEAK_MIN = 0.25
 INLIER_FRAC = 1 / 6
-CONST_P90_MS = 8.0
 DRIFT_TOL_MS = 2.0
+REFINE_SPAN, REFINE_STEPS = 0.04, 801   # period refinement: +-4% around each candidate, 0.01% steps
+STRONG = 0.5                            # beat peaks at least this high are "strong"
+HIT_FRAC = 0.1                          # a strong peak is accounted for within 1/10 beat of a grid beat
+EXPLAIN_W = 0.5                         # candidate score weight of the accounted-for strong-peak fraction:
+                                        # beat peaks outvote a tempo prior leaning up to ~2.3:1 the other way
+WIN_MS = 8000.0                         # constancy test windows
+Q_MIN = 0.4                             # one grid unless a window (10th pct) accounts for < 40% strong weight
+SPLIT_GAIN = 0.15                       # a split must raise that 10th-percentile score at least this much
 
 
 @dataclass
@@ -128,6 +141,52 @@ def _meter(down_act, phase, period, region):
     return best[0], best[1]
 
 
+def _tempo_bin(period: float) -> int:
+    return int(np.clip(round(math.log2(max(60000 / period, 40) / 40) / 0.05), 0, TEMPO_BINS - 1))
+
+
+def refine_period(t: np.ndarray, w: np.ndarray, p0: float) -> float:
+    """The period within +-REFINE_SPAN of p0 that maximizes the peaks' phase coherence at the period and
+    at half of it (the half-period term keeps the estimate sharp when off-beat peaks cancel the first)."""
+    ps = p0 * (1.0 + np.linspace(-REFINE_SPAN, REFINE_SPAN, REFINE_STEPS))
+    ww = w / w.sum()
+    ang = 2j * np.pi * t[None, :] / ps[:, None]
+    c = np.abs(np.exp(ang) @ ww) + np.abs(np.exp(2 * ang) @ ww)
+    return float(ps[int(np.argmax(c))])
+
+
+def explained(t: np.ndarray, w: np.ndarray, phase: float, period: float) -> float:
+    """Fraction of strong-peak weight within HIT_FRAC of a beat of the grid."""
+    strong = w >= STRONG
+    if not strong.any():
+        return 0.0
+    r = (t[strong] - phase) / period
+    return float(np.sum(w[strong] * (np.abs(r - np.round(r)) <= HIT_FRAC)) / np.sum(w[strong]))
+
+
+def window_scores(t: np.ndarray, w: np.ndarray, beats: np.ndarray, region) -> np.ndarray:
+    """Per WIN_MS window of the region: fraction of strong-peak weight within HIT_FRAC beat of ``beats``."""
+    keep = (w >= STRONG) & (t >= region[0]) & (t <= region[1])
+    ts, ws = t[keep], w[keep]
+    if len(beats) < 2 or len(ts) == 0:
+        return np.zeros(1)
+    i = np.clip(np.searchsorted(beats, ts), 1, len(beats) - 1)
+    d = np.minimum(np.abs(ts - beats[i - 1]), np.abs(beats[i] - ts))
+    hit = d <= HIT_FRAC * (beats[i] - beats[i - 1])
+    out = []
+    for a in np.arange(region[0], region[1], WIN_MS):
+        m = (ts >= a) & (ts < a + WIN_MS)
+        if m.sum() >= 4:
+            out.append(np.sum(ws[m] * hit[m]) / np.sum(ws[m]))
+    return np.asarray(out) if out else np.zeros(1)
+
+
+def _fit_quality(lines, t, w, region) -> float:
+    """10th percentile over windows: how well the worst stretches of the song fit these red lines."""
+    beats = beat_times(lines, region[0] - 2000, region[1] + 2000)
+    return float(np.percentile(window_scores(t, w, beats, region), 10))
+
+
 def fit_red_lines(beat_act, down_act, tempo_probs, region: tuple[float, float]) -> list[RedLineFit]:
     t, w = peaks(beat_act)
     sel = (t >= region[0] - 2000) & (t <= region[1] + 2000)
@@ -136,20 +195,28 @@ def fit_red_lines(beat_act, down_act, tempo_probs, region: tuple[float, float]) 
         return [RedLineFit(region[0], 500.0, 4)]
     best = None
     for p0 in _candidates(beat_act, tempo_probs, region):
-        phase, period, k, resid, inl = _fit_grid(t, w, p0)
-        if not (150.0 <= period <= 1500.0):
+        phase, period, _, _, inl = _fit_grid(t, w, refine_period(t, w, p0))
+        if not (150.0 <= period <= 1500.0) or inl.sum() < 4:
             continue
-        prior = tempo_probs[int(np.clip(round(math.log2(max(60000 / period, 40) / 40) / 0.05), 0, TEMPO_BINS - 1))]
-        s = _score(beat_act, t, w, phase, period, region, prior)
+        s = (_score(beat_act, t, w, phase, period, region, tempo_probs[_tempo_bin(period)])
+             + EXPLAIN_W * explained(t, w, phase, period))
         if best is None or s > best[0]:
-            best = (s, phase, period, resid, inl)
-    _, phase, period, resid, inl = best
-    p90 = np.percentile(np.abs(resid[inl]), 90) if inl.sum() else 1e9
-    coverage = inl.mean() if len(inl) else 0.0
-    if p90 <= CONST_P90_MS and coverage >= 0.7:
-        segments = [(t[inl], w[inl], phase, period)]
-    else:
-        segments = _segment(t, w, tempo_probs) or [(t[inl], w[inl], phase, period)]
+            best = (s, phase, period, inl)
+    if best is None:
+        return [RedLineFit(region[0], 500.0, 4)]
+    _, phase, period, inl = best
+    const = _lines_from_segments([(t[inl], w[inl], phase, period)], down_act, region)
+    q_const = _fit_quality(const, t, w, region)
+    if q_const >= Q_MIN:
+        return const
+    segments = _segment(t, w, tempo_probs)
+    if not segments:
+        return const
+    split = _lines_from_segments(segments, down_act, region)
+    return split if _fit_quality(split, t, w, region) >= q_const + SPLIT_GAIN else const
+
+
+def _lines_from_segments(segments, down_act, region) -> list[RedLineFit]:
     lines = []
     for i, (ts, ws, ph, per) in enumerate(segments):
         n_beats = max(1, int((ts[-1] - ts[0]) / per))
@@ -244,13 +311,26 @@ def beat_times(lines, start: float, end: float) -> np.ndarray:
 
 
 def drift_report(pred_lines, human_lines, region) -> dict[str, float]:
-    """Errors of human beats against the predicted grid, with tempo-ratio classification."""
+    """Errors of human beats against the predicted grid, with tempo-ratio classification.
+
+    ``shift_ms`` is the grid's constant offset against the human one (median of predicted - human, > 0 =
+    predicted later); ``shape_*`` are the errors after removing it. They are reported separately because
+    a single human chart's offset is itself uncertain: against the audio's onsets, human offsets scatter
+    with an IQR of ~7 ms across songs, while T's grids scatter by ~2 ms, and 0.93 of the correlation in
+    T's constant shifts is with that human scatter (val, 2026-11-25).
+    """
     hb = beat_times(human_lines, *region)
     pb = beat_times(pred_lines, region[0] - 2000, region[1] + 2000)
     if len(hb) < 4 or len(pb) < 4:
-        return {"ok": False, "ratio": float("nan"), "max_ms": float("inf"), "median_ms": float("inf")}
+        return {"ok": False, "ratio": float("nan"), "max_ms": float("inf"), "median_ms": float("inf"),
+                "shift_ms": float("nan"), "shape_max_ms": float("inf"), "shape_median_ms": float("inf")}
     idx = np.clip(np.searchsorted(pb, hb), 1, len(pb) - 1)
-    err = np.minimum(np.abs(hb - pb[idx - 1]), np.abs(hb - pb[idx]))
+    lo, hi = pb[idx - 1], pb[idx]
+    signed = np.where(np.abs(hb - lo) <= np.abs(hb - hi), lo, hi) - hb
+    err = np.abs(signed)
+    shift = float(np.median(signed))
+    shape = np.abs(signed - shift)
     ratio = np.median(np.diff(hb)) / np.median(np.diff(pb))
     return {"ok": True, "ratio": float(ratio), "max_ms": float(err.max()), "median_ms": float(np.median(err)),
-            "p95_ms": float(np.percentile(err, 95))}
+            "p95_ms": float(np.percentile(err, 95)), "shift_ms": shift, "shape_max_ms": float(shape.max()),
+            "shape_median_ms": float(np.median(shape))}

@@ -53,6 +53,65 @@ class TempoTest(unittest.TestCase):
         rep = drift_report(lines, human, (500.0, 68000.0))
         self.assertLessEqual(rep["median_ms"], 3.0)
 
+    # Failure modes measured on 1,106 held-out songs (2026-11-25): the old fit split 9.6% of steady songs
+    # into several red lines and could pick half tempo on the tempo prior alone. Activations here look
+    # like T's on real songs: uneven peak heights, timing jitter, optional half-beat peaks.
+    def _steady(self, bpm, seconds, prior_bpm=None, offbeat=0.0, jitter=1.5, seed=0, priors=None):
+        rng = np.random.default_rng(seed)
+        period, phase = 60000.0 / bpm, 321.0
+        n = int(seconds * 1000 / FRAME_MS)
+        beats = phase + period * np.arange(int((seconds * 1000 - 600) / period))
+        idx = np.arange(n)
+        act = np.zeros(n, np.float32)
+        times = [(b, rng.uniform(0.6, 0.95)) for b in beats]
+        if offbeat:
+            times += [(b + period / 2, offbeat * rng.uniform(0.6, 1.1)) for b in beats]
+        for t, h in times:
+            c = (t + rng.normal(0, jitter)) / FRAME_MS
+            lo, hi = max(0, int(c) - 8), min(n, int(c) + 9)
+            act[lo:hi] = np.maximum(act[lo:hi], h * np.exp(-0.5 * ((idx[lo:hi] - c) / 1.5) ** 2))
+        tempo = np.full(TEMPO_BINS, 1e-3)
+        for b, p in priors or ((prior_bpm or bpm, 1.0),):
+            tempo[tempo_bin(b)] = p
+        region = (1000.0, seconds * 1000 - 1000)
+        lines = fit_red_lines(act, _activation(beats[::4], n, seed=1), tempo / tempo.sum(), region)
+        return lines, drift_report(lines, [RedLineFit(phase, period, 4)], region)
+
+    def test_jittery_peaks_do_not_split_a_steady_song(self):
+        for seed in (0, 1):
+            lines, rep = self._steady(126.0, 240, jitter=7.0, seed=seed)
+            self.assertEqual(len(lines), 1, f"seed {seed}")
+            self.assertLess(abs(rep["ratio"] - 1), 1e-3)
+            self.assertLessEqual(rep["shape_max_ms"], 5.0)
+
+    def test_strong_half_beat_peaks_do_not_split_a_steady_song(self):
+        for seed in (0, 1):
+            lines, rep = self._steady(126.0, 240, offbeat=0.7, jitter=7.0, seed=seed)
+            self.assertEqual(len(lines), 1, f"seed {seed}")
+            self.assertLess(abs(rep["ratio"] - 1), 1e-3)
+
+    def test_long_fast_song_gets_the_exact_bpm_from_a_coarse_tempo_guess(self):
+        lines, rep = self._steady(220.0, 300, prior_bpm=214.0, jitter=4.0)   # tempo bins are ~3.5% apart
+        self.assertEqual(len(lines), 1)
+        self.assertAlmostEqual(60000 / lines[0].beat_ms, 220.0, places=2)
+        self.assertLessEqual(rep["shape_max_ms"], 5.0)
+
+    def test_beat_peaks_outvote_a_leaning_half_tempo_prior(self):
+        # T's song-level tempo guess leans to half tempo (55% vs 30%), but its beat detector fires on every
+        # full-tempo beat. Half tempo lands on beats too, so only the beat-peak term can break the tie.
+        lines, rep = self._steady(180.0, 120, priors=((90.0, 0.55), (180.0, 0.30)))
+        self.assertEqual(len(lines), 1)
+        self.assertLess(abs(rep["ratio"] - 1), 1e-3)
+
+    def test_drift_report_separates_constant_shift_from_shape(self):
+        human = [RedLineFit(1000.0, 500.0, 4)]
+        rep = drift_report([RedLineFit(1007.0, 500.0, 4)], human, (2000.0, 60000.0))
+        self.assertAlmostEqual(rep["shift_ms"], 7.0, places=6)
+        self.assertAlmostEqual(rep["median_ms"], 7.0, places=6)
+        self.assertLess(rep["shape_max_ms"], 1e-6)
+        rep = drift_report([RedLineFit(1000.0, 500.05, 4)], human, (2000.0, 60000.0))   # drifting grid
+        self.assertGreater(rep["shape_max_ms"], 2.0)
+
 
 def _rhythm_batch(b=2, l=40, K=4, T=3000):
     torch.manual_seed(0)
